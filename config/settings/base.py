@@ -77,6 +77,7 @@ LOCAL_APPS = [
     "vanir.blockchain.apps.BlockchainConfig",
     "vanir.token.apps.TokenConfig",
     "vanir.account.apps.AccountConfig",
+    "vanir.utils.apps.UtilsConfig"
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

@@ -33,8 +33,12 @@ class ObjectListView(SingleTableView):
 class ObjectUpdateView(UpdateView):
     model = None
     fields = '__all__'
-    template_name_suffix = '_update_form'
+    template_name = "object_update.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["model_name"] = self.model.__name__.lower()
+        return context
 
 @method_decorator(login_required, name='dispatch')
 class ObjectDetailView(DetailView):

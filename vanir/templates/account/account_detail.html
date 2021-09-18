@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+
+  <div class="float-right">
+    <div class="btn-toolbar" role="toolbar" aria-label="Buttons">
+      <div class="btn-group mr-2" role="group" aria-label="Edit">
+        <a class="btn btn-warning float-right" href="{% url 'account:account_update' account.pk %}" role="button">Edit</a>
+      </div>
+      <div class="btn-group mr-2" role="group" aria-label="Delete">
+        <a class="btn btn-danger btn-outline float-right" href="{% url 'account:account_delete' account.pk %}" role="button">Delete</a>
+      </div>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Exchange</th>
+          <th scope="col">User</th>
+          <th scope="col">tld</th>
+          <th scope="col">default_fee_rate</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">{{ account.exchange.name }}</th>
+          <td>{{ account.user.name }}</td>
+          <td>{{ account.tld }}</td>
+          <td>{{ account.default_fee_rate }}</td>
+        </tr>
+        </tbody>
+      </table>
+  </div>
+</div>
+{% endblock %}
