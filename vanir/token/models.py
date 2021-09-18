@@ -13,6 +13,14 @@ class Coin(models.Model):
     def __str__(self):
         return self.symbol
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('token:coin_detail', kwargs={'pk': self.pk})
+
 
 class Token(Coin):
     token_type = models.CharField(max_length=9, choices=TokenTypes.choices)
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('token:token_detail', kwargs={'pk': self.pk})

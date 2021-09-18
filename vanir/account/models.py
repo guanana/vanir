@@ -20,7 +20,7 @@ class Account(models.Model):
     tld = models.CharField(max_length=10, default="com")
     password = models.CharField(max_length=250, blank=True, null=True)
     default_fee_rate = models.DecimalField(
-        max_digits=30, decimal_places=4, default=Decimal(0.1)
+        max_digits=30, decimal_places=4, default=Decimal(0.0100)
     )
 
     @property
@@ -29,3 +29,8 @@ class Account(models.Model):
 
     def __str__(self):
         return f"{self.pk}: {self.exchange} - {self.user.get_username()}"
+
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('account:account_detail', kwargs={'pk': self.pk})

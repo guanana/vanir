@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="py-5 text-center">
+        <img class="d-block mx-auto mb-4" src="../../static/images/{{ model_name }}/{{ model_name }}.png" alt="{{ model_name }}" width="30%" height="30%">
+        <h2>Add {{ model_name }}</h2>
+        <p class="lead">Please fill all the fields to create a new {{ model_name }} on the system</p>
+</div>
+
+<div class="container">
+  <form method="post">
+    {% csrf_token %}
+  {% for field in form %}
+      <div class="form-group">
+        <div class="col-md-6 mb-3">
+          {{ field.errors }}
+          <label>{{ field.label_tag }}</label>
+          {{ field }}
+        </div>
+      </div>
+  {% endfor %}
+    <input class="btn btn-primary" type="submit" value="Submit">
+  </form>
+</div>
+
+{% endblock content %}

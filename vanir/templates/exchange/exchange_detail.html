@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+
+  <div class="float-right">
+    <div class="btn-toolbar" role="toolbar" aria-label="Buttons">
+      <div class="btn-group mr-2" role="group" aria-label="Edit">
+        <a class="btn btn-warning float-right" href="{% url 'exchange:exchange_update' exchange.pk %}" role="button">Edit</a>
+      </div>
+      <div class="btn-group mr-2" role="group" aria-label="Delete">
+        <a class="btn btn-danger btn-outline float-right" href="{% url 'exchange:exchange_delete' exchange.pk %}" role="button">Delete</a>
+      </div>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Native Token</th>
+          <th scope="col">Default Fee</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">{{ exchange.name }}</th>
+          <td>{{ exchange.native_token }}</td>
+          <td>{{ exchange.default_fee }}</td>
+        </tr>
+        </tbody>
+      </table>
+  </div>
+</div>
+{% endblock %}

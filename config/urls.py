@@ -9,14 +9,15 @@ from rest_framework.authtoken.views import obtain_auth_token
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
-    path(
-        "about/", TemplateView.as_view(template_name="pages/about.html"), name="about"
-    ),
-    # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
     # User management
     path("users/", include("vanir.users.urls", namespace="users")),
-    path("accounts/", include("allauth.urls")),
+    path("account/", include("vanir.account.urls", namespace="account")),
+    path("exchange/", include("vanir.exchange.urls", namespace="exchange")),
+    path("blockchain/", include("vanir.blockchain.urls", namespace="blockchain")),
+    path("token/", include("vanir.token.urls", namespace="token")),
+
+
     # Your stuff: custom urls includes go here
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 if settings.DEBUG:

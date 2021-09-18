@@ -1,1 +1,114 @@
 {% extends "base.html" %}
+{% block content %}
+{% load static %}
+<header>
+  <div class="collapse bg-dark" id="navbarHeader">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-8 col-md-7 py-4">
+          <h4 class="text-white">About</h4>
+          <p class="text-muted">This project started to help normal people to manage their crypto activities, feel free to contribute!</p>
+        </div>
+        <div class="col-sm-4 offset-md-1 py-4">
+          <h4 class="text-white">Contact</h4>
+          <ul class="list-unstyled">
+            <li><a href="#" class="text-white">Email me</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="navbar navbar-dark bg-dark shadow-sm">
+    <div class="container d-flex justify-content-between">
+      <a href="#" class="navbar-brand d-flex align-items-center">
+        <strong>Vanir</strong>
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main role="main">
+
+  <section class="jumbotron text-center">
+    <div class="container">
+      <h1>Welcome to your personal Open Source Crypto Manager</h1>
+      <p class="lead text-muted">The application depend on different entities to be created before you can start operating. You need to create some basic entries to start playing around</p>
+      <p>
+        <a href="{% url 'blockchain:blockchain_add' %}" class="btn btn-primary my-2">Create a Blockchain</a>
+        <a href="{% url 'token:token_add' %}" class="btn btn-primary my-2">Create a Token</a>
+        <a href="{% url 'exchange:exchange_add' %}" class="btn btn-primary my-2">Create an Exchange</a>
+        <a href="{% url 'account:account_add' %}" class="btn btn-primary my-2">Create an Account</a>
+      </p>
+    </div>
+  </section>
+
+  <div class="album py-5 bg-light">
+    <div class="container">
+
+      <div class="row">
+        <div class="col-md-4">
+          <div class="card mb-4 shadow-sm">
+            <img src="../../static/images/blockchain/home.png" class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Blockchain"><title>Blockchain</title><rect width="100%" height="100%" fill="#55595c"/></img>
+            <div class="card-body">
+              <p class="card-text">Blockchain seems complicated, and it definitely can be, but its core concept is really quite simple. A blockchain is a type of database. </p>
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="btn-group">
+                  <a href="{% url 'blockchain:blockchain_add' %}" type="button" class="btn btn-sm btn-outline-secondary">Add</a>
+                  <a href="{% url 'blockchain:blockchain_list' %}"type="button" class="btn btn-sm btn-outline-secondary">View</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card mb-4 shadow-sm">
+            <img src="../../static/images/token/home.png" class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Token"><title>Token</title><rect width="100%" height="100%" fill="#55595c"/></img>
+            <div class="card-body">
+              <p class="card-text">Cryptocurrencies are denominated into these tokens, which reside on their own blockchains. Crypto tokens represent a certain unit of value. </p>
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="btn-group">
+                  <a href="{% url 'token:token_add' %}" type="button" class="btn btn-sm btn-outline-secondary">Add</a>
+                  <a href="{% url 'token:token_list' %}"type="button" class="btn btn-sm btn-outline-secondary">View</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card mb-4 shadow-sm">
+            <img src="../../static/images/exchange/home.png" class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Exchange"><title>Exchange</title><rect width="100%" height="100%" fill="#55595c"/></img>
+            <div class="card-body">
+              <p class="card-text">A crypto exchange is a business that allows customers to trade cryptocurrencies for fiat money or other digital currencies.</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="btn-group">
+                  <a href="{% url 'exchange:exchange_add' %}" type="button" class="btn btn-sm btn-outline-secondary">Add</a>
+                  <a href="{% url 'exchange:exchange_list' %}"type="button" class="btn btn-sm btn-outline-secondary">View</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card mb-4 shadow-sm">
+            <img src="../../static/images/account/home.png" class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Account"><title>Account</title><rect width="100%" height="100%" fill="#55595c"/></img>
+            <div class="card-body">
+              <p class="card-text">An account is where you will define the credentials for your different Exchange accounts and create "profiles".</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="btn-group">
+                  <a href="{% url 'account:account_add' %}" type="button" class="btn btn-sm btn-outline-secondary">Add</a>
+                  <a href="{% url 'account:account_list' %}"type="button" class="btn btn-sm btn-outline-secondary">View</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+{%endblock content %}
