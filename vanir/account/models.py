@@ -12,7 +12,6 @@ class Account(models.Model):
     """
     Exchange Account
     """
-
     exchange = models.ForeignKey(Exchange, on_delete=models.CASCADE, null=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     api_key = models.CharField(max_length=250)
@@ -22,6 +21,9 @@ class Account(models.Model):
     default_fee_rate = models.DecimalField(
         max_digits=30, decimal_places=4, default=Decimal(0.0100)
     )
+    @property
+    def name(self):
+        return f"{self.pk:02}-{self.exchange}-{self.user.get_username()}"
 
     @property
     def get_account_client(self):
@@ -30,6 +32,9 @@ class Account(models.Model):
     def __str__(self):
         return f"{self.pk}: {self.exchange} - {self.user.get_username()}"
 
+    # def save(self, *args, **kwargs):
+    #     self.name = f"{self.pk:02}-{self.exchange}-{self.user.get_username()}"
+    #     super(Account, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         from django.urls import reverse
