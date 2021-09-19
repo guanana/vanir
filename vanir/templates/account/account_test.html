@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load filtertemplates %}
+
+{% block content %}
+<div class="container">
+  {% if con %}
+    <div class="p-3 mb-2 bg-success text-center text-white">
+      All good
+    </div>
+  {% else %}
+    <div class="p-3 mb-2 bg-danger text-center text-white">
+      Please check your api key and api secret, the test fail
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
