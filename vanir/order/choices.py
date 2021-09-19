@@ -1,0 +1,16 @@
+from django.db import models
+
+
+class OrderSide(models.TextChoices):
+    SIDE_BUY = 'BUY'
+    SIDE_SELL = 'SELL'
+
+
+class OrderType(models.TextChoices):
+    ORDER_TYPE_LIMIT = 'LIMIT'
+    ORDER_TYPE_MARKET = 'MARKET'
+    ORDER_TYPE_STOP_LOSS = 'STOP_LOSS'
+    ORDER_TYPE_STOP_LOSS_LIMIT = 'STOP_LOSS_LIMIT'
+    ORDER_TYPE_TAKE_PROFIT = 'TAKE_PROFIT'
+    ORDER_TYPE_TAKE_PROFIT_LIMIT = 'TAKE_PROFIT_LIMIT'
+    ORDER_TYPE_LIMIT_MAKER = 'LIMIT_MAKER'

@@ -1,20 +1,11 @@
-from decimal import Decimal
 from django.db import models
 from vanir.token.models import Token
+from vanir.utils.models import BaseObject
 
 
-class Exchange(models.Model):
+class Exchange(BaseObject):
     name = models.CharField(max_length=250)
     default_fee = models.DecimalField(
-        max_digits=30, decimal_places=4, default=Decimal(0.1)
+        max_digits=30, decimal_places=4, default=0.1
     )
     native_token = models.ForeignKey(Token, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.name
-
-    def get_absolute_url(self):
-        from django.urls import reverse
-        return reverse('exchange:exchange_detail', kwargs={'pk': self.pk})
-
-

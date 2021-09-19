@@ -2,9 +2,10 @@ from django.db import models
 
 from vanir.blockchain.models import Blockchain
 from vanir.token.choices import TokenTypes
+from vanir.utils.models import BaseObject
 
 
-class Coin(models.Model):
+class Coin(BaseObject):
     name = models.CharField(max_length=40)
     symbol = models.CharField(max_length=6)
     blockchain = models.ForeignKey(Blockchain, on_delete=models.CASCADE)

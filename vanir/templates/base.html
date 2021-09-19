@@ -43,38 +43,7 @@
 
   <body>
 
-    <div class="mb-1">
-      <nav class="navbar navbar-expand-md navbar-light bg-light">
-        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <a class="navbar-brand" href="{% url 'home' %}">Vanir</a>
-
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item {% if request.resolver_match.view_name == 'home' %}active{% endif %}">
-              <a class="nav-link" href="{% url 'home' %}">Home <span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item {% if request.resolver_match.view_name == 'blockchain:blockchain_list' %}active{% endif %}">
-              <a class="nav-link" href="{% url 'blockchain:blockchain_list' %}">Blockchain</a>
-            </li>
-            </li>
-            <li class="nav-item {% if request.resolver_match.view_name == 'token:token_list' %}active{% endif %}">
-              <a class="nav-link" href="{% url 'token:token_list' %}">Token</a>
-            </li>
-            </li>
-            <li class="nav-item {% if request.resolver_match.view_name == 'exchange:exchange_list' %}active{% endif %}">
-              <a class="nav-link" href="{% url 'exchange:exchange_list' %}">Exchange</a>
-            </li>
-            <li class="nav-item {% if request.resolver_match.view_name == 'account:account_list' %}active{% endif %}">
-              <a class="nav-link" href="{% url 'account:account_list' %}">Account</a>
-            </li>
-          </ul>
-        </div>
-      </nav>
-
-    </div>
-
+    {% include "menu.html" %}
     <div class="container">
 
       {% if messages %}

@@ -7,8 +7,10 @@ from vanir.users.admin import User
 from binance.client import Client
 from binance.exceptions import BinanceAPIException
 
+from vanir.utils.models import BaseObject
 
-class Account(models.Model):
+
+class Account(BaseObject):
     """
     Exchange Account
     """
@@ -19,7 +21,7 @@ class Account(models.Model):
     tld = models.CharField(max_length=10, default="com")
     password = models.CharField(max_length=250, blank=True, null=True)
     default_fee_rate = models.DecimalField(
-        max_digits=30, decimal_places=4, default=Decimal(0.0100)
+        max_digits=30, decimal_places=4, default=0.01
     )
     @property
     def name(self):
@@ -28,14 +30,3 @@ class Account(models.Model):
     @property
     def get_account_client(self):
         return Client(api_key=self.api_key, api_secret=self.secret, tld=self.tld)
-
-    def __str__(self):
-        return f"{self.pk}: {self.exchange} - {self.user.get_username()}"
-
-    # def save(self, *args, **kwargs):
-    #     self.name = f"{self.pk:02}-{self.exchange}-{self.user.get_username()}"
-    #     super(Account, self).save(*args, **kwargs)
-
-    def get_absolute_url(self):
-        from django.urls import reverse
-        return reverse('account:account_detail', kwargs={'pk': self.pk})

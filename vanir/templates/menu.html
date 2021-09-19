@@ -1,0 +1,29 @@
+ <div class="mb-1">
+    <nav class="navbar navbar-expand-md navbar-light bg-light">
+       <div class="collapse navbar-collapse">
+          <a class="btn btn-success" href="{% url 'home' %}">Vanir</a>
+        </div>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            {% for key, app_value in apps.items %}
+              <div class="row">
+                <div class="col-sm">
+                  <div class="btn-toolbar">
+                    <div class="btn-group">
+                      <a href="{% url app_value.list %}" class="btn btn-primary">{{key}}</a>
+                      <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                      <div class="dropdown-menu">
+                        <a class="dropdown-item" href="{% url app_value.list %}">List</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url app_value.add %}">Add</a>
+                      </div>
+                    </div>
+                    <div class="container"> </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+        </ul>
+      </div>
+    </nav>
+ </div>

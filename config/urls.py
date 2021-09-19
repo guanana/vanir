@@ -4,11 +4,12 @@ from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path
 from django.views import defaults as default_views
-from django.views.generic import TemplateView
 from rest_framework.authtoken.views import obtain_auth_token
 
+from vanir.utils.views import HomeView
+
 urlpatterns = [
-    path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
+    path("", HomeView.as_view(), name="home"),
     path(settings.ADMIN_URL, admin.site.urls),
     # User management
     path("users/", include("vanir.users.urls", namespace="users")),
@@ -16,6 +17,8 @@ urlpatterns = [
     path("exchange/", include("vanir.exchange.urls", namespace="exchange")),
     path("blockchain/", include("vanir.blockchain.urls", namespace="blockchain")),
     path("token/", include("vanir.token.urls", namespace="token")),
+    path("order/", include("vanir.order.urls", namespace="order")),
+
 
 
     # Your stuff: custom urls includes go here
