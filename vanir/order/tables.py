@@ -1,8 +1,10 @@
+from django_tables2 import tables
 from .models import Order
-from vanir.utils.tables import ObjectTable
+
+# Orders are not allowed to be edited (at least for now, that's why not inheriting from utils like rest of obj
 
 
-class OrderTable(ObjectTable):
+class OrderTable(tables.Table):
     class Meta:
         model = Order
         template_name = "django_tables2/bootstrap.html"

@@ -12,5 +12,6 @@ class OrderListView(ObjectListView):
     model = Order
     table_class = OrderTable
 
+
 class OrderDetailView(ObjectDetailView):
     model = Order
