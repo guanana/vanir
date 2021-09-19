@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 {% load filtertemplates %}
+{% load static %}
 {% block content %}
 <div class="py-5 text-center">
-        <img class="d-block mx-auto mb-4" src="../../../static/images/{{ model_name }}/{{ model_name }}.png" alt="{{ model_name }}" width="30%" height="30%">
-        <h2>Edit {{ model_name }}</h2>
+        {% with "images/"|add:model_name|add:"/"|add:model_name|add:".png" as image_path %}
+        <img class="d-block mx-auto mb-4" src="{% static image_path %}" alt="{{ model_name }}" width="30%" height="30%">
+        {% endwith %}        <h2>Edit {{ model_name }}</h2>
         <p class="lead">Edit the desired fields on the {{ model_name }}</p>
 </div>
 
