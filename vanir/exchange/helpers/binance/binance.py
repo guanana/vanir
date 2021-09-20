@@ -3,15 +3,17 @@ from binance import Client
 from binance.exceptions import BinanceAPIException
 
 from vanir.account.models import Account
-from vanir.blockchain.models import Blockchain
 from vanir.exchange.helpers.main import BasicExchange
+from vanir.exchange.models import Exchange
 from vanir.utils.helpers import change_table_align, change_table_style
 
 
 class VanirBinance(BasicExchange):
     def __init__(self, account: Account):
         self.all_margin_assets = {}
-        self.default_blockchain = Blockchain.objects.get_or_create(name="Binance")
+        self.default_blockchain = Exchange.objects.get(
+            name__startswith="Binance"
+        ).default_blockchain
         super().__init__(account)
 
     @property
