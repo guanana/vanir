@@ -1,6 +1,11 @@
-{% extends "base.html" %}
+{% extends "object_base.html" %}
 {% load django_tables2 %}
+{% block title %}
+List {{ model_name }}
+{% endblock title %}
+
 {% block content %}
+{{ block.super }}
   <div class="float-right">
 
     <div class="btn-toolbar" role="toolbar" aria-label="Buttons">

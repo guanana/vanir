@@ -5,17 +5,18 @@
         </div>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-            {% for key, app_value in apps.items %}
+          {% with 'Exchange Blockchain Token Account Order' as list %}
+            {% for app in list.split %}
               <div class="row">
                 <div class="col-sm">
                   <div class="btn-toolbar">
                     <div class="btn-group">
-                      <a href="{% url app_value.list %}" class="btn btn-primary">{{key}}</a>
+                      <a href="{% url app|add:":"|add:app|add:"_list"|lower %}" class="btn btn-primary">{{app}}</a>
                       <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
                       <div class="dropdown-menu">
-                        <a class="dropdown-item" href="{% url app_value.list %}">List</a>
+                        <a class="dropdown-item" href="{% url app|add:":"|add:app|add:"_list"|lower %}">List</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{% url app_value.add %}">Add</a>
+                        <a class="dropdown-item" href="{% url app|add:":"|add:app|add:"_add"|lower %}">Add</a>
                       </div>
                     </div>
                     <div class="container"> </div>
@@ -23,6 +24,7 @@
                 </div>
               </div>
             {% endfor %}
+          {% endwith %}
         </ul>
       </div>
     </nav>

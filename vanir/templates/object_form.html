@@ -1,7 +1,12 @@
-{% extends "base.html" %}
+{% extends "object_base.html" %}
 {% load filtertemplates %}
 {% load static %}
+{% block title %}
+Add new {{ model_name }}
+{% endblock title %}
+
 {% block content %}
+{{ block.super }}
 <div class="py-5 text-center">
         {% with "images/"|add:model_name|add:"/"|add:model_name|add:".png" as image_path %}
         <img class="d-block mx-auto mb-4" src="{% static image_path %}" alt="{{ model_name }}" width="30%" height="30%">
@@ -19,6 +24,9 @@
           {{ field.errors }}
           <label>{{ field.label_tag }}</label>
           {{ field|add_class:"form-control form-control-lg" }}
+          {% if "Exchange" in field.label_tag and SUPPORTED_EXCHANGES %}
+            <text class="small"> Only exchange(s) supported for advance features: {{ SUPPORTED_EXCHANGES }}</text>
+          {% endif %}
         </div>
       </div>
   {% endfor %}
