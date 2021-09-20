@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.generic import TemplateView
 
 from .views import (
     AccountCreateView,
@@ -22,5 +23,10 @@ urlpatterns = [
     path("<int:pk>/balance/", exchange_balanceview, name="account_balance"),
     path(
         "<int:pk>/balance/import/", exchange_importtokens, name="account_balance_import"
+    ),
+    path(
+        "<int:pk>/more/",
+        TemplateView.as_view(template_name="account/account_more.html"),
+        name="account_more",
     ),
 ]
