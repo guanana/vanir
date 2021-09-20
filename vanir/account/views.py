@@ -25,6 +25,15 @@ class AccountCreateView(ObjectCreateView):
         "default_fee_rate",
     )
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from vanir.exchange.utils import SUPPORTED_EXCHANGES
+
+        context["SUPPORTED_EXCHANGES"] = ""
+        for key, v in SUPPORTED_EXCHANGES.items():
+            context["SUPPORTED_EXCHANGES"] += key
+        return context
+
 
 class AccountListView(ObjectListView):
     model = Account
