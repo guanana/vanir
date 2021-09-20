@@ -3,12 +3,15 @@ from binance import Client
 from binance.exceptions import BinanceAPIException
 
 from vanir.account.models import Account
+from vanir.blockchain.models import Blockchain
 from vanir.exchange.helpers.main import BasicExchange
 from vanir.utils.helpers import change_table_align, change_table_style
 
 
 class VanirBinance(BasicExchange):
     def __init__(self, account: Account):
+        self.all_margin_assets = {}
+        self.default_blockchain = Blockchain.objects.get_or_create(name="Binance")
         super().__init__(account)
 
     @property
@@ -22,7 +25,7 @@ class VanirBinance(BasicExchange):
         except BinanceAPIException:
             return False
 
-    def get_balance(self):
+    def get_balance(self) -> pd.DataFrame:
         account = self.con.get_account()
         balance = [
             asset
@@ -33,6 +36,19 @@ class VanirBinance(BasicExchange):
             )
         ]
         df = pd.DataFrame(balance).sort_values(by=["free"], ascending=False)
+        return df
+
+    def get_balance_html(self):
+        df = self.get_balance()
         response = change_table_style(df.to_html(classes="table table-striped"))
         response = change_table_align(response)
         return response
+
+    def get_all_assets(self):
+        if not self.all_margin_assets:
+            margin_assets = self.con.get_margin_all_assets()
+            for asset in margin_assets:
+                self.all_margin_assets.update(
+                    {asset["assetName"]: asset["assetFullName"]}
+                )
+        return self.all_margin_assets

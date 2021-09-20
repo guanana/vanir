@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+<a href="{{ request.path|add:"import" }}" class="btn btn-success">Import tokens?</a>
 <div class="table-responsive">
   {% autoescape off %}
     {{ con }}

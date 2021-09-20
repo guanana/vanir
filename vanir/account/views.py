@@ -1,11 +1,9 @@
-from django.http import HttpResponse
-from django.template import loader
 from django.urls import reverse_lazy
 
 from vanir.account.models import Account
 from vanir.account.tables import AccountTable
-from vanir.exchange.utils import SUPPORTED_EXCHANGES
-from vanir.utils.helpers import get_nav_menu
+from vanir.account.utils import exchange_view_render, get_exchange
+from vanir.token.helpers.import_utils import token_import
 from vanir.utils.views import (
     ObjectCreateView,
     ObjectDeleteView,
@@ -46,27 +44,24 @@ class AccountDeleteView(ObjectDeleteView):
     success_url = reverse_lazy("account:account_list")
 
 
-def exchangetestview(request, pk):
-    account = Account.objects.get(pk=pk)
-    classname = SUPPORTED_EXCHANGES[account.exchange.name]
-    exchange_obj = classname(account)
+def exchange_testview(request, pk):
+    exchange_obj = get_exchange(pk)
     response = exchange_obj.test()
-    template = loader.get_template("account/account_test.html")
-    context = {
-        "con": response,
-    }
-    context = get_nav_menu(context)
-    return HttpResponse(template.render(context, request))
+    return exchange_view_render("account/account_test.html", response, request)
 
 
-def exchangebalanceview(request, pk):
+def exchange_balanceview(request, pk):
+    exchange_obj = get_exchange(pk)
+    response = exchange_obj.get_balance_html()
+    return exchange_view_render("account/account_balance.html", response, request)
+
+
+def exchange_importtokens(request, pk):
     account = Account.objects.get(pk=pk)
-    classname = SUPPORTED_EXCHANGES[account.exchange.name]
-    exchange_obj = classname(account)
-    response = exchange_obj.get_balance()
-    template = loader.get_template("account/account_balance.html")
-    context = {
-        "con": response,
-    }
-    context = get_nav_menu(context)
-    return HttpResponse(template.render(context, request))
+    exchange_obj = get_exchange(pk)
+    df = exchange_obj.get_balance()
+    response = []
+    for index, row in df.iterrows():
+        token_import(account, row["asset"], float(row["free"]) + float(row["locked"]))
+        response.append(row["asset"])
+    return exchange_view_render("account/account_import.html", response, request)
