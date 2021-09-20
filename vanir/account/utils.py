@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.template import loader
 
@@ -8,7 +9,13 @@ from vanir.utils.helpers import get_nav_menu
 
 def get_exchange(pk):
     account = Account.objects.get(pk=pk)
-    classname = SUPPORTED_EXCHANGES[account.exchange.name]
+    try:
+        classname = SUPPORTED_EXCHANGES[account.exchange.name]
+    except KeyError:
+        raise ValidationError(
+            f"Please create an account with a supported Exchange to get extra functionalities"
+            f"{[item for item in SUPPORTED_EXCHANGES.keys()]}"
+        )
     return classname(account)
 
 
