@@ -23,6 +23,7 @@ class AccountCreateView(ObjectCreateView):
         "tld",
         "password",
         "default_fee_rate",
+        "token_pair",
     )
 
     def get_context_data(self, **kwargs):
@@ -42,6 +43,7 @@ class AccountListView(ObjectListView):
 
 class AccountUpdateView(ObjectUpdateView):
     model = Account
+    # TODO: Fix selection of tokens
 
 
 class AccountDetailView(ObjectDetailView):

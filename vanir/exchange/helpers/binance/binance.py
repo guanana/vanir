@@ -1,8 +1,10 @@
 import pandas as pd
 from binance import Client
 from binance.exceptions import BinanceAPIException
+from django.core.exceptions import ValidationError
 
 from vanir.account.models import Account
+from vanir.blockchain.models import Blockchain
 from vanir.exchange.helpers.main import BasicExchange
 from vanir.exchange.models import Exchange
 from vanir.utils.helpers import change_table_align, change_table_style
@@ -11,10 +13,20 @@ from vanir.utils.helpers import change_table_align, change_table_style
 class VanirBinance(BasicExchange):
     def __init__(self, account: Account):
         self.all_margin_assets = {}
-        self.default_blockchain = Exchange.objects.get(
-            name__startswith="Binance"
-        ).default_blockchain
         super().__init__(account)
+
+    @property
+    def default_blockchain(self):
+        blockchain = Exchange.objects.get(name__startswith="Binance").default_blockchain
+        if not blockchain:
+            try:
+                return Blockchain.objects.get(name__startswith="Binance")
+            except Blockchain.DoesNotExist:
+                raise ValidationError(
+                    "You need to define a default blockchain on the exchange"
+                )
+        else:
+            return blockchain
 
     @property
     def con(self):
@@ -54,3 +66,6 @@ class VanirBinance(BasicExchange):
                     {asset["assetName"]: asset["assetFullName"]}
                 )
         return self.all_margin_assets
+
+
+# TODO: Get token value base on account.token_pair

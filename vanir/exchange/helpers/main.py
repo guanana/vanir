@@ -11,6 +11,10 @@ class BasicExchange(ABC):
         self.tld = account.tld
 
     @abstractmethod
+    def default_blockchain(self):
+        raise NotImplementedError
+
+    @abstractmethod
     def con(self):
         raise NotImplementedError
 

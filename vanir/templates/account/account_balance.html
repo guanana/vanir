@@ -6,7 +6,10 @@ Account Balance
 
 {% block content %}
 {{ block.super }}
-<a href="{{ request.path|add:"import" }}" class="btn btn-success">Import tokens?</a>
+  <div class="float-right">
+    <a href="{{ request.path|add:"import" }}" class="btn btn-success">Import tokens?</a>
+  </div>
+
 <div class="table-responsive">
   {% autoescape off %}
     {{ con }}

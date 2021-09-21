@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import SET_NULL
 
 from vanir.account.models_relation import AccountTokens
 from vanir.exchange.models import Exchange
@@ -22,6 +23,9 @@ class Account(BaseObject):
         max_digits=30, decimal_places=4, default=0.01
     )
     token = models.ManyToManyField(Token, through=AccountTokens)
+    token_pair = models.ForeignKey(
+        Token, on_delete=SET_NULL, null=True, related_name="token_pair"
+    )
 
     @property
     def name(self):

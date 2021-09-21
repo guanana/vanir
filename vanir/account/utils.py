@@ -3,10 +3,14 @@ from django.http import HttpResponse
 from django.template import loader
 
 from vanir.account.models import Account
+from vanir.exchange.helpers.main import BasicExchange
 from vanir.exchange.utils import SUPPORTED_EXCHANGES
 
 
-def get_exchange(pk):
+def get_exchange(pk) -> BasicExchange:
+    """
+    Return the Exchange object corresponding to the exchange selected in the account
+    """
     account = Account.objects.get(pk=pk)
     try:
         classname = SUPPORTED_EXCHANGES[account.exchange.name.split(" ")[0]]
