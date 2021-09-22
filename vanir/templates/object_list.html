@@ -13,6 +13,11 @@ List {{ model_name }}
       <div class="btn-group mr-2" role="group" aria-label="Add">
         <a class="btn btn-success float-right" href="{% url model_name|get_viewname:'add' %}" role="button">Add</a>
       </div>
+      {% if model_name == "token" %}
+      <div class="btn-group mr-2" role="group" aria-label="Add">
+        <a class="btn btn-warning float-right" href="{% url model_name|get_viewname:'bulk_update_price' %}" role="button">Bulk price update</a>
+      </div>
+      {% endif %}
     </div>
   </div>
 
