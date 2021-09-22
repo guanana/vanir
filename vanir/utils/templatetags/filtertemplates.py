@@ -6,6 +6,8 @@ from django.conf import settings
 from django.templatetags.static import static as templatetags_static
 from django.urls import NoReverseMatch, reverse
 
+from vanir.utils.helpers import fetch_default_account
+
 register = template.Library()
 
 
@@ -67,3 +69,8 @@ def get_model_image(model_name, image_name: str = ""):
 @register.filter()
 def get_model_name(model):
     return model._meta.model_name
+
+
+@register.simple_tag
+def default_pair_symbol():
+    return fetch_default_account().token_pair

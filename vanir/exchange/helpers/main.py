@@ -9,6 +9,7 @@ class BasicExchange(ABC):
         self.api_key = account.api_key
         self.api_secret = account.secret
         self.tld = account.tld
+        self.testnet = account.testnet
 
     @abstractmethod
     def default_blockchain(self):
