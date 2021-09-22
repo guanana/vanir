@@ -10,10 +10,17 @@ from vanir.exchange.models import Exchange
 from vanir.utils.helpers import change_table_align, change_table_style
 
 
-class VanirBinance(BasicExchange):
+class VanirBinance(BasicExchange, Client):
     def __init__(self, account: Account):
         self.all_margin_assets = {}
+        self.testnet = False
         super().__init__(account)
+        super(Client, self).__init__(
+            api_key=self.api_key,
+            api_secret=self.api_secret,
+            tld=self.tld,
+            testnet=self.testnet,
+        )
 
     @property
     def default_blockchain(self):
@@ -34,13 +41,13 @@ class VanirBinance(BasicExchange):
 
     def test(self):
         try:
-            self.con.get_account()
+            self.get_account()
             return True
         except BinanceAPIException:
             return False
 
     def get_balance(self) -> pd.DataFrame:
-        account = self.con.get_account()
+        account = self.get_account()
         balance = [
             asset
             for asset in account["balances"]
@@ -66,6 +73,3 @@ class VanirBinance(BasicExchange):
                     {asset["assetName"]: asset["assetFullName"]}
                 )
         return self.all_margin_assets
-
-
-# TODO: Get token value base on account.token_pair
