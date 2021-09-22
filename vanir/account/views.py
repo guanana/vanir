@@ -64,7 +64,12 @@ def exchange_testview(request, pk):
 def exchange_balanceview(request, pk):
     exchange_obj = get_exchange(pk)
     response = exchange_obj.get_balance_html()
-    return exchange_view_render("account/account_balance.html", response, request)
+    return exchange_view_render(
+        "account/account_balance.html",
+        response,
+        request,
+        object=Account.objects.get(pk=pk),
+    )
 
 
 def exchange_importtokens(request, pk):

@@ -1,5 +1,7 @@
 {% extends "object_base.html" %}
 {% load django_tables2 %}
+{% load filtertemplates %}
+
 {% block title %}
 List {{ model_name }}
 {% endblock title %}
@@ -9,7 +11,7 @@ List {{ model_name }}
 
     <div class="btn-toolbar" role="toolbar" aria-label="Buttons">
       <div class="btn-group mr-2" role="group" aria-label="Add">
-        <a class="btn btn-success float-right" href="{% url model_url %}" role="button">Add</a>
+        <a class="btn btn-success float-right" href="{% url model_name|get_viewname:'add' %}" role="button">Add</a>
       </div>
     </div>
   </div>

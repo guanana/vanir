@@ -22,9 +22,7 @@ def get_exchange(pk) -> BasicExchange:
     return classname(account)
 
 
-def exchange_view_render(template_name, response, request):
+def exchange_view_render(template_name, response, request, **kwargs):
     template = loader.get_template(template_name)
-    context = {
-        "con": response,
-    }
+    context = {"con": response, **kwargs}
     return HttpResponse(template.render(context, request))

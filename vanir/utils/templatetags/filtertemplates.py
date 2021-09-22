@@ -28,7 +28,10 @@ def validated_viewname(model, action):
     try:
         # Validate and return the view name. We don't return the actual URL yet because many of the templates
         # are written to pass a name to {% url %}.
-        reverse(viewname)
+        if action in ("balance_import", "edit", "more", "update", "delete"):
+            reverse(viewname, kwargs={"pk": model.pk})
+        else:
+            reverse(viewname)
         return viewname
     except NoReverseMatch:
         return None

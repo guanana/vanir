@@ -1,12 +1,13 @@
 {% extends "object_base.html" %}
 {% load static %}
+{% load filtertemplates %}
 {% block title %}
 Account Balance
 {% endblock title %}
 
 {% block content %}
   <div class="float-right">
-    <a href="{{ request.path|add:"import" }}" class="btn btn-success">Import tokens?</a>
+    <a href="{% url object|validated_viewname:'balance_import' object.pk %}" class="btn btn-success">Import tokens?</a>
   </div>
 
 <div class="table-responsive">
