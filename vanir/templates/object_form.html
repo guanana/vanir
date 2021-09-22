@@ -6,7 +6,6 @@ Add new {{ view.model|get_model_name }}
 {% endblock title %}
 
 {% block content %}
-{{ block.super }}
 <div class="py-5 text-center">
         <img class="d-block mx-auto mb-4" src="{% static view.model|get_model_name|get_model_image %}" alt="{{ view.model|get_model_name }}" width="30%" height="30%">
         <h2>Add {{ view.model|get_model_name }}</h2>
@@ -24,6 +23,9 @@ Add new {{ view.model|get_model_name }}
           {{ field|add_class:"form-control form-control-lg" }}
           {% if "Exchange" in field.label_tag and SUPPORTED_EXCHANGES %}
             <text class="small"> Only exchange(s) supported for advance features: {{ SUPPORTED_EXCHANGES }}</text>
+          {% endif %}
+          {% if "last_value" in field.label_tag %}
+            <text class="small"> Add the value in {% default_pair_symbol %} </text>
           {% endif %}
         </div>
       </div>
