@@ -9,6 +9,9 @@ Token Detail
   <div class="float-right">
     <div class="btn-toolbar" role="toolbar" aria-label="Buttons">
       <div class="btn-group mr-2" role="group" aria-label="Edit">
+        <a class="btn btn-warning float-right" href="{% url 'token:token_update_price' token.pk %}" role="button">Update Price</a>
+      </div>
+      <div class="btn-group mr-2" role="group" aria-label="Edit">
         <a class="btn btn-warning float-right" href="{% url 'token:token_update' token.pk %}" role="button">Edit</a>
       </div>
       <div class="btn-group mr-2" role="group" aria-label="Delete">
@@ -23,6 +26,7 @@ Token Detail
           <th scope="col">Symbol</th>
           <th scope="col">Name</th>
           <th scope="col">Blockchain</th>
+          <th scope="col">Last update price</th>
         </tr>
       </thead>
       <tbody>
@@ -30,6 +34,7 @@ Token Detail
           <th scope="row">{{ token.symbol }}</th>
           <td>{{ token.name }}</td>
           <td>{{ token.blockchain }}</td>
+          <td>{{ token.last_value }}</td>
         </tr>
         </tbody>
       </table>
