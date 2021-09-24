@@ -14,9 +14,12 @@ def change_table_align(table_html, align="center"):
 def fetch_default_account() -> Account:
     account = [account for account in Account.objects.all() if account.default]
     if not account:
-        raise ValidationError(
-            "At least one account should be default, please fix that!"
-        )
+        if Account.objects.count() > 0:
+            raise ValidationError(
+                "At least one account should be default, please fix that!"
+            )
+        else:
+            return None
     if len(account) > 1:
         raise ValidationError(
             "More than one account is labeled as default, please correct that first!"
