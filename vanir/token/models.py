@@ -1,4 +1,3 @@
-from binance.exceptions import BinanceAPIException
 from django.db import models
 
 from vanir.blockchain.models import Blockchain
@@ -29,24 +28,12 @@ class Coin(BaseObject):
         # Special exception when calling same pair
         if self.symbol == account.token_pair:
             return 0
-
         from vanir.account.utils import get_exchange
 
         exchange_obj = get_exchange(account.pk)
-        try:
-            price = exchange_obj.con.get_avg_price(
-                symbol=f"{self.symbol}{account.token_pair}"
-            )["price"]
-        except BinanceAPIException as binanceexception:
-            if binanceexception.code == -1121:
-                raise ValueError(
-                    f"Pair {self.symbol}{account.token_pair} not supported"
-                )
-
-        try:
-            self.last_value = float(price)
-        except ValueError:
-            raise ValueError("Something went wrong, try again later")
+        self.last_value = exchange_obj.get_token_price(
+            f"{self.symbol}{account.token_pair}"
+        )
         self.save()
         return self.last_value
 

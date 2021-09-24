@@ -73,3 +73,15 @@ class VanirBinance(BasicExchange, Client):
                     {asset["assetName"]: asset["assetFullName"]}
                 )
         return self.all_margin_assets
+
+    def get_token_price(self, pair):
+        try:
+            price = self.get_avg_price(symbol=f"{pair}")["price"]
+        except BinanceAPIException as binanceexception:
+            if binanceexception.code == -1121:
+                raise ValueError(f"Pair {pair} not supported")
+
+        try:
+            return float(price)
+        except ValueError:
+            return None
