@@ -26,3 +26,7 @@ class BasicExchange(ABC):
     @abstractmethod
     def get_balance(self):
         raise NotImplementedError
+
+    @abstractmethod
+    def all_assets_prices(self) -> dict:
+        pass
