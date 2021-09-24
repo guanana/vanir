@@ -2,9 +2,7 @@ import django_tables2 as tables
 
 
 class ObjectTable(tables.Table):
-    name = tables.TemplateColumn(
-        '<a href="{{record.get_absolute_url}}">{{record.name}}</a>'
-    )
+    name = tables.Column(linkify=True)
 
     class Meta:
         model = None
