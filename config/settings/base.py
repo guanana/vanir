@@ -72,6 +72,7 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
+    "vanir.users.apps.UsersConfig",
     "vanir.exchange.apps.ExchangeConfig",
     "vanir.blockchain.apps.BlockchainConfig",
     "vanir.token.apps.TokenConfig",
@@ -91,7 +92,16 @@ MIGRATION_MODULES = {"sites": "vanir.contrib.sites.migrations"}
 # AUTHENTICATION
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#authentication-backends
-AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.ModelBackend"]
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend"
+]
+# https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
+AUTH_USER_MODEL = "users.User"
+# https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
+LOGIN_REDIRECT_URL = "users:redirect"
+# https://docs.djangoproject.com/en/dev/ref/settings/#login-url
+LOGIN_URL = "account_login"
+
 # PASSWORDS
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#password-hashers
