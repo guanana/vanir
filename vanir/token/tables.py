@@ -7,9 +7,10 @@ from .models import Token
 
 
 class TokenTable(ObjectTable):
-    last_value = Column(
-        verbose_name=f"Last value in {fetch_default_account().token_pair}"
-    )
+    if fetch_default_account():
+        last_value = Column(
+            verbose_name=f"Last value in {fetch_default_account().token_pair}"
+        )
 
     class Meta:
         model = Token
