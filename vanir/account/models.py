@@ -4,10 +4,11 @@ from django.db.models import SET_NULL
 from django.utils.functional import cached_property
 
 from vanir.account.models_relation import AccountTokens
-from vanir.exchange.helpers.main import ExtendedExchangeRegistry
+from vanir.exchange.libs.exchanges import ExtendedExchangeRegistry
 from vanir.exchange.models import Exchange
 from vanir.token.models import Token
 from vanir.users.admin import User
+from vanir.utils.helpers import value_pair
 from vanir.utils.models import BaseObject
 
 
@@ -47,6 +48,9 @@ class Account(BaseObject):
             self.default = True
         super().save(*args, **kwargs)
 
+    def clear_tokens(self):
+        self.accounttokens_set.all().delete()
+
     @cached_property
     def exchange_obj(self):
         try:
@@ -65,14 +69,15 @@ class Account(BaseObject):
         total_value = 0
         tokens_not_found = []
         price_dict = self.exchange_obj.all_assets_prices
-        for token in self.accounttokens_set.all():
-            pair = f"{token.token.symbol}{self.token_pair.symbol}"
+        for token_account in self.accounttokens_set.all():
+            token_obj = token_account.token
+            pair = value_pair(token_obj, self.token_pair)
             try:
-                total_value += price_dict[pair] * token.quantity
+                total_value += price_dict[pair] * token_account.quantity
             except KeyError:
-                tokens_not_found.append(token.token.name)
+                tokens_not_found.append(token_obj.name)
         return round(total_value, 2)
 
-    @cached_property
+    @property
     def total_value_account_table(self):
         return f"{self.total_value_account} {self.token_pair}"
