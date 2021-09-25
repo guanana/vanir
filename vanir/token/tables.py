@@ -12,6 +12,12 @@ class TokenTable(ObjectTable):
             verbose_name=f"Last value in {fetch_default_account().token_pair}"
         )
 
+    def render_last_value(self, value):
+        if value == 0:
+            return "Pair not supported"
+        else:
+            return value
+
     class Meta:
         model = Token
         template_name = "django_tables2/bootstrap.html"

@@ -39,7 +39,7 @@ class TokenDetailUpdateValueView(ObjectDetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        self.object.get_value()
+        self.object.set_value()
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 
@@ -51,7 +51,8 @@ class TokenBulkUpdateValueView(ObjectListView):
     def get(self, request, *args, **kwargs):
         for token in Token.objects.all():
             try:
-                token.get_value()
+                token.set_value()
             except ValueError:
-                pass
+                token.last_value = 0
+                token.save()
         return super(TokenBulkUpdateValueView, self).get(request, *args, **kwargs)
