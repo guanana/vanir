@@ -25,6 +25,7 @@ Account Detail
     <table class="table table-striped">
       <thead>
         <tr>
+          <th scope="col">Name</th>
           <th scope="col">Exchange</th>
           <th scope="col">Account Value</th>
           <th scope="col">User</th>
@@ -35,6 +36,7 @@ Account Detail
       </thead>
       <tbody>
         <tr>
+          <th scope="row">{{ account.name }}</th>
           <th scope="row">{{ account.exchange.name }}</th>
           <td>{{ account.total_value_account }} {{ account.token_pair.symbol }}</td>
           <td>{{ account.user.username }}</td>
@@ -51,6 +53,9 @@ Account Detail
           <th scope="col">Token Name</th>
           <th scope="col">Symbol</th>
           <th scope="col">Qty</th>
+          <th scope="col">Last Value ({{ account.token_pair }})</th>
+          <th scope="col">Total Value ({{ account.token_pair }})</th>
+
         </tr>
       </thead>
       <tbody>
@@ -59,6 +64,8 @@ Account Detail
             <th scope="row">{{ tokenqty.token.name }}</th>
             <td>{{ tokenqty.token.symbol }}</td>
             <td>{{ tokenqty.quantity }}</td>
+            <td>{{ tokenqty.token.last_value }}</td>
+            <td>{{ account|account_token_value:tokenqty.token.name }} </td>
           </tr>
           {% endfor %}
       </tbody>
