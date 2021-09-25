@@ -1,4 +1,3 @@
-import pdb
 from abc import abstractmethod
 
 import pandas as pd
@@ -47,7 +46,7 @@ class BasicExchange:
         self.testnet = account.testnet
 
     @abstractmethod
-    def default_blockchain(self):
+    def default_blockchain(self) -> Blockchain:
         raise NotImplementedError
 
     @abstractmethod
@@ -55,11 +54,11 @@ class BasicExchange:
         raise NotImplementedError
 
     @abstractmethod
-    def test(self):
+    def test(self) -> bool:
         raise NotImplementedError
 
     @abstractmethod
-    def get_balance(self):
+    def get_balance(self) -> pd.DataFrame:
         raise NotImplementedError
 
     @abstractmethod
@@ -87,16 +86,13 @@ class VanirBinance(ExtendedExchange, Client, metaclass=ExtendedExchangeRegistry)
 
     @property
     def default_blockchain(self):
-        blockchain = Exchange.objects.get(name__startswith="Binance").default_blockchain
-        if not blockchain:
-            try:
-                return Blockchain.objects.get(name__startswith="Binance")
-            except Blockchain.DoesNotExist:
-                raise ValidationError(
-                    "You need to define a default blockchain on the exchange"
-                )
-        else:
-            return blockchain
+        try:
+            exchange_model = Exchange.objects.get(name__startswith="Binance")
+        except Blockchain.DoesNotExist:
+            raise ValidationError(
+                "You need to define a default blockchain on the exchange"
+            )
+        return exchange_model.default_blockchain
 
     @property
     def con(self):
@@ -114,7 +110,7 @@ class VanirBinance(ExtendedExchange, Client, metaclass=ExtendedExchangeRegistry)
         except BinanceAPIException:
             return False
 
-    def get_balance(self) -> pd.DataFrame:
+    def get_balance(self):
         account = self.get_account()
         balance = [
             asset
@@ -136,7 +132,6 @@ class VanirBinance(ExtendedExchange, Client, metaclass=ExtendedExchangeRegistry)
     @cached_property
     def all_margin_assets(self):
         all_margin_assets = {}
-        pdb.set_trace()
         margin_assets = self.con.get_margin_all_assets()
         for asset in margin_assets:
             all_margin_assets.update({asset["assetName"]: asset["assetFullName"]})
