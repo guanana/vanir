@@ -19,20 +19,31 @@ class Coin(BaseObject):
 
         return reverse("token:coin_detail", kwargs={"pk": self.pk})
 
-    def get_value(self, account=None):
+    def set_value(self, account=None):
+        from vanir.utils.helpers import fetch_default_account, value_pair
+
         if not account:
-            from vanir.utils.helpers import fetch_default_account
-
             account = fetch_default_account()
-
-        # Special exception when calling same pair
-        if self.symbol == account.token_pair:
-            return 0
+        exceptions_value = self.check_exceptions_value(account)
+        if exceptions_value:
+            return exceptions_value
         self.last_value = account.exchange_obj.get_token_price(
-            f"{self.symbol}{account.token_pair}"
+            value_pair(self, account.token_pair)
         )
         self.save()
         return self.last_value
+
+    def check_exceptions_value(self, account):
+        dollar_pairs = ("BUSD", "USDT", "USDC", "DAI", "UST", "TUSD", "USDP")
+        # Special exception when calling same pair
+        if self.symbol == account.token_pair.symbol:
+            self.last_value = 1
+            self.save()
+            return 1
+        elif self.symbol in dollar_pairs and account.token_pair.symbol in dollar_pairs:
+            self.last_value = 1
+            self.save()
+            return 1
 
 
 class Token(Coin):
