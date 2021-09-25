@@ -18,9 +18,7 @@ urlpatterns = [
     path("blockchain/", include("vanir.blockchain.urls", namespace="blockchain")),
     path("token/", include("vanir.token.urls", namespace="token")),
     path("order/", include("vanir.order.urls", namespace="order")),
-
-
-
+    path("utils/", include("vanir.utils.urls", namespace="utils")),
     # Your stuff: custom urls includes go here
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 if settings.DEBUG:
