@@ -9,7 +9,7 @@ class Coin(BaseObject):
     name = models.CharField(max_length=40)
     symbol = models.CharField(max_length=6)
     blockchain = models.ForeignKey(Blockchain, on_delete=models.CASCADE)
-    last_value = models.DecimalField(decimal_places=10, max_digits=40, null=True)
+    last_value = models.FloatField(null=True)
 
     def __str__(self):
         return self.symbol
@@ -28,10 +28,7 @@ class Coin(BaseObject):
         # Special exception when calling same pair
         if self.symbol == account.token_pair:
             return 0
-        from vanir.account.utils import get_exchange
-
-        exchange_obj = get_exchange(account.pk)
-        self.last_value = exchange_obj.get_token_price(
+        self.last_value = account.exchange_obj.get_token_price(
             f"{self.symbol}{account.token_pair}"
         )
         self.save()

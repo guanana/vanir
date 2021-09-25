@@ -1,25 +1,28 @@
 import datetime
-from decimal import Decimal
+
 from django.db import models
 
 from vanir.account.models import Account
-from .choices import OrderSide, OrderType
 from vanir.token.models import Token
+
+from .choices import OrderSide, OrderType
 
 
 class Order(models.Model):
     """
     Orders
     """
+
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
-    token_from = models.ForeignKey(Token, related_name="token_from", on_delete=models.CASCADE, null=False)
-    token_to = models.ForeignKey(Token, related_name="token_to", on_delete=models.CASCADE, null=False)
+    token_from = models.ForeignKey(
+        Token, related_name="token_from", on_delete=models.CASCADE, null=False
+    )
+    token_to = models.ForeignKey(
+        Token, related_name="token_to", on_delete=models.CASCADE, null=False
+    )
     side = models.CharField(max_length=4, choices=OrderSide.choices, null=False)
     orderType = models.CharField(max_length=20, choices=OrderType.choices, null=False)
-    quoteOrderQty = models.DecimalField(
-        max_digits=30, decimal_places=8, default=0.1,
-        null=False
-    )
+    quoteOrderQty = models.FloatField(default=0.1, null=False)
 
     # stopLossQty = models.DecimalField(
     #     max_digits=30, decimal_places=8, default=Decimal(0.1)
@@ -52,8 +55,10 @@ class Order(models.Model):
             side=self.side,
             type=self.orderType,
             quantity=self.quoteOrderQty,
-            **kwargs)
+            **kwargs,
+        )
 
     def get_absolute_url(self):
         from django.urls import reverse
-        return reverse('order:order_detail', kwargs={'pk': self.pk})
+
+        return reverse("order:order_detail", kwargs={"pk": self.pk})

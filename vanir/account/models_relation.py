@@ -10,5 +10,5 @@ class AccountTokens(models.Model):
 
     account = models.ForeignKey("Account", on_delete=models.CASCADE)
     token = models.ForeignKey(Token, on_delete=models.CASCADE)
-    quantity = models.DecimalField(max_digits=30, decimal_places=4, default=0.01)
+    quantity = models.FloatField(default=0)
     update_time = models.TimeField(auto_now=True)
