@@ -1,3 +1,5 @@
+from django.db.models import QuerySet
+
 from vanir.account.models import Account
 from vanir.account.models_relation import AccountTokens
 from vanir.blockchain.models import Blockchain
@@ -26,3 +28,12 @@ def token_import(
     if quantity:
         AccountTokens(account=account, token=token_obj, quantity=quantity).save()
     return token_obj
+
+
+def bulk_update(token_qs: QuerySet[Token]):
+    for token in token_qs:
+        try:
+            token.set_value()
+        except ValueError:
+            token.last_value = 0
+            token.save()

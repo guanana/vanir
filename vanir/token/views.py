@@ -1,5 +1,6 @@
 from django.urls import reverse_lazy
 
+from vanir.token.helpers.import_utils import bulk_update
 from vanir.token.models import Token
 from vanir.token.tables import TokenTable
 from vanir.utils.views import (
@@ -38,8 +39,7 @@ class TokenDetailUpdateValueView(ObjectDetailView):
     model = Token
 
     def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        self.object.set_value()
+        super().get(request, *args, **kwargs)
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 
@@ -49,10 +49,5 @@ class TokenBulkUpdateValueView(ObjectListView):
     table_class = TokenTable
 
     def get(self, request, *args, **kwargs):
-        for token in Token.objects.all():
-            try:
-                token.set_value()
-            except ValueError:
-                token.last_value = 0
-                token.save()
+        bulk_update(Token.objects.all())
         return super(TokenBulkUpdateValueView, self).get(request, *args, **kwargs)
