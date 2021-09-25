@@ -71,6 +71,16 @@ def get_model_name(model):
     return model._meta.model_name
 
 
+@register.filter()
+def account_token_value(account, token_name):
+    for tokenqty in account.accounttokens_set.all():
+        if tokenqty.token.name == token_name:
+            try:
+                return round(tokenqty.token.last_value * tokenqty.quantity, 2)
+            except TypeError:
+                return tokenqty.quantity
+
+
 @register.simple_tag
 def default_pair_symbol():
     return fetch_default_account().token_pair
