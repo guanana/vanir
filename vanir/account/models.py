@@ -35,6 +35,10 @@ class Account(BaseObject):
     name = models.CharField(max_length=250, unique=True)
 
     def save(self, *args, **kwargs):
+        self.check_default()
+        super().save(*args, **kwargs)
+
+    def check_default(self):
         # Check if there are more accounts with default setting
         # if there is another (can only be one). Remove the default
         # flag and add it to the new one
@@ -46,7 +50,6 @@ class Account(BaseObject):
         # In case is the first account always set up as default
         if Account.objects.count() == 0:
             self.default = True
-        super().save(*args, **kwargs)
 
     def clear_tokens(self):
         self.accounttokens_set.all().delete()
