@@ -1,17 +1,81 @@
+import pdb
+from abc import abstractmethod
+
 import pandas as pd
 from binance import Client
 from binance.exceptions import BinanceAPIException
 from django.core.exceptions import ValidationError
+from django.utils.functional import cached_property
 
 from vanir.blockchain.models import Blockchain
-from vanir.exchange.helpers.main import ExtendedExchange, ExtendedExchangeRegistry
 from vanir.exchange.models import Exchange
 from vanir.utils.table_helpers import change_table_align, change_table_style
 
 
+class ExtendedExchangeRegistry(type):
+    registered = {}
+
+    def __new__(mcs, name, bases, attrs):
+        # create the new type
+        newclass = type.__new__(mcs, name, bases, attrs)
+        mcs.registered[name] = newclass
+        return type.__new__(mcs, name, bases, attrs)
+
+    @classmethod
+    def get_class_by_name(mcs, name):
+        if name in mcs.registered.keys():
+            return mcs.registered[name]
+        else:
+            return mcs.registered[f"Vanir{name}"]
+
+    @classmethod
+    def all_supported(mcs):
+        temp_list = mcs.registered.copy()
+        temp_list.pop("ExtendedExchange")
+        list_iter = temp_list.copy()
+        for key in list_iter.keys():
+            temp_list[key.replace("Vanir", "")] = temp_list.pop(key)
+        return ",".join(temp_list.keys())
+
+
+class BasicExchange:
+    @abstractmethod
+    def __init__(self, account):
+        self.api_key = account.api_key
+        self.api_secret = account.secret
+        self.tld = account.tld
+        self.testnet = account.testnet
+
+    @abstractmethod
+    def default_blockchain(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def con(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def test(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_balance(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def all_assets_prices(self) -> dict:
+        pass
+
+
+class ExtendedExchange(BasicExchange, metaclass=ExtendedExchangeRegistry):
+    pass
+
+
+#
+# VANIR BINANCE
+#
 class VanirBinance(ExtendedExchange, Client, metaclass=ExtendedExchangeRegistry):
     def __init__(self, account):
-        self.all_margin_assets = {}
         self.testnet = False
         super(ExtendedExchange, self).__init__(account)
         super(Client, self).__init__(
@@ -69,14 +133,14 @@ class VanirBinance(ExtendedExchange, Client, metaclass=ExtendedExchangeRegistry)
         response = change_table_align(response)
         return response
 
-    def get_all_assets(self):
-        if not self.all_margin_assets:
-            margin_assets = self.con.get_margin_all_assets()
-            for asset in margin_assets:
-                self.all_margin_assets.update(
-                    {asset["assetName"]: asset["assetFullName"]}
-                )
-        return self.all_margin_assets
+    @cached_property
+    def all_margin_assets(self):
+        all_margin_assets = {}
+        pdb.set_trace()
+        margin_assets = self.con.get_margin_all_assets()
+        for asset in margin_assets:
+            all_margin_assets.update({asset["assetName"]: asset["assetFullName"]})
+        return all_margin_assets
 
     def get_token_price(self, pair):
         try:
