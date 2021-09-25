@@ -26,6 +26,7 @@ Account Detail
       <thead>
         <tr>
           <th scope="col">Exchange</th>
+          <th scope="col">Account Value</th>
           <th scope="col">User</th>
           <th scope="col">Tld</th>
           <th scope="col">Default Fee</th>
@@ -35,7 +36,8 @@ Account Detail
       <tbody>
         <tr>
           <th scope="row">{{ account.exchange.name }}</th>
-          <td>{{ account.user.name }}</td>
+          <td>{{ account.total_value_account }} {{ account.token_pair.symbol }}</td>
+          <td>{{ account.user.username }}</td>
           <td>{{ account.tld }}</td>
           <td>{{ account.default_fee_rate }}</td>
           <td>{{ account.token_pair }}</td>

@@ -1,10 +1,10 @@
-from django.contrib.auth.models import User
 from django.test import TestCase
 
 from vanir.account.models import Account
 from vanir.blockchain.models import Blockchain
 from vanir.exchange.models import Exchange
 from vanir.token.models import Token
+from vanir.users.admin import User
 
 
 class AccountModelTest(TestCase):
