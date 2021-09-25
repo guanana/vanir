@@ -1,7 +1,10 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import SET_NULL
+from django.utils.functional import cached_property
 
 from vanir.account.models_relation import AccountTokens
+from vanir.exchange.helpers.main import ExtendedExchangeRegistry
 from vanir.exchange.models import Exchange
 from vanir.token.models import Token
 from vanir.users.admin import User
@@ -18,10 +21,7 @@ class Account(BaseObject):
     api_key = models.CharField(max_length=250)
     secret = models.CharField(max_length=250)
     tld = models.CharField(max_length=10, default="com")
-    password = models.CharField(max_length=250, blank=True, null=True)
-    default_fee_rate = models.DecimalField(
-        max_digits=30, decimal_places=4, default=0.01
-    )
+    default_fee_rate = models.FloatField(default=0.1)
     token = models.ManyToManyField(Token, through=AccountTokens)
     token_pair = models.ForeignKey(
         Token, on_delete=SET_NULL, null=True, related_name="token_pair"
@@ -31,10 +31,7 @@ class Account(BaseObject):
         help_text="Default account to run fetch methods like token price update",
     )
     testnet = models.BooleanField(default=False)
-
-    @property
-    def name(self):
-        return f"{self.pk:02}-{self.exchange}-{self.user.get_username()}"
+    name = models.CharField(max_length=250, unique=True)
 
     def save(self, *args, **kwargs):
         # Check if there are more accounts with default setting
@@ -49,3 +46,33 @@ class Account(BaseObject):
         if Account.objects.count() == 0:
             self.default = True
         super().save(*args, **kwargs)
+
+    @cached_property
+    def exchange_obj(self):
+        try:
+            class_obj = ExtendedExchangeRegistry.get_class_by_name(
+                self.exchange.name.split(" ")[0]
+            )
+        except KeyError:
+            raise ValidationError(
+                f"Please create an account with a supported Exchange to get extra functionalities"
+                f"{[item for item in ExtendedExchangeRegistry.registered.keys()]}"
+            )
+        return class_obj(self)
+
+    @property
+    def total_value_account(self):
+        total_value = 0
+        tokens_not_found = []
+        price_dict = self.exchange_obj.all_assets_prices
+        for token in self.accounttokens_set.all():
+            pair = f"{token.token.symbol}{self.token_pair.symbol}"
+            try:
+                total_value += price_dict[pair] * token.quantity
+            except KeyError:
+                tokens_not_found.append(token.token.name)
+        return round(total_value, 2)
+
+    @cached_property
+    def total_value_account_table(self):
+        return f"{self.total_value_account} {self.token_pair}"

@@ -3,18 +3,17 @@ from binance import Client
 from binance.exceptions import BinanceAPIException
 from django.core.exceptions import ValidationError
 
-from vanir.account.models import Account
 from vanir.blockchain.models import Blockchain
-from vanir.exchange.helpers.main import BasicExchange
+from vanir.exchange.helpers.main import ExtendedExchange, ExtendedExchangeRegistry
 from vanir.exchange.models import Exchange
-from vanir.utils.helpers import change_table_align, change_table_style
+from vanir.utils.table_helpers import change_table_align, change_table_style
 
 
-class VanirBinance(BasicExchange, Client):
-    def __init__(self, account: Account):
+class VanirBinance(ExtendedExchange, Client, metaclass=ExtendedExchangeRegistry):
+    def __init__(self, account):
         self.all_margin_assets = {}
         self.testnet = False
-        super().__init__(account)
+        super(ExtendedExchange, self).__init__(account)
         super(Client, self).__init__(
             api_key=self.api_key,
             api_secret=self.api_secret,
@@ -37,7 +36,12 @@ class VanirBinance(BasicExchange, Client):
 
     @property
     def con(self):
-        return Client(api_key=self.api_key, api_secret=self.api_secret, tld=self.tld)
+        return Client(
+            api_key=self.api_key,
+            api_secret=self.api_secret,
+            tld=self.tld,
+            testnet=self.testnet,
+        )
 
     def test(self):
         try:
@@ -85,3 +89,10 @@ class VanirBinance(BasicExchange, Client):
             return float(price)
         except ValueError:
             return None
+
+    @property
+    def all_assets_prices(self):
+        temp_prices = {}
+        for asset in self.get_all_tickers():
+            temp_prices[asset["symbol"]] = float(asset["price"])
+        return temp_prices
