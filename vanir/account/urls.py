@@ -7,6 +7,7 @@ from .views import (
     AccountDetailView,
     AccountListView,
     AccountUpdateView,
+    delete_tokens_account,
     exchange_balanceview,
     exchange_importtokens,
     exchange_testview,
@@ -20,6 +21,9 @@ urlpatterns = [
     path("<int:pk>/edit/", AccountUpdateView.as_view(), name="account_update"),
     path("<int:pk>/delete/", AccountDeleteView.as_view(), name="account_delete"),
     path("<int:pk>/test/", exchange_testview, name="account_test"),
+    path(
+        "<int:pk>/delete_tokens/", delete_tokens_account, name="account_delete_tokens"
+    ),
     path("<int:pk>/balance/", exchange_balanceview, name="account_balance"),
     path(
         "<int:pk>/balance/import/", exchange_importtokens, name="account_balance_import"
