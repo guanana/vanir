@@ -3,7 +3,7 @@ from django.urls import reverse_lazy
 from vanir.account.models import Account
 from vanir.account.tables import AccountTable
 from vanir.account.utils import exchange_view_render
-from vanir.exchange.helpers.main import ExtendedExchange
+from vanir.exchange.libs.exchanges import ExtendedExchange
 from vanir.token.helpers.import_utils import token_import
 from vanir.utils.views import (
     ObjectCreateView,
@@ -59,6 +59,12 @@ def exchange_testview(request, pk):
     return exchange_view_render("account/account_test.html", response, request)
 
 
+def delete_tokens_account(request, pk):
+    Account.objects.get(pk=pk).clear_tokens()
+    response = True
+    return exchange_view_render("account/account_delete_tokens.html", response, request)
+
+
 def exchange_balanceview(request, pk):
     response = Account.objects.get(pk=pk).exchange_obj.get_balance_html()
     return exchange_view_render(
@@ -71,10 +77,11 @@ def exchange_balanceview(request, pk):
 
 def exchange_importtokens(request, pk):
     account = Account.objects.get(pk=pk)
-    exchange_obj = account.exchange_obj
-    df = exchange_obj.get_balance()
+    df = account.exchange_obj.get_balance()
     response = []
     for index, row in df.iterrows():
         token_import(account, row["asset"], float(row["free"]) + float(row["locked"]))
         response.append(row["asset"])
+    # TODO: Refresh prices
+
     return exchange_view_render("account/account_import.html", response, request)
