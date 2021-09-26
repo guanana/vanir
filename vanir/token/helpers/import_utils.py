@@ -30,10 +30,12 @@ def token_import(
     return token_obj
 
 
-def bulk_update(token_qs: QuerySet[Token]):
+def bulk_update(token_qs: QuerySet[Token], account: Account = None):
     for token in token_qs:
         try:
-            token.set_value()
+            token.token.set_value(account)
+            token.save()
         except ValueError:
-            token.last_value = 0
+            token.token.last_value = 0
+            token.token.save()
             token.save()
