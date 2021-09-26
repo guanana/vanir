@@ -2,6 +2,7 @@ from django.db import models
 
 
 class TokenTypes(models.TextChoices):
+    BEP_20 = "BEP-20"
     ETH_ERC_20 = "ERC-20"
     ETH_ERC_223 = "ERC-223"
     ETH_ERC_721 = "ERC-721"

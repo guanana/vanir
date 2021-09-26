@@ -32,7 +32,6 @@ class Account(BaseObject):
         help_text="Default account to run fetch methods like token price update",
     )
     testnet = models.BooleanField(default=False)
-    name = models.CharField(max_length=250, unique=True)
 
     def save(self, *args, **kwargs):
         self.check_default()

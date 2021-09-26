@@ -42,9 +42,9 @@ class Order(models.Model):
     def symbol(self):
         return f"{self.token_from}{self.token_to}"
 
-    @property
-    def name(self):
-        return f"{datetime.datetime.today()}:{self.symbol}"
+    def save(self, *args, **kwargs):
+        self.name = f"{datetime.datetime.today()}:{self.symbol}"
+        super().save(*args, **kwargs)
 
     def get_avg_price(self):
         return self.account.get_account_client.get_avg_price(symbol=self.symbol)

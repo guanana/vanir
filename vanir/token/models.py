@@ -5,14 +5,27 @@ from vanir.token.choices import TokenTypes
 from vanir.utils.models import BaseObject
 
 
+class TokenObjectManager(models.Manager):
+    def get_by_natural_key(self, symbol):
+        return self.get(symbol=symbol)
+
+
 class Coin(BaseObject):
-    name = models.CharField(max_length=40)
-    symbol = models.CharField(max_length=6)
-    blockchain = models.ForeignKey(Blockchain, on_delete=models.CASCADE)
+    name = models.CharField(max_length=40, unique=True)
+    symbol = models.CharField(max_length=6, unique=True)
+    blockchain = models.ForeignKey(
+        Blockchain, on_delete=models.CASCADE, null=True, blank=True
+    )
     last_value = models.FloatField(null=True)
+
+    class Meta:
+        unique_together = ("name", "symbol")
 
     def __str__(self):
         return self.symbol
+
+    def natural_key(self):
+        return (self.symbol,)
 
     def get_absolute_url(self):
         from django.urls import reverse
