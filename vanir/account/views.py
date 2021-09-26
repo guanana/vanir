@@ -5,7 +5,7 @@ from vanir.account.models import Account
 from vanir.account.tables import AccountTable
 from vanir.account.utils import exchange_view_render
 from vanir.exchange.libs.exchanges import ExtendedExchange
-from vanir.token.helpers.import_utils import bulk_update, token_import
+from vanir.token.helpers.import_utils import bulk_update, qs_update, token_import
 from vanir.utils.views import (
     ObjectCreateView,
     ObjectDeleteView,
@@ -56,7 +56,7 @@ class AccountTokenBulkUpdateValueView(ObjectDetailView):
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
         token_subset = self.object.accounttokens_set
-        bulk_update(token_subset.all(), self.object)
+        qs_update(token_subset.all(), self.object)
         return redirect(
             reverse("account:account_detail", kwargs={"pk": self.object.pk})
         )
@@ -95,6 +95,5 @@ def exchange_importtokens(request, pk):
     for index, row in df.iterrows():
         token_import(account, row["asset"], float(row["free"]) + float(row["locked"]))
         response.append(row["asset"])
-    # TODO: Refresh prices
-
+    bulk_update()
     return exchange_view_render("account/account_import.html", response, request)

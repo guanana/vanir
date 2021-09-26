@@ -4,6 +4,7 @@ from vanir.account.models import Account
 from vanir.account.models_relation import AccountTokens
 from vanir.blockchain.models import Blockchain
 from vanir.token.models import Token
+from vanir.utils.helpers import fetch_default_account, value_pair
 
 
 def get_token_full_name(account: Account, token_symbol: str) -> str:
@@ -30,12 +31,28 @@ def token_import(
     return token_obj
 
 
-def bulk_update(token_qs: QuerySet[Token], account: Account = None):
+def token_update(token: Token, account: Account, price_dict: dict):
+    pair = value_pair(token, account.token_pair)
+    try:
+        token.last_value = price_dict[pair]
+        token.save()
+    except KeyError:
+        token.last_value = 0
+        token.save()
+
+
+def qs_update(token_qs: QuerySet[Token], account: Account = None):
+    if not account:
+        account = fetch_default_account()
+    price_dict = account.exchange_obj.all_assets_prices
     for token in token_qs:
-        try:
-            token.token.set_value(account)
-            token.save()
-        except ValueError:
-            token.token.last_value = 0
-            token.token.save()
-            token.save()
+        token_update(token.token, account, price_dict)
+        token.save()
+
+
+def bulk_update(account: Account = None):
+    if not account:
+        account = fetch_default_account()
+    price_dict = account.exchange_obj.all_assets_prices
+    for token_obj in Token.objects.all():
+        token_update(token_obj, account, price_dict)

@@ -50,5 +50,5 @@ class TokenBulkUpdateValueView(ObjectListView):
     table_class = TokenTable
 
     def get(self, request, *args, **kwargs):
-        bulk_update(Token.objects.all())
+        bulk_update()
         return super(TokenBulkUpdateValueView, self).get(request, *args, **kwargs)

@@ -14,6 +14,8 @@ class AccountTokens(models.Model):
     token = models.ForeignKey(Token, on_delete=models.CASCADE)
     quantity = models.FloatField(default=0)
     update_time = models.TimeField(blank=True, null=True)
+    # TODO: Last value needs to be in the relationship to be able
+    #  to support different prices for different accounts!
 
     def save(self, *args, **kwargs):
         token = AccountTokens.objects.filter(token=self.token)
