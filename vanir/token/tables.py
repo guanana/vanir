@@ -1,17 +1,9 @@
-from django_tables2 import Column
-
 from vanir.utils.tables import ObjectTable
 
-from ..utils.helpers import fetch_default_account
 from .models import Token
 
 
 class TokenTable(ObjectTable):
-    if fetch_default_account():
-        last_value = Column(
-            verbose_name=f"Last value in {fetch_default_account().token_pair}"
-        )
-
     def render_last_value(self, value):
         if value == 0:
             return "Pair not supported"
