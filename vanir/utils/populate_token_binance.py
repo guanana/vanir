@@ -5,12 +5,12 @@ from django.views.generic import FormView
 from vanir.account.models import Account
 from vanir.blockchain.models import Blockchain
 from vanir.exchange.libs.exchanges import VanirBinance
-from vanir.token.helpers.import_utils import get_token_full_name
+from vanir.token.helpers.import_utils import bulk_update
 from vanir.token.models import Token
 
 
 class PopulateDBBinance:
-    def __init__(self, account):
+    def __init__(self, account: Account):
         self.account = account
         if self.account.testnet:
             raise ValidationError("You cannot populate DB with test account")
@@ -28,15 +28,12 @@ class PopulateDBBinance:
         return blockchain
 
     def create_all_tokens(self):
-        for symbol, price in self.con.all_assets_prices:
+        for symbol, fullname in self.con.all_margin_assets.items():
             token, created = Token.objects.get_or_create(
-                name=get_token_full_name(self.account, symbol),
-                symbol=symbol,
-                blockchain=self.blockchain,
-                last_value=price,
+                name=fullname, symbol=symbol, blockchain=self.blockchain
             )
-            token.save()
             self.tokens.append(token)
+        bulk_update(self.account)
 
 
 def validate_account(account):
@@ -49,7 +46,7 @@ class PopulateDBBinanceForm(forms.Form):
     )
 
     def populate_db(self):
-        PopulateDBBinance(self.account).create_all_tokens()
+        PopulateDBBinance(self.cleaned_data["account"]).create_all_tokens()
 
 
 class PopulateDBBinanceView(FormView):
