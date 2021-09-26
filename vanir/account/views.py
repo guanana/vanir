@@ -1,10 +1,11 @@
-from django.urls import reverse_lazy
+from django.shortcuts import redirect
+from django.urls import reverse, reverse_lazy
 
 from vanir.account.models import Account
 from vanir.account.tables import AccountTable
 from vanir.account.utils import exchange_view_render
 from vanir.exchange.libs.exchanges import ExtendedExchange
-from vanir.token.helpers.import_utils import token_import
+from vanir.token.helpers.import_utils import bulk_update, token_import
 from vanir.utils.views import (
     ObjectCreateView,
     ObjectDeleteView,
@@ -47,6 +48,18 @@ class AccountUpdateView(ObjectUpdateView):
 
 class AccountDetailView(ObjectDetailView):
     model = Account
+
+
+class AccountTokenBulkUpdateValueView(ObjectDetailView):
+    model = Account
+
+    def get(self, request, *args, **kwargs):
+        super().get(request, *args, **kwargs)
+        token_subset = self.object.accounttokens_set
+        bulk_update(token_subset.all(), self.object)
+        return redirect(
+            reverse("account:account_detail", kwargs={"pk": self.object.pk})
+        )
 
 
 class AccountDeleteView(ObjectDeleteView):

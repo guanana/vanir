@@ -8,8 +8,8 @@ Token Detail
 
   <div class="float-right">
     <div class="btn-toolbar" role="toolbar" aria-label="Buttons">
-      <div class="btn-group mr-2" role="group" aria-label="Edit">
-        <a class="btn btn-warning float-right" href="{% url 'token:token_update_price' token.pk %}" role="button">Update Price</a>
+      <div class="btn-group mr-2" role="group" aria-label="Refresh">
+        <a class="btn btn-secondary float-right" href="{% url 'token:token_update_price' token.pk %}" role="button">Refresh Price</a>
       </div>
       <div class="btn-group mr-2" role="group" aria-label="Edit">
         <a class="btn btn-warning float-right" href="{% url 'token:token_update' token.pk %}" role="button">Edit</a>

@@ -4,12 +4,14 @@
 {% block title %}
 Account Detail
 {% endblock title %}
-
 {% block content %}
 <div class="container">
 
   <div class="float-right">
     <div class="btn-toolbar" role="toolbar" aria-label="Buttons">
+      <div class="btn-group mr-2" role="group" aria-label="refresh">
+        <a class="btn btn-secondary float-right" href="{% url account|validated_viewname:'refresh' account.pk %}" role="button">Refresh account</a>
+      </div>
       <div class="btn-group mr-2" role="group" aria-label="More">
         <a class="btn btn-primary float-right" href="{% url account|validated_viewname:'more' account.pk %}" role="button">More</a>
       </div>
