@@ -1,6 +1,4 @@
-from django import forms
 from django.core.exceptions import ValidationError
-from django.views.generic import FormView
 
 from vanir.account.models import Account
 from vanir.blockchain.models import Blockchain
@@ -34,32 +32,3 @@ class PopulateDBBinance:
             )
             self.tokens.append(token)
         bulk_update(self.account)
-
-
-def validate_account(account):
-    PopulateDBBinance(account)
-
-
-class PopulateDBBinanceForm(forms.Form):
-    account = forms.ModelChoiceField(
-        queryset=Account.objects.all(), validators=[validate_account]
-    )
-
-    def populate_db(self):
-        PopulateDBBinance(self.cleaned_data["account"]).create_all_tokens()
-
-
-class PopulateDBBinanceView(FormView):
-    form_class = PopulateDBBinanceForm
-    template_name = "basic_form.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["title"] = "Populate DB with Binance"
-        return context
-
-    def form_valid(self, form):
-        # This method is called when valid form data has been POSTed.
-        # It should return an HttpResponse.
-        form.populate_db()
-        return super().form_valid(form)

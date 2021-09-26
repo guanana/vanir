@@ -1,6 +1,6 @@
 from django.urls import path
 
-from vanir.utils.populate_token_binance import PopulateDBBinanceView
+from vanir.utils.views import PopulateDBBinanceView
 
 app_name = "utils"
 urlpatterns = [

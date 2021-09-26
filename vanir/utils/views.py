@@ -1,8 +1,11 @@
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, DetailView, TemplateView
-from django.views.generic.edit import DeleteView, UpdateView
+from django.views.generic.edit import DeleteView, FormView, UpdateView
 from django_tables2 import SingleTableView
+
+from vanir.utils.forms import PopulateDBBinanceForm
 
 
 @method_decorator(login_required, name="dispatch")
@@ -51,3 +54,20 @@ class ObjectDeleteView(DeleteView):
 
 class HomeView(TemplateView):
     template_name = "pages/home.html"
+
+
+class PopulateDBBinanceView(FormView):
+    form_class = PopulateDBBinanceForm
+    template_name = "basic_form.html"
+    success_url = reverse_lazy("token:token_list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Populate DB with Binance"
+        return context
+
+    def form_valid(self, form):
+        # This method is called when valid form data has been POSTed.
+        # It should return an HttpResponse.
+        form.populate_db()
+        return super().form_valid(form)
