@@ -1,4 +1,5 @@
-from django.urls import reverse_lazy
+from django.shortcuts import redirect
+from django.urls import reverse, reverse_lazy
 
 from vanir.token.helpers.import_utils import bulk_update
 from vanir.token.models import Token
@@ -40,8 +41,8 @@ class TokenDetailUpdateValueView(ObjectDetailView):
 
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
-        context = self.get_context_data(object=self.object)
-        return self.render_to_response(context)
+        self.object.set_value()
+        return redirect(reverse("token:token_detail", kwargs={"pk": self.object.pk}))
 
 
 class TokenBulkUpdateValueView(ObjectListView):
