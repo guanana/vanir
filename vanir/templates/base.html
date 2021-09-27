@@ -45,23 +45,19 @@
 
     {% include "menu.html" %}
     <div class="container">
-
-      {% if messages %}
-          {% for message in messages %}
-              <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
-          {% endfor %}
-      {% endif %}
-      {% block layout_title %}{% endblock %}
-      {% block content %}
-        <p>Use this document as a way to quick start any new project.</p>
-      {% endblock content %}
+    {% include 'messages.html' %}
+    {% block layout_title %}{% endblock %}
+    {% block content %}
+      <p>Use this document as a way to quick start any new project.</p>
+    {% endblock content %}
 
     </div> <!-- /container -->
 
     {% block modal %}{% endblock modal %}
 
     {% block inline_javascript %}
-    {# Script tags with only code, no src (defer by default) #}
     {% endblock inline_javascript %}
+
+
   </body>
 </html>
