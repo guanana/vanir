@@ -1,10 +1,10 @@
 from django.core.exceptions import ValidationError
 
-from vanir.token.models import Coin
+from vanir.core.token.models import Coin
 
 
 def fetch_default_account():
-    from vanir.account.models import Account
+    from vanir.core.account.models import Account
 
     if Account.objects.count() == 0:
         return None

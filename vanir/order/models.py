@@ -2,8 +2,8 @@ import datetime
 
 from django.db import models
 
-from vanir.account.models import Account
-from vanir.token.models import Token
+from vanir.core.account.models import Account
+from vanir.core.token.models import Token
 
 from .choices import OrderSide, OrderType
 

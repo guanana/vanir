@@ -2,10 +2,10 @@ import logging
 
 from django.core.exceptions import ValidationError
 
-from vanir.account.models import Account
-from vanir.blockchain.models import Blockchain
-from vanir.exchange.libs.exchanges import VanirBinance
-from vanir.token.helpers.import_utils import bulk_update, token_import
+from vanir.core.account.models import Account
+from vanir.core.blockchain.models import Blockchain
+from vanir.core.exchange.libs.exchanges import VanirBinance
+from vanir.core.token.helpers.import_utils import bulk_update, token_import
 
 logger = logging.getLogger(__name__)
 

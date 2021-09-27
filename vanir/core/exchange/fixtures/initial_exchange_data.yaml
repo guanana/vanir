@@ -1,0 +1,6 @@
+- model: core.exchange.Exchange
+  pk: 1
+  fields:
+    name: Binance
+    native_token: 1
+    default_blockchain: 1

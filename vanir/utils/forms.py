@@ -1,6 +1,6 @@
 from django import forms
 
-from vanir.account.models import Account
+from vanir.core.account.models import Account
 from vanir.utils.populate_token_binance import PopulateDBBinance
 
 

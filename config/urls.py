@@ -13,10 +13,10 @@ urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     # User management
     path("users/", include("vanir.users.urls", namespace="users")),
-    path("account/", include("vanir.account.urls", namespace="account")),
-    path("exchange/", include("vanir.exchange.urls", namespace="exchange")),
-    path("blockchain/", include("vanir.blockchain.urls", namespace="blockchain")),
-    path("token/", include("vanir.token.urls", namespace="token")),
+    path("account/", include("vanir.core.account.urls", namespace="account")),
+    path("exchange/", include("vanir.core.exchange.urls", namespace="exchange")),
+    path("blockchain/", include("vanir.core.blockchain.urls", namespace="blockchain")),
+    path("token/", include("vanir.core.token.urls", namespace="token")),
     path("order/", include("vanir.order.urls", namespace="order")),
     path("utils/", include("vanir.utils.urls", namespace="utils")),
     # Your stuff: custom urls includes go here
