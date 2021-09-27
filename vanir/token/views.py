@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 
@@ -51,4 +52,5 @@ class TokenBulkUpdateValueView(ObjectListView):
 
     def get(self, request, *args, **kwargs):
         bulk_update()
+        messages.info(request, "Bulk update completed")
         return super(TokenBulkUpdateValueView, self).get(request, *args, **kwargs)

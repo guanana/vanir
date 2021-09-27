@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 
@@ -56,6 +57,7 @@ class AccountTokenBulkUpdateValueView(ObjectDetailView):
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
         token_subset = self.object.accounttokens_set
+        messages.info(request, "Tokens updated")
         qs_update(token_subset.all(), self.object)
         return redirect(
             reverse("account:account_detail", kwargs={"pk": self.object.pk})
@@ -93,7 +95,11 @@ def exchange_importtokens(request, pk):
     df = account.exchange_obj.get_balance()
     response = []
     for index, row in df.iterrows():
-        token_import(account, row["asset"], float(row["free"]) + float(row["locked"]))
+        token_import(
+            account=account,
+            token_symbol=row["asset"],
+            quantity=float(row["free"]) + float(row["locked"]),
+        )
         response.append(row["asset"])
     bulk_update()
     return exchange_view_render("account/account_import.html", response, request)
