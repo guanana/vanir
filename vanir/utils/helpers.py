@@ -6,6 +6,8 @@ from vanir.token.models import Coin
 def fetch_default_account():
     from vanir.account.models import Account
 
+    if Account.objects.count() == 0:
+        return None
     account = [account for account in Account.objects.all() if account.default]
     if not account:
         if Account.objects.count() > 0:
