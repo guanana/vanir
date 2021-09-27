@@ -3,7 +3,6 @@ from django.db import models
 from django.db.models import SET_NULL
 from django.utils.functional import cached_property
 
-from vanir.account.models_relation import AccountTokens
 from vanir.exchange.libs.exchanges import ExtendedExchangeRegistry
 from vanir.exchange.models import Exchange
 from vanir.token.models import Token
@@ -23,7 +22,9 @@ class Account(BaseObject):
     secret = models.CharField(max_length=250)
     tld = models.CharField(max_length=10, default="com")
     default_fee_rate = models.FloatField(default=0.1)
-    token = models.ManyToManyField(Token, through=AccountTokens)
+    token = models.ManyToManyField(
+        "token.Token", through="AccountTokens", related_name="accounts"
+    )
     token_pair = models.ForeignKey(
         Token, on_delete=SET_NULL, null=True, related_name="token_pair"
     )

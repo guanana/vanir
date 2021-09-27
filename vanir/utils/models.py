@@ -1,14 +1,8 @@
 from django.db import models
 
 
-class BaseObjectManager(models.Manager):
-    def get_by_natural_key(self, name):
-        return self.get(name=name)
-
-
 class BaseObject(models.Model):
     name = models.CharField(max_length=250, unique=True)
-    objects = BaseObjectManager()
 
     class Meta:
         abstract = True
