@@ -3,11 +3,9 @@ from abc import abstractmethod
 import pandas as pd
 from binance import Client
 from binance.exceptions import BinanceAPIException
-from django.core.exceptions import ValidationError
 from django.utils.functional import cached_property
 
 from vanir.blockchain.models import Blockchain
-from vanir.exchange.models import Exchange
 from vanir.utils.table_helpers import change_table_align, change_table_style
 
 
@@ -67,7 +65,8 @@ class BasicExchange:
 
 
 class ExtendedExchange(BasicExchange, metaclass=ExtendedExchangeRegistry):
-    pass
+    def __init__(self, account):
+        self.account = account
 
 
 #
@@ -86,13 +85,7 @@ class VanirBinance(ExtendedExchange, Client, metaclass=ExtendedExchangeRegistry)
 
     @property
     def default_blockchain(self):
-        try:
-            exchange_model = Exchange.objects.get(name__startswith="Binance")
-        except Blockchain.DoesNotExist:
-            raise ValidationError(
-                "You need to define a default blockchain on the exchange"
-            )
-        return exchange_model.default_blockchain
+        return Blockchain.objects.get(name__contains="Binance")
 
     @property
     def con(self):
