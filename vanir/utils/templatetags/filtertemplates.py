@@ -84,4 +84,7 @@ def account_token_value(account, token_name):
 
 @register.simple_tag
 def default_pair_symbol():
+    account = fetch_default_account()
+    if not account:
+        return ""
     return fetch_default_account().token_pair
