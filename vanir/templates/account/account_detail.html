@@ -1,28 +1,20 @@
 {% extends "object_base.html" %}
 {% load static %}
+{% load buttons %}
 {% load filtertemplates %}
 {% block title %}
 Account Detail
 {% endblock title %}
 {% block content %}
 <div class="container">
-
-  <div class="float-right">
-    <div class="btn-toolbar" role="toolbar" aria-label="Buttons">
-      <div class="btn-group mr-2" role="group" aria-label="refresh">
-        <a class="btn btn-secondary float-right" href="{% url account|validated_viewname:'refresh' account.pk %}" role="button">Refresh account</a>
-      </div>
-      <div class="btn-group mr-2" role="group" aria-label="More">
-        <a class="btn btn-primary float-right" href="{% url account|validated_viewname:'more' account.pk %}" role="button">More</a>
-      </div>
-      <div class="btn-group mr-2" role="group" aria-label="Edit">
-        <a class="btn btn-warning float-right" href="{% url account|validated_viewname:'update' account.pk %}" role="button">Edit</a>
-      </div>
-      <div class="btn-group mr-2" role="group" aria-label="Delete">
-        <a class="btn btn-danger btn-outline float-right" href="{% url account|validated_viewname:'delete' account.pk %}" role="button">Delete</a>
-      </div>
-    </div>
-  </div>
+    {% block extra_controls %}
+      <a href="{% url account|validated_viewname:'refresh' account.pk %}" class="btn btn-sm btn-info" role="button">
+        <span class="mdi mdi-pencil" aria-hidden="true"></span>&nbsp;Refresh account
+      </a>
+      <a href="{% url account|validated_viewname:'more' account.pk %}" class="btn btn-sm btn-primary" role="button">
+        <span class="mdi mdi-pencil" aria-hidden="true"></span>&nbsp;More
+      </a>
+  {% endblock extra_controls %}
   <div class="container-fluid">
     <table class="table table-striped">
       <thead>

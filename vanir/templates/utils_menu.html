@@ -1,7 +1,6 @@
- <div class="btn-group">
-  <a href="#" class="btn btn-primary">Utils</a>
-  <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-  <div class="dropdown-menu">
-    <a class="dropdown-item" href="{% url "utils:utils_populate_db_binance" %}">Binance: Populate Tokens</a>
+<li class="nav-item dropdown">
+  <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" href="#">Utils</a>
+  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+    <a class="dropdown-item" href="{% url 'utils:utils_populate_db_binance' %}">Binance: Populate Tokens</a>
   </div>
-</div>
+</li>

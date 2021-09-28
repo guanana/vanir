@@ -4,35 +4,22 @@ Blockchain Detail
 {% endblock title %}
 
 {% block content %}
-<div class="container">
-
-  <div class="float-right">
-    <div class="btn-toolbar" role="toolbar" aria-label="Buttons">
-      <div class="btn-group mr-2" role="group" aria-label="Edit">
-        <a class="btn btn-warning float-right" href="{% url 'blockchain:blockchain_update' blockchain.pk %}" role="button">Edit</a>
-      </div>
-      <div class="btn-group mr-2" role="group" aria-label="Delete">
-        <a class="btn btn-danger btn-outline float-right" href="{% url 'blockchain:blockchain_delete' blockchain.pk %}" role="button">Delete</a>
-      </div>
-    </div>
-  </div>
-  <div class="container-fluid">
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th scope="col">Name</th>
-          <th scope="col">Project URL</th>
-          <th scope="col">Explorer URL</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <th scope="row">{{ blockchain.name }}</th>
-          <td><a href="{{ blockchain.project_url }}" target="_blank">Project Web</a></td>
-          <td><a href="{{ blockchain.explorer_url }}" target="_blank">Explorer</a></td>
-        </tr>
-        </tbody>
-      </table>
-  </div>
+<div class="container-fluid">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Project URL</th>
+        <th scope="col">Explorer URL</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">{{ blockchain.name }}</th>
+        <td><a href="{{ blockchain.project_url }}" target="_blank">Project Web</a></td>
+        <td><a href="{{ blockchain.explorer_url }}" target="_blank">Explorer</a></td>
+      </tr>
+      </tbody>
+  </table>
 </div>
 {% endblock %}

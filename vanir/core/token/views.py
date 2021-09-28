@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 
+from vanir.core.token.filtersets import TokenFilter
 from vanir.core.token.helpers.import_utils import bulk_update
 from vanir.core.token.models import Token
 from vanir.core.token.tables import TokenTable
@@ -9,6 +10,7 @@ from vanir.utils.views import (
     ObjectCreateView,
     ObjectDeleteView,
     ObjectDetailView,
+    ObjectListFilterView,
     ObjectListView,
     ObjectUpdateView,
 )
@@ -19,9 +21,10 @@ class TokenCreateView(ObjectCreateView):
     fields = ("name", "symbol", "blockchain", "last_value")
 
 
-class TokenListView(ObjectListView):
+class TokenListView(ObjectListFilterView):
     model = Token
     table_class = TokenTable
+    filterset_class = TokenFilter
 
 
 class TokenUpdateView(ObjectUpdateView):

@@ -26,7 +26,10 @@ def validated_viewname(model, action):
     """
     Return the view name for the given model and action if valid, or None if invalid.
     """
-    viewname = f"{model._meta.app_label}:{model._meta.model_name}_{action}"
+    try:
+        viewname = f"{model._meta.app_label}:{model._meta.model_name}_{action}"
+    except AttributeError:
+        return model
     try:
         # Validate and return the view name. We don't return the actual URL yet because many of the templates
         # are written to pass a name to {% url %}.
@@ -37,7 +40,7 @@ def validated_viewname(model, action):
             reverse(viewname, kwargs={"pk": model.pk})
             return viewname
         except NoReverseMatch:
-            return "ERROR"
+            return "Validated View name ERROR"
 
 
 @register.filter()
@@ -69,6 +72,8 @@ def get_model_image(model_name, image_name: str = ""):
 
 @register.filter()
 def get_model_name(model):
+    if model == "":
+        return "Custom"
     return model._meta.model_name
 
 

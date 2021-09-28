@@ -20,7 +20,7 @@ urlpatterns = [
         name="token_bulk_update_price",
     ),
     path("<int:pk>/", TokenDetailView.as_view(), name="token_detail"),
-    path("<int:pk>/edit/", TokenUpdateView.as_view(), name="token_update"),
+    path("<int:pk>/edit/", TokenUpdateView.as_view(), name="token_edit"),
     path("<int:pk>/delete/", TokenDeleteView.as_view(), name="token_delete"),
     path(
         "<int:pk>/update_price/",

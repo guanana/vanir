@@ -1,55 +1,78 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, DetailView, TemplateView
 from django.views.generic.edit import DeleteView, FormView, UpdateView
+from django_filters.views import FilterView
 from django_tables2 import SingleTableView
+from django_tables2.views import SingleTableMixin
 
 from vanir.utils.forms import PopulateDBBinanceForm
 
 
-@method_decorator(login_required, name="dispatch")
-class ObjectCreateView(CreateView):
+def set_context_data(context, view):
+    app_label = view.model._meta.app_label
+    model_name = view.model._meta.model_name
+    context["app_label"] = app_label
+    context["model_name"] = model_name
+    return context
+
+
+class ObjectCreateView(LoginRequiredMixin, CreateView):
     model = None
     template_name = "object_form.html"
 
 
-@method_decorator(login_required, name="dispatch")
-class ObjectListView(SingleTableView):
+class ObjectListView(LoginRequiredMixin, SingleTableView):
     model = None
     table_class = None
     template_name = "object_list.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        model_name = self.model.__name__.lower()
-        context["model_name"] = model_name
-        context["model_url"] = f"{model_name}:{model_name}_add"
-        return context
+        return set_context_data(context, self)
 
 
-@method_decorator(login_required, name="dispatch")
-class ObjectUpdateView(UpdateView):
+class ObjectListFilterView(LoginRequiredMixin, SingleTableMixin, FilterView):
+    model = None
+    table_class = None
+    filterset_class = None
+    template_name = "object_list.html"
+    table_pagination = {"per_page": 15}
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return set_context_data(context, self)
+
+
+class ObjectUpdateView(LoginRequiredMixin, UpdateView):
     model = None
     fields = "__all__"
     template_name = "object_update.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["model_name"] = self.model.__name__.lower()
-        return context
+        context["form_button"] = "Apply"
+        return set_context_data(context, self)
 
 
-@method_decorator(login_required, name="dispatch")
 class ObjectDetailView(DetailView):
     model = None
 
 
-@method_decorator(login_required, name="dispatch")
-class ObjectDeleteView(DeleteView):
+# TODO: Check how to pass into table
+# class ObjectDetailView(LoginRequiredMixin, SingleTableView):
+#     model = None
+
+
+class ObjectDeleteView(LoginRequiredMixin, DeleteView):
     model = None
     template_name = "object_delete_confirm.html"
     success_url = "/"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return set_context_data(context, self)
 
 
 class HomeView(TemplateView):
@@ -64,7 +87,12 @@ class PopulateDBBinanceView(FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = "Populate DB with Binance"
+        context["form_button"] = "Apply"
         return context
+
+    def post(self, request, *args: str, **kwargs):
+        messages.success(request, "Import completed")
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         # This method is called when valid form data has been POSTed.

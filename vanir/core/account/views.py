@@ -44,11 +44,28 @@ class AccountListView(ObjectListView):
 
 class AccountUpdateView(ObjectUpdateView):
     model = Account
-    # TODO: Fix selection of tokens
+    fields = (
+        "name",
+        "exchange",
+        "user",
+        "api_key",
+        "secret",
+        "tld",
+        "testnet",
+        "default",
+    )
 
 
 class AccountDetailView(ObjectDetailView):
     model = Account
+    # TODO: Check how to pass into table
+    # template_name = "account/account_detail.html"
+    #
+    # def get_table_data(self):
+    #     account_pk = self.request.resolver_match.kwargs.get("pk")
+    #     if account_pk:
+    #         data = Account.objects.filter(pk=account_pk)
+    #         return data
 
 
 class AccountTokenBulkUpdateValueView(ObjectDetailView):

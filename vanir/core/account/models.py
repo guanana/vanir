@@ -26,13 +26,19 @@ class Account(BaseObject):
         "token.Token", through="AccountTokens", related_name="accounts"
     )
     token_pair = models.ForeignKey(
-        Token, on_delete=SET_NULL, null=True, related_name="token_pair"
+        Token,
+        on_delete=SET_NULL,
+        null=True,
+        related_name="token_pair",
+        help_text="Choose a token to be your pair value",
     )
     default = models.BooleanField(
         default=False,
         help_text="Default account to run fetch methods like token price update",
     )
-    testnet = models.BooleanField(default=False)
+    testnet = models.BooleanField(
+        default=False, help_text="Only for test accounts with DEV accounts"
+    )
 
     def save(self, *args, **kwargs):
         self.check_default()

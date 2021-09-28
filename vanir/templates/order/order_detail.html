@@ -4,41 +4,28 @@ Order Detail
 {% endblock title %}
 
 {% block content %}
-<div class="container">
-
-  <div class="float-right">
-<!--    <div class="btn-toolbar" role="toolbar" aria-label="Buttons">-->
-<!--      <div class="btn-group mr-2" role="group" aria-label="Edit">-->
-<!--        <a class="btn btn-warning float-right" href="{% url 'order:order_update' order.pk %}" role="button">Edit</a>-->
-<!--      </div>-->
-<!--      <div class="btn-group mr-2" role="group" aria-label="Delete">-->
-<!--        <a class="btn btn-danger btn-outline float-right" href="{% url 'order:order_delete' order.pk %}" role="button">Delete</a>-->
-<!--      </div>-->
-    </div>
-  </div>
-  <div class="container-fluid">
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th scope="col">Name</th>
-          <th scope="col">Account</th>
-          <th scope="col">Symbol</th>
-          <th scope="col">Side</th>
-          <th scope="col">Order Type</th>
-          <th scope="col">Quantity</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <th scope="row">{{ order.name }}</th>
-          <td>{{ order.account.name }}</td>
-          <td>{{ order.symbol }}</td>
-          <td>{{ order.side }}</td>
-          <td>{{ order.orderType }}</td>
-          <td>{{ order.quoteOrderQty }}</td>
-        </tr>
-        </tbody>
-      </table>
-  </div>
+<div class="container-fluid">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Account</th>
+        <th scope="col">Symbol</th>
+        <th scope="col">Side</th>
+        <th scope="col">Order Type</th>
+        <th scope="col">Quantity</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">{{ order.name }}</th>
+        <td>{{ order.account.name }}</td>
+        <td>{{ order.symbol }}</td>
+        <td>{{ order.side }}</td>
+        <td>{{ order.orderType }}</td>
+        <td>{{ order.quoteOrderQty }}</td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 {% endblock %}

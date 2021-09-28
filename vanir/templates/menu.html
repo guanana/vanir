@@ -1,33 +1,28 @@
 {% load filtertemplates %}
-<div class="mb-1">
-    <nav class="navbar navbar-expand-md navbar-light bg-light">
-       <div class="collapse navbar-collapse">
-          <a class="btn btn-success" href="{% url 'home' %}">Vanir</a>
-        </div>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-          {% with 'Exchange Blockchain Token Account Order' as list %}
+{% load static %}
+<div class="container-fluid">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="{% url 'home' %}">
+      <img src="{% static 'images/favicons/vanir_logo.png' %}" width="30" height="30" class="d-inline-block align-top" alt="">
+      Vanir
+    </a>
+  <div class="container-lg">
+      <ul class="navbar-nav mr-auto">
+        {% with 'Exchange Blockchain Token Account Order' as list %}
             {% for app in list.split %}
-              <div class="row">
-                <div class="col-sm">
-                  <div class="btn-toolbar">
-                    <div class="btn-group">
-                      <a href="{% url app|get_viewname:"list" %}" class="btn btn-primary">{{app}}</a>
-                      <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-                      <div class="dropdown-menu">
-                        <a class="dropdown-item" href="{% url app|get_viewname:"list" %}">List</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{% url app|get_viewname:"add" %}">Add</a>
-                      </div>
-                    </div>
-                    <div class="container"> </div>
-                  </div>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" href="{% url app|get_viewname:'list' %}">{{app}}</a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" href="{% url app|get_viewname:'list' %}">List</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="{% url app|get_viewname:'add' %}">Add</a>
                 </div>
-              </div>
+              </li>
+              <div class="container"> </div>
             {% endfor %}
-          {% endwith %}
           {% include "utils_menu.html" %}
-        </ul>
-      </div>
-    </nav>
- </div>
+        {% endwith %}
+      </ul>
+  </div>
+  </nav>
+</div>

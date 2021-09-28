@@ -1,36 +1,25 @@
-{% extends "object_base.html" %}
+{% extends "basic_form.html" %}
 {% load filtertemplates %}
 {% load static %}
+{% load buttons %}
+
 {% block title %}
 Update {{ model_name }}
 {% endblock title %}
 
-{% block content %}
-<div class="float-right">
-  <div class="btn-toolbar" role="toolbar" aria-label="Buttons">
-    <div class="btn-group mr-2" role="group" aria-label="Add">
-      <a class="btn btn-danger float-right" href="{% url object|validated_viewname:'delete' object.id %}" role="button">Delete</a>
-    </div>
-  </div>
+{% block buttons %}
+<div class="control-group float-right">
+  {# Extra buttons #}
+  {% block extra_controls %}
+  {% endblock %}
+  {% delete_button object %}
 </div>
+{% endblock buttons %}
+
+{% block model %}
 <div class="py-5 text-center">
   <img class="d-block mx-auto mb-4" src="{% static model_name|get_model_image %}" alt="{{ model_name }}" width="30%" height="30%">
   <h2>Edit {{ model_name }}</h2>
   <p class="lead">Edit the desired fields on the {{ model_name }}</p>
 </div>
-
-<div class="container">
-  <form method="post">
-    {% csrf_token %}
-  {% for field in form %}
-      <div class="form-group">
-          {{ field.errors }}
-          <label>{{ field.label_tag }}</label>
-            {{ field|add_class:"form-control form-control-lg" }}
-      </div>
-  {% endfor %}
-    <input class="btn btn-primary" type="submit" value="Submit">
-  </form>
-</div>
-
-{% endblock content %}
+{% endblock model %}
