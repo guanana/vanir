@@ -1,0 +1,28 @@
+{% extends "object_base.html" %}
+{% load filtertemplates %}
+{% load static %}
+{% load bootstrap4 %}
+{% block title %}
+Login
+{% endblock title %}
+{% block buttons %}{% endblock buttons %}
+
+{% block content %}
+{% block model %}{% endblock model %}
+
+  {% block form %}
+<div class="container-fluid">
+   <div class="col-md-6 col-sm-12">
+      <div class="login-form">
+        <form method="post">
+          {% csrf_token %}
+          {% bootstrap_form form form_group_class='fadeIn second' %}
+          {% buttons %}
+          <button class="btn btn-success btn-sm" type="submit" value="Submit">Login</button>
+          {% endbuttons %}
+        </form>
+      </div>
+  </div>
+</div>
+  {% endblock form %}
+{% endblock content %}

@@ -18,8 +18,15 @@
     <link rel="icon" href="{% static 'images/favicons/vanir_logo.png' %}">
 
   {# Load CSS and JavaScript #}
-  {% bootstrap_css %}
-  {% bootstrap_javascript jquery='full' %}
+  {% block css %}
+    <link href="{% static 'css/project.css' %}" rel="stylesheet">
+    {% bootstrap_css %}
+  {% endblock css %}
+  {% block javascript %}
+    {% bootstrap_javascript jquery='full' %}
+    <script defer src="{% static 'js/project.js' %}"></script>
+<!--    <script defer src="{% static 'js/search.js' %}"></script>-->
+  {% endblock javascript %}
 
   </head>
 
