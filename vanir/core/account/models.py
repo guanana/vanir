@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import SET_NULL
@@ -6,7 +7,6 @@ from django.utils.functional import cached_property
 from vanir.core.exchange.libs.exchanges import ExtendedExchangeRegistry
 from vanir.core.exchange.models import Exchange
 from vanir.core.token.models import Token
-from vanir.users.admin import User
 from vanir.utils.helpers import value_pair
 from vanir.utils.models import BaseObject
 
@@ -39,6 +39,9 @@ class Account(BaseObject):
     testnet = models.BooleanField(
         default=False, help_text="Only for test accounts with DEV accounts"
     )
+
+    class Meta:
+        ordering = ["name"]
 
     def save(self, *args, **kwargs):
         self.check_default()

@@ -6,8 +6,8 @@
       <img src="{% static 'images/favicons/vanir_logo.png' %}" width="30" height="30" class="d-inline-block align-top" alt="">
       Vanir
     </a>
-  <div class="container-lg">
-      <ul class="navbar-nav mr-auto">
+  <div class="container">
+      <ul class="navbar-nav">
         {% with 'Exchange Blockchain Token Account Order' as list %}
             {% for app in list.split %}
               <li class="nav-item dropdown">
@@ -24,5 +24,6 @@
         {% endwith %}
       </ul>
   </div>
+    {% include 'login_items.html' %}
   </nav>
 </div>

@@ -1,4 +1,4 @@
-- model: core.token.coin
+- model: token.coin
   pk: 1
   fields:
     name: Binance Coin
@@ -6,13 +6,13 @@
     blockchain: 1
     last_value: 1
 
-- model: core.token.token
+- model: token.token
   pk: 1
   fields:
     token_type: BEP_20
 
 
-- model: core.token.coin
+- model: token.coin
   pk: 2
   fields:
     name: Tether
@@ -20,14 +20,14 @@
     blockchain: 2
     last_value: 1
 
-- model: core.token.token
+- model: token.token
   pk: 2
   fields:
     token_type: ERC-20
 
 
 
-- model: core.token.coin
+- model: token.coin
   pk: 3
   fields:
     name: Etherum
@@ -35,7 +35,7 @@
     blockchain: 2
     last_value: 1
 
-- model: core.token.token
+- model: token.token
   pk: 3
   fields:
     token_type: ERC-20

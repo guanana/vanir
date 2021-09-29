@@ -1,0 +1,19 @@
+<div class="float-right">
+  <ul class="nav nav-pills nav-justified">
+    {% if user.is_authenticated %}
+    <li class="nav-item">
+      <a href="{% url 'admin:auth_user_changelist' %}" class="nav-item nav-link active" id="navbarUser" role="button" aria-haspopup="true" aria-expanded="false">{{ user.get_username }}</a>
+    </li>
+    <li class="nav-item">
+      <a href="{% url 'users:logout' %}" class="nav-link" id="navbarLogout" role="button" aria-haspopup="true" aria-expanded="false">Log out</a>
+    </li>
+    {% else %}
+    <li class="nav-item">
+      <a href="{% url 'users:login' %}" class="nav-link" id="navbarLogin" role="button" aria-haspopup="true" aria-expanded="false">Login</a>
+    </li>
+    <li class="nav-item">
+      <a href="{% url 'admin:auth_user_add' %}" class="nav-link" id="navbarsignup" role="button" aria-haspopup="true" aria-expanded="false" >Sign up</a>
+    </li>
+    {% endif %}
+  </ul>
+</div>

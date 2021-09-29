@@ -12,9 +12,7 @@ def reverse_func(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ('users', '0001_initial'),
-    ]
+    initial = True
     operations = [
         migrations.RunPython(forwards_func, reverse_func, elidable=False)
     ]

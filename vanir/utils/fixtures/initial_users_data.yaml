@@ -1,14 +1,13 @@
-- model: users.user
+- model: auth.user
   pk: 1
   fields:
     password: 'argon2$argon2i$v=19$m=512,t=2,p=2$a2l1UXVGVkVWNkFa$CoZzevbsjSjjj36G7TnA3Q'
     last_login: null
     is_superuser: true
     username: admin
-    email: ''
+    email: 'admin@vanir'
     is_staff: true
     is_active: true
     date_joined: '2021-09-26T22:05:15.378Z'
-    name: ''
     groups: []
     user_permissions: []

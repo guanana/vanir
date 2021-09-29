@@ -1,11 +1,11 @@
-- model: core.blockchain.Blockchain
+- model: blockchain.Blockchain
   pk: 1
   fields:
     name: Binance Smart Chain
     project_url: https://www.binance.org/en/smartChain
     explorer_url: https://bscscan.com/
 
-- model: core.blockchain.Blockchain
+- model: blockchain.Blockchain
   pk: 2
   fields:
     name: Etherum Blockchain
