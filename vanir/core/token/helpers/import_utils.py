@@ -24,14 +24,8 @@ def get_token_full_name(account: Account, token_symbol: str) -> str:
 
 
 def token_import(
-    account: Account,
-    token_symbol: str,
-    token_fullname: str = None,
-    quantity: float = None,
-    blockchain: Blockchain = None,
+    account: Account, token_symbol: str, token_fullname: str = None
 ) -> Token:
-    if not blockchain:
-        blockchain = account.exchange_obj.default_blockchain
     try:
         if not token_fullname:
             token_fullname = get_token_full_name(account, token_symbol)
@@ -43,18 +37,23 @@ def token_import(
             token_obj.name = token_fullname
             token_obj.save()
     except Token.DoesNotExist:
-        token_obj = Token.objects.create(
-            name=token_fullname, symbol=token_symbol, blockchain=blockchain
+        token_obj = Token.objects.create(name=token_fullname, symbol=token_symbol)
+    return token_obj
+
+
+def import_token_account(
+    token_obj: Token, account: Account, blockchain: Blockchain, quantity: float
+):
+    try:
+        account_token = AccountTokens.objects.get(
+            account=account, token=token_obj, blockchain=blockchain
         )
-    if quantity:
-        try:
-            account_token = AccountTokens.objects.get(account=account, token=token_obj)
-        except AccountTokens.DoesNotExist:
-            account_token = AccountTokens.objects.create(
-                account=account, token=token_obj
-            )
-        account_token.quantity = quantity
-        account_token.save()
+    except AccountTokens.DoesNotExist:
+        account_token = AccountTokens.objects.create(
+            account=account, token=token_obj, blockchain=blockchain
+        )
+    account_token.quantity = quantity
+    account_token.save()
     return token_obj
 
 

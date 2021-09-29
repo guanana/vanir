@@ -21,7 +21,7 @@ class AccountTokens(models.Model):
     #  to support different prices for different accounts!
 
     class Meta:
-        unique_together = ("account", "token")
+        unique_together = ("account", "token", "blockchain")
 
     def save(self, *args, **kwargs):
         token = AccountTokens.objects.filter(token=self.token)

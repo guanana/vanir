@@ -6,7 +6,13 @@ from vanir.core.account.models import Account
 from vanir.core.account.tables import AccountTable
 from vanir.core.account.utils import exchange_view_render
 from vanir.core.exchange.libs.exchanges import ExtendedExchange
-from vanir.core.token.helpers.import_utils import bulk_update, qs_update, token_import
+from vanir.core.token.helpers.import_utils import (
+    bulk_update,
+    import_token_account,
+    qs_update,
+    token_import,
+)
+from vanir.core.token.models import Token
 from vanir.utils.views import (
     ObjectCreateView,
     ObjectDeleteView,
@@ -112,10 +118,15 @@ def exchange_importtokens(request, pk):
     df = account.exchange_obj.get_balance()
     response = []
     for index, row in df.iterrows():
-        token_import(
+        try:
+            token = Token.objects.get(symbol=row["asset"])
+        except Token.DoesNotExist:
+            token = token_import(account=account, token_symbol=row["asset"])
+        import_token_account(
             account=account,
-            token_symbol=row["asset"],
+            token_obj=token,
             quantity=float(row["free"]) + float(row["locked"]),
+            blockchain=account.exchange_obj.default_blockchain,
         )
         response.append(row["asset"])
     bulk_update()

@@ -1,5 +1,5 @@
-from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, TemplateView
 from django.views.generic.edit import DeleteView, FormView, UpdateView
@@ -79,10 +79,11 @@ class HomeView(TemplateView):
     template_name = "pages/home.html"
 
 
-class PopulateDBBinanceView(FormView):
+class PopulateDBBinanceView(SuccessMessageMixin, FormView):
     form_class = PopulateDBBinanceForm
     template_name = "basic_form.html"
     success_url = reverse_lazy("token:token_list")
+    success_message = "Import completed"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -91,7 +92,6 @@ class PopulateDBBinanceView(FormView):
         return context
 
     def post(self, request, *args: str, **kwargs):
-        messages.success(request, "Import completed")
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
