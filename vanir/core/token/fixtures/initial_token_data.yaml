@@ -3,7 +3,6 @@
   fields:
     name: Binance Coin
     symbol: BNB
-    blockchain: 1
     last_value: 1
 
 - model: token.token
@@ -17,7 +16,6 @@
   fields:
     name: Tether
     symbol: USDT
-    blockchain: 2
     last_value: 1
 
 - model: token.token
@@ -32,7 +30,6 @@
   fields:
     name: Etherum
     symbol: ETH
-    blockchain: 2
     last_value: 1
 
 - model: token.token

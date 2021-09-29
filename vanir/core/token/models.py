@@ -1,6 +1,5 @@
 from django.db import models
 
-from vanir.core.blockchain.models import Blockchain
 from vanir.core.token.choices import TokenTypes
 from vanir.utils.models import BaseObject
 
@@ -8,9 +7,6 @@ from vanir.utils.models import BaseObject
 class Coin(BaseObject):
     name = models.CharField(max_length=40, unique=True)
     symbol = models.CharField(max_length=6, unique=True)
-    blockchain = models.ForeignKey(
-        Blockchain, on_delete=models.CASCADE, null=True, blank=True
-    )
     last_value = models.FloatField(null=True)
 
     class Meta:

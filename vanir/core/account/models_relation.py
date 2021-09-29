@@ -2,6 +2,8 @@ from datetime import datetime
 
 from django.db import models
 
+from vanir.core.blockchain.models import Blockchain
+
 
 class AccountTokens(models.Model):
     """
@@ -11,6 +13,9 @@ class AccountTokens(models.Model):
     account = models.ForeignKey("Account", on_delete=models.CASCADE)
     token = models.ForeignKey("token.Token", on_delete=models.CASCADE)
     quantity = models.FloatField(default=0)
+    blockchain = models.ForeignKey(
+        Blockchain, on_delete=models.CASCADE, null=True, blank=True
+    )
     update_time = models.TimeField(blank=True, null=True)
     # TODO: Last value needs to be in the relationship to be able
     #  to support different prices for different accounts!
