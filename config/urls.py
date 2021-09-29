@@ -12,7 +12,7 @@ urlpatterns = [
     path("", HomeView.as_view(), name="home"),
     path(settings.ADMIN_URL, admin.site.urls),
     # User management
-    path("users/", include("vanir.users.urls", namespace="users")),
+    path("users/", include(("django.contrib.auth.urls", "users"), namespace="users")),
     path("account/", include("vanir.core.account.urls", namespace="account")),
     path("exchange/", include("vanir.core.exchange.urls", namespace="exchange")),
     path("blockchain/", include("vanir.core.blockchain.urls", namespace="blockchain")),
