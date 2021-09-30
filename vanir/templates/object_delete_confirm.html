@@ -12,6 +12,9 @@ Delete
   <form action="" method="post">
     {% csrf_token %}
       <p>Are you sure you want to delete "{{ object }}"?</p>
+      <li class="list-group-item list-group-item-danger">
+        <p>This action <b>CANNOT be reverted!</b></p>
+      </li>
       <input class="btn btn-danger" type="submit" value="Confirm" />
   </form>
 </div>

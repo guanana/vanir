@@ -1,4 +1,4 @@
-{% extends "object_base.html" %}
+{% extends "extras_base.html" %}
 {% load static %}
 {% block title %}
 More actions
@@ -6,34 +6,36 @@ More actions
 
 {% block content %}
 <div class="row col-xl-32">
-      <div class="col-md-6">
-        <h2></h2>
-        <h4 align="center" class="bg-secondary text-white">Test your account</h4>
-        <img src="{% static "images/misc/test.png" %}" class="bd-placeholder-img card-img-top" width="90%" height="225" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="balance"><title>Get your account balance</title><rect width="90%" height="90%" fill="#55595c"/></img>
-        <a href="{% url 'account:account_test' pk %}" class="alert-link">
-          <div class="d-block p-2 bg-primary text-white">
-            <blockquote class="text-center">Test</blockquote>
-          </div>
-        </a>
+  <div class="col-md-4">
+    <h2></h2>
+    <h4 align="center" class="bg-secondary text-white">Test your account</h4>
+    <img src="{% static "images/misc/test.png" %}" class="bd-placeholder-img card-img-top" width="90%" height="225" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="balance"><title>Get your account balance</title><rect width="90%" height="90%" fill="#55595c"/></img>
+    <a href="{% url 'account:account_test' pk %}" class="alert-link">
+      <div class="d-block p-2 bg-primary text-white">
+        <blockquote class="text-center">Test</blockquote>
       </div>
-      <div class="col-md-6">
-          <h2></h2>
-          <h4 align="center" class="bg-secondary text-white">Check account balance from exchange</h4>
-          <img src="{% static "images/misc/balance.png" %}" class="bd-placeholder-img card-img-top" width="90%" height="225" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="balance"><title>Get your account balance</title><rect width="90%" height="90%" fill="#55595c"/></img>
-          <a href="{% url 'account:account_balance' pk %}" class="alert-link">
-            <div class="d-block p-2 bg-primary text-white">
-              <blockquote class="text-center">Sync</blockquote>
-            </div>
-          </a>
-      </div>
-        <div class="col-md-6">
-            <h2></h2>
-            <h4 align="center" class="bg-danger text-white">Delete all tokens</h4>
-            <img src="{% static "images/misc/delete_tokens.png" %}" class="bd-placeholder-img card-img-top" width="90%" height="225" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="balance"><title>Delete tokens from the account</title><rect width="90%" height="90%" fill="#55595c"/></img>
-            <a href="{% url 'account:account_delete_tokens' pk %}" class="alert-link">
-              <div class="d-block p-2 bg-danger text-white">
-                <blockquote class="text-center">Delete all tokens</blockquote>
-              </div>
-            </a>
+    </a>
+  </div>
+  <div class="col-md-4">
+      <h2></h2>
+      <h4 align="center" class="bg-secondary text-white">Check account balance from exchange</h4>
+      <img src="{% static "images/misc/balance.png" %}" class="bd-placeholder-img card-img-top" width="90%" height="225" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="balance"><title>Get your account balance</title><rect width="90%" height="90%" fill="#55595c"/></img>
+      <a href="{% url 'account:account_balance' pk %}" class="alert-link">
+        <div class="d-block p-2 bg-primary text-white">
+          <blockquote class="text-center">Sync</blockquote>
         </div>
-{% endblock content%}
+      </a>
+  </div>
+  <div class="col-md-4">
+      <h2></h2>
+      <h4 align="center" class="bg-danger text-white">Delete all tokens</h4>
+      <img src="{% static "images/misc/delete_tokens.png" %}" class="bd-placeholder-img card-img-top" width="90%" height="225" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="balance"><title>Delete tokens from the account</title><rect width="90%" height="90%" fill="#55595c"/></img>
+      <a href="{% url 'account:account_delete_tokens' pk %}" class="alert-link">
+        <div class="d-block p-2 bg-danger text-white">
+          <blockquote class="text-center">Delete all tokens</blockquote>
+        </div>
+      </a>
+  </div>
+</div>
+
+  {% endblock content%}

@@ -51,7 +51,7 @@ class Coin(BaseObject):
 
 
 class Token(Coin):
-    token_type = models.CharField(max_length=9, choices=TokenTypes.choices)
+    token_type = models.CharField(max_length=9, choices=TokenTypes.choices, null=True)
 
     def get_absolute_url(self):
         from django.urls import reverse

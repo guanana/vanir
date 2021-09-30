@@ -33,10 +33,10 @@
   <body>
 
     {% include "menu.html" %}
-    <div class="container-fluid">
+    {% block layout_title %}{% endblock %}
+    <div class="container-sm">
     {% include 'messages.html' %}
     </div>
-    {% block layout_title %}{% endblock %}
     <!-- /container -->
     <div class="container-fluid">
       <div class="col-lg">

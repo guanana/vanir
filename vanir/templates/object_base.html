@@ -1,14 +1,7 @@
-{% extends "base.html" %}
+{% extends "extras_base.html" %}
 {% load filtertemplates %}
 {% load buttons %}
 {% load static %}
-
-{% block layout_title %}
-<div class="container-fluid">
-  <h2 align="center" class="alert alert-success">
-  {% block title %} Base {% endblock %}
-  </h2>
-</div>
 
 {% block buttons %}
 <div class="d-flex flex-row-reverse">
@@ -19,11 +12,7 @@
   {% edit_button object %}
   </div>
   {# Extra buttons #}
-  <div class="p-2">
   {% block extra_controls %}
   {% endblock extra_controls %}
-  </div>
 </div>
 {% endblock buttons %}
-
-{% endblock layout_title %}

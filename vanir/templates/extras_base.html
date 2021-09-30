@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load filtertemplates %}
+{% load buttons %}
+{% load static %}
+
+{% block layout_title %}
+<div class="container-fluid">
+  <h2 align="center" class="alert alert-success">
+  {% block title %} Extras Base {% endblock %}
+  </h2>
+</div>
+{% block buttons %}{% endblock buttons %}
+{% endblock layout_title %}
+
+{% block content %}{% endblock content %}
