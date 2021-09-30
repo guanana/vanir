@@ -7,23 +7,29 @@ from bs4 import BeautifulSoup
 class BaseScrap:
     SCRAP_URLS = {
         "Binance": {
-            "url": "https://www.binance.com/en/support/announcement/c-48",
+            "base_url": "https://www.binance.com",
+            "announcement_path": "/en/support/announcement/c-48",
             "scrap_pattern": re.compile("link-0-"),
         }
     }
+    URL_HREF_PATTERN = re.compile("href=(?P<url>)")
     LIST_PATTERN = re.compile("List .* (?P<symbol>\((\w+\)))")
     PAIR_PATTERN = re.compile("(?P<pair>\w+/\w+)")
 
 
 class ScrapBinance(BaseScrap):
     def __init__(self, scrap_option: str):
-        self.url = self.SCRAP_URLS.get(scrap_option)["url"]
+        self.base_url = self.SCRAP_URLS.get(scrap_option)["base_url"]
+        self.url = (
+            f'{self.base_url}{self.SCRAP_URLS.get(scrap_option)["announcement_path"]}'
+        )
         self.url_pattern = self.SCRAP_URLS.get(scrap_option)["scrap_pattern"]
         if not self.url:
             raise ValueError(f"{scrap_option} not a valid option")
         self.link_content = {}
 
-    def _get_raw_content(self):
+    @property
+    def _raw_content(self):
         page = requests.get(self.url)
         if not page:
             raise ValueError(f"There was a problem with the connection to {self.url}")
@@ -32,9 +38,20 @@ class ScrapBinance(BaseScrap):
 
     @property
     def text_content(self):
-        raw_content = self._get_raw_content()
-        content = raw_content.findAll("a", id=self.url_pattern)
+        content = self._raw_content.findAll("a", id=self.url_pattern)
         return [item.text for item in content]
+
+    @property
+    def url_content(self):
+        content = self._raw_content.find_all("a", id=self.url_pattern)
+        dict_urls = {item.text: f"{self.base_url}{item['href']}" for item in content}
+        temp_dict = dict_urls.copy()
+        for text, url in temp_dict.items():
+            match_list = self.LIST_PATTERN.search(text)
+            match_pair = self.PAIR_PATTERN.findall(text)
+            if not match_list and not match_pair:
+                dict_urls.pop(text)
+        return dict_urls
 
     @property
     def direct_list_tokens(self):
