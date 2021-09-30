@@ -13,4 +13,4 @@ class TokenTable(ObjectTable):
     class Meta:
         model = Token
         template_name = "django_tables2/bootstrap.html"
-        fields = ("name", "symbol", "blockchain", "last_value")
+        fields = ("name", "symbol", "last_value")
