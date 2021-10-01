@@ -1,16 +1,15 @@
+import logging
 import re
+from datetime import datetime
 
 import requests
 from bs4 import BeautifulSoup
 
-# from .choices import DiscoverMethod
-# from .helpers import token_already_exists
-# from .models import BinanceNewTokenModel
+logger = logging.getLogger(__name__)
 
 
 class BaseScrap:
-    def __init__(self, scrap_option: str):
-        self.scrap_option = scrap_option
+    def __init__(self):
         self.url = ""
         self.match_lines = dict()
 
@@ -23,6 +22,10 @@ class BaseScrap:
 
 
 class AnnouncementScrap(BaseScrap):
+    def __init__(self, scrap_option: str):
+        super().__init__()
+        self.scrap_option = scrap_option
+
     LIST_PATTERN = re.compile("List .* (?P<symbol>\((\w+\)))")  # noqa W605
     PAIR_PATTERN = re.compile("(?P<pair>\w+/\w+)")  # noqa W605
     ANNOUNCEMENT_SCRAP_URLS = {
@@ -125,9 +128,51 @@ class ScrapBinance(AnnouncementScrap):
     def _last_token_announcements(self):
         return self.direct_list_tokens + self.new_pair_tokens
 
-    def follow_urls(self, symbol):
+    def release_date(self, symbol):
+        scrap_timestamp_obj = ScrapTimestamp()
         if len(self._last_token_announcements) > 0:
             try:
-                return self.url_lines[self.match_lines[symbol]]
+                url = self.url_lines[self.match_lines[symbol]]
+                scrap_timestamp_obj.url = url
+                token_date = scrap_timestamp_obj.timestamp_content
+                return token_date
             except KeyError:
-                pass
+                logger.error("Problem finding the match line")
+
+
+class ScrapTimestamp(BaseScrap):
+    """
+    TIMESTAMP_PATTERN = re.compile("(?P<year>^(19|20)\d{2})-"
+                                   "(?P<month>0[1-9]|1[0-2])-"
+                                   "(?P<day>0[1-9]|[12][0-9]|3[01]).+"
+                                   "(?P<hour>[0-1][0-9]|2[0-4]):"
+                                   "(?P<minute>[0-5][0-9]).+\((?P<timezone>\w+)\)")
+    """
+
+    TIMESTAMP_PATTERN = re.compile(
+        ".*(?P<year>(19|20)\d{2})-"
+        "(?P<month>0[1-9]|1[0-2])-"
+        "(?P<day>0[1-9]|[12][0-9]|3[01]).+"
+        "(?P<hour>[0-1][0-9]|2[0-4]):(?P<minute>[0-5][0-9])\s"
+        "((AM|PM\s \(UTC\))|\(UTC\))"
+    )  # noqa W605
+
+    def find_first_timestamp(self):
+        pass
+
+    @property
+    def timestamp_content(self):
+        article_content = self._raw_content().find_all("article")
+        try:
+            content = re.match(self.TIMESTAMP_PATTERN, article_content[0].text)
+        except IndexError:
+            logger.error(f"No article tag found for {self.url}")
+            return
+        if not content:
+            logger.error(f"No date found for {self.url}")
+            return
+
+        temp_dict = content.groupdict()
+        date_dict = {name: int(value) for name, value in temp_dict.items()}
+        date = datetime(**date_dict)
+        return date
