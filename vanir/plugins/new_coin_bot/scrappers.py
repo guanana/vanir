@@ -3,9 +3,9 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
-from .choices import DiscoverMethod
-from .helpers import token_already_exists
-from .models import BinanceNewTokenModel
+# from .choices import DiscoverMethod
+# from .helpers import token_already_exists
+# from .models import BinanceNewTokenModel
 
 
 class BaseScrap:
@@ -13,14 +13,6 @@ class BaseScrap:
         self.scrap_option = scrap_option
         self.url = ""
         self.match_lines = dict()
-
-    SCRAP_URLS = {
-        "Binance": {
-            "base_url": "https://www.binance.com",
-            "announcement_path": "/en/support/announcement/c-48",
-            "scrap_pattern": re.compile("link-0-"),
-        }
-    }
 
     def _raw_content(self):
         page = requests.get(self.url)
@@ -33,6 +25,13 @@ class BaseScrap:
 class AnnouncementScrap(BaseScrap):
     LIST_PATTERN = re.compile("List .* (?P<symbol>\((\w+\)))")  # noqa W605
     PAIR_PATTERN = re.compile("(?P<pair>\w+/\w+)")  # noqa W605
+    ANNOUNCEMENT_SCRAP_URLS = {
+        "Binance": {
+            "base_url": "https://www.binance.com",
+            "announcement_path": "/en/support/announcement/c-48",
+            "scrap_pattern": re.compile("link-0-"),
+        }
+    }
 
     @property
     def _last_token_announcements(self):
@@ -43,6 +42,8 @@ class AnnouncementScrap(BaseScrap):
         """
         raise NotImplementedError
 
+
+class AnnouncementScrapModel(BaseScrap):
     def remove_existing_tokens(self):
         """
         Checks against existing tokens in core Token DB and remove
@@ -58,15 +59,16 @@ class AnnouncementScrap(BaseScrap):
 
 
 class ScrapBinance(AnnouncementScrap):
-    DISCOVER_METHOD = DiscoverMethod.BINANCE_SCRAPPER
     URL_HREF_PATTERN = re.compile("href=(?P<url>)")  # noqa W605
 
     def __init__(self, scrap_option: str = "Binance"):
         super().__init__(scrap_option)
 
-        self.base_url = self.SCRAP_URLS.get(self.scrap_option)["base_url"]
-        self.url = f'{self.base_url}{self.SCRAP_URLS.get(self.scrap_option)["announcement_path"]}'
-        self.url_pattern = self.SCRAP_URLS.get(self.scrap_option)["scrap_pattern"]
+        self.base_url = self.ANNOUNCEMENT_SCRAP_URLS.get(self.scrap_option)["base_url"]
+        self.url = f'{self.base_url}{self.ANNOUNCEMENT_SCRAP_URLS.get(self.scrap_option)["announcement_path"]}'
+        self.url_pattern = self.ANNOUNCEMENT_SCRAP_URLS.get(self.scrap_option)[
+            "scrap_pattern"
+        ]
         if not self.url:
             raise ValueError(f"{self.scrap_option} not a valid option")
         self.link_content = {}
@@ -122,21 +124,6 @@ class ScrapBinance(AnnouncementScrap):
     @property
     def _last_token_announcements(self):
         return self.direct_list_tokens + self.new_pair_tokens
-
-    def remove_existing_tokens(self):
-        for token_symbol in self._last_token_announcements:
-            if token_already_exists(token_symbol):
-                self._last_token_announcements.pop()
-
-    def import_token_announcements(self):
-        self.remove_existing_tokens()
-        for token_symbol in self._last_token_announcements:
-            new_coin = BinanceNewTokenModel.objects.get_or_create(
-                name=token_symbol,
-                symbol=token_symbol,
-                discovered_method=self.DISCOVER_METHOD,
-            )
-            new_coin.increase_announcement_seen()
 
     def follow_urls(self, symbol):
         if len(self._last_token_announcements) > 0:
