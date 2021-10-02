@@ -11,6 +11,13 @@ def _validated_viewname_by_context(context, action):
     if not context or not action:
         raise ValidationError("Something went wrong with viewname validation")
     viewname = f'{context["app_label"]}:{context["model_name"]}_{action}'
+    try:
+        if context["plugin"]:
+            viewname = (
+                f'plugins:{context["app_label"]}:{context["model_name"]}_{action}'
+            )
+    except KeyError:
+        pass
     return viewname
 
 
