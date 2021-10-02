@@ -1,21 +1,23 @@
 from django.db import models
 
-from vanir.core.token.models import Token
+from vanir.core.token.models import Coin, Token
 from vanir.plugins.models import PluginBase
 from vanir.plugins.new_coin_bot.choices import DiscoverMethod, ScheduleScrap
 from vanir.utils.models import TimeStampedMixin
 
 
-class NewCoinModel(PluginBase, Token, TimeStampedMixin):
+class NewCoinConfig(PluginBase, TimeStampedMixin):
+    scrapping_interval = models.IntegerField(choices=ScheduleScrap.choices, default=10)
+
+
+class NewCoin(PluginBase, Coin, TimeStampedMixin):
     discovered_method = models.CharField(max_length=25, choices=DiscoverMethod.choices)
     listing_day = models.DateTimeField(null=True)
     announcement_seen = models.IntegerField(null=True)
-    scrapping_interval = models.IntegerField(
-        max_length=4, choices=ScheduleScrap, default=10
-    )
 
     class Meta:
         abstract = True
+        unique_together = ("name", "symbol")
 
     def increase_announcement_seen(self):
         self.announcement_seen += 1
@@ -35,7 +37,7 @@ class NewCoinModel(PluginBase, Token, TimeStampedMixin):
         self.delete()
 
 
-class BinanceNewTokenModel(NewCoinModel):
+class BinanceNewToken(NewCoin):
     discovered_method = models.CharField(
         max_length=25, choices=DiscoverMethod.choices, default="Binance Scrapper"
     )
