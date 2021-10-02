@@ -4,10 +4,9 @@ from django.db import models
 from django.db.models import SET_NULL
 from django.utils.functional import cached_property
 
-from vanir.core.exchange.libs.exchanges import ExtendedExchangeRegistry
 from vanir.core.exchange.models import Exchange
 from vanir.core.token.models import Token
-from vanir.utils.helpers import value_pair
+from vanir.utils.helpers import fetch_exchange_obj, value_pair
 from vanir.utils.models import BaseObject
 
 
@@ -43,6 +42,12 @@ class Account(BaseObject):
     class Meta:
         ordering = ["name"]
 
+    def clean(self):
+        if not self.exchange_obj.test():
+            raise ValidationError(
+                "Api key and Secret are not correct, unable to connect"
+            )
+
     def save(self, *args, **kwargs):
         self.check_default()
         super().save(*args, **kwargs)
@@ -65,15 +70,7 @@ class Account(BaseObject):
 
     @cached_property
     def exchange_obj(self):
-        try:
-            class_obj = ExtendedExchangeRegistry.get_class_by_name(
-                self.exchange.name.split(" ")[0]
-            )
-        except KeyError:
-            raise ValidationError(
-                f"Please create an account with a supported Exchange to get extra functionalities"
-                f"{[item for item in ExtendedExchangeRegistry.registered.keys()]}"
-            )
+        class_obj = fetch_exchange_obj(self.exchange.name)
         return class_obj(self)
 
     @property

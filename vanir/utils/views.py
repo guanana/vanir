@@ -15,6 +15,7 @@ def set_context_data(context, view):
     model_name = view.model._meta.model_name
     context["app_label"] = app_label
     context["model_name"] = model_name
+    context["title"] = model_name.capitalize()
     return context
 
 
