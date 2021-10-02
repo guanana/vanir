@@ -78,7 +78,9 @@ LOCAL_APPS = [
     "vanir.core.token.apps.TokenConfig",
     "vanir.core.account.apps.AccountConfig",
     "vanir.order.apps.OrderConfig",
-    "vanir.utils.apps.UtilsConfig"
+    "vanir.utils.apps.UtilsConfig",
+    "vanir.plugins.apps.PluginsConfig",
+    "vanir.plugins.new_coin_bot.apps.NewCoinBotConfig"
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -168,7 +170,7 @@ TEMPLATES = [
         # https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-TEMPLATES-BACKEND
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         # https://docs.djangoproject.com/en/dev/ref/settings/#template-dirs
-        "DIRS": [str(APPS_DIR / "templates")],
+        "DIRS": [str(APPS_DIR / "templates"), str(APPS_DIR / "plugins" / "templates")],
         "OPTIONS": {
             # https://docs.djangoproject.com/en/dev/ref/settings/#template-loaders
             # https://docs.djangoproject.com/en/dev/ref/templates/api/#loader-types
