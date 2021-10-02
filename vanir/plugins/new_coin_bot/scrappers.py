@@ -1,6 +1,7 @@
 import logging
 import re
 from datetime import datetime
+from functools import cached_property
 
 import requests
 from bs4 import BeautifulSoup
@@ -63,6 +64,7 @@ class AnnouncementScrapModel(BaseScrap):
 
 class ScrapBinance(AnnouncementScrap):
     URL_HREF_PATTERN = re.compile("href=(?P<url>)")  # noqa W605
+    CLEAN_WORDS = ["Margin", "Isolated", "Futures"]
 
     def __init__(self, scrap_option: str = "Binance"):
         super().__init__(scrap_option)
@@ -89,7 +91,15 @@ class ScrapBinance(AnnouncementScrap):
         }
         return dict_urls
 
-    @property
+    def discard_match(self, line):
+        match = [
+            True for discard_word in self.CLEAN_WORDS if discard_word in line.split()
+        ]
+        if match:
+            return True
+        return False
+
+    @cached_property
     def direct_list_tokens(self):
         """
         Scrapes new listings page for and returns new Symbol when appropriate
@@ -97,7 +107,8 @@ class ScrapBinance(AnnouncementScrap):
         direct_list_tokens = []
         for idx, line in enumerate(self.text_content):
             match_pattern = self.LIST_PATTERN.search(line)
-            if match_pattern:
+            discard = self.discard_match(line)
+            if match_pattern and not discard:
                 try:
                     symbol = match_pattern.group("symbol")[1:-1]
                     direct_list_tokens.append(symbol)
@@ -106,7 +117,7 @@ class ScrapBinance(AnnouncementScrap):
                     pass
         return direct_list_tokens
 
-    @property
+    @cached_property
     def new_pair_tokens(self):
         """
         Scrapes new pairs and returns new pairs when appropriate
@@ -114,7 +125,8 @@ class ScrapBinance(AnnouncementScrap):
         new_pair_tokens = []
         for idx, line in enumerate(self.text_content):
             match_pattern = self.PAIR_PATTERN.findall(line)
-            if match_pattern:
+            discard = self.discard_match(line)
+            if match_pattern and not discard:
                 for pair in match_pattern:
                     symbol1 = pair.split("/")[0]
                     symbol2 = pair.split("/")[1]
@@ -124,7 +136,7 @@ class ScrapBinance(AnnouncementScrap):
                     self.match_lines[symbol2] = idx
         return new_pair_tokens
 
-    @property
+    @cached_property
     def _last_token_announcements(self):
         return self.direct_list_tokens + self.new_pair_tokens
 
@@ -134,45 +146,65 @@ class ScrapBinance(AnnouncementScrap):
             try:
                 url = self.url_lines[self.match_lines[symbol]]
                 scrap_timestamp_obj.url = url
-                token_date = scrap_timestamp_obj.timestamp_content
+                token_date = scrap_timestamp_obj.get_date()
                 return token_date
             except KeyError:
                 logger.error("Problem finding the match line")
 
 
 class ScrapTimestamp(BaseScrap):
-    """
-    TIMESTAMP_PATTERN = re.compile("(?P<year>^(19|20)\d{2})-"
-                                   "(?P<month>0[1-9]|1[0-2])-"
-                                   "(?P<day>0[1-9]|[12][0-9]|3[01]).+"
-                                   "(?P<hour>[0-1][0-9]|2[0-4]):"
-                                   "(?P<minute>[0-5][0-9]).+\((?P<timezone>\w+)\)")
-    """
+    year_pattern = "(?P<year>(19|20)\d{2})"  # noqa W605
+    month_pattern = "(?P<month>0[1-9]|1[0-2])"
+    day_pattern = "(?P<day>0[1-9]|[12][0-9]|3[01])"
+    hour_pattern = "(?P<hour>[0-1][0-9]|2[0-4])"
+    minute_pattern = "(?P<minute>[0-5][0-9])"
+    timezone_pattern = "(?P<timezone>\(UTC\))"  # noqa W605
+    am_pm_pattern = "(?P<am_pm_utc>AM|PM)"
+    TIMESTAMP_PATTERN_BASIC = (
+        f"{year_pattern}-"
+        f"{month_pattern}-"
+        f"{day_pattern}.+"
+        f"{hour_pattern}:"
+        f"{minute_pattern}\s"
+    )
 
-    TIMESTAMP_PATTERN = re.compile(
-        ".*(?P<year>(19|20)\d{2})-"
-        "(?P<month>0[1-9]|1[0-2])-"
-        "(?P<day>0[1-9]|[12][0-9]|3[01]).+"
-        "(?P<hour>[0-1][0-9]|2[0-4]):(?P<minute>[0-5][0-9])\s"
-        "((AM|PM\s \(UTC\))|\(UTC\))"
+    TIMESTAMP_PATTERN_24H = re.compile(
+        f"(.*(?P<all>{TIMESTAMP_PATTERN_BASIC}{timezone_pattern}))"
+    )  # noqa W605
+    TIMESTAMP_PATTERN_AM_PM = re.compile(
+        f"(.*(?P<all>{TIMESTAMP_PATTERN_BASIC}{am_pm_pattern}\s{timezone_pattern}))"
     )  # noqa W605
 
-    def find_first_timestamp(self):
-        pass
-
-    @property
-    def timestamp_content(self):
+    def get_date(self):
+        date = None
         article_content = self._raw_content().find_all("article")
         try:
-            content = re.match(self.TIMESTAMP_PATTERN, article_content[0].text)
+            content_24h = re.match(self.TIMESTAMP_PATTERN_24H, article_content[0].text)
+            content_am_pm = re.match(
+                self.TIMESTAMP_PATTERN_AM_PM, article_content[0].text
+            )
         except IndexError:
             logger.error(f"No article tag found for {self.url}")
-            return
-        if not content:
+            return date
+        if not content_24h and not content_am_pm:
             logger.error(f"No date found for {self.url}")
-            return
-
-        temp_dict = content.groupdict()
-        date_dict = {name: int(value) for name, value in temp_dict.items()}
-        date = datetime(**date_dict)
+            return date
+        if content_24h:
+            try:
+                date = datetime.strptime(
+                    content_24h.group("all"), "%Y-%m-%d %H:%M (%Z)"
+                )
+            except ValueError:
+                logger.error(
+                    f'Something happened wit this time import {content_24h.group("all")}'
+                )
+        else:
+            try:
+                date = datetime.strptime(
+                    content_am_pm.group("all"), "%Y-%m-%d %I:%M %p (%Z)"
+                )
+            except ValueError:
+                logger.error(
+                    f'Something happened wit this time import {content_24h.group("all")}'
+                )
         return date
