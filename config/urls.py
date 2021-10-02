@@ -19,6 +19,7 @@ urlpatterns = [
     path("token/", include("vanir.core.token.urls", namespace="token")),
     path("order/", include("vanir.order.urls", namespace="order")),
     path("utils/", include("vanir.utils.urls", namespace="utils")),
+    path("plugins/", include("vanir.plugins.urls", namespace="plugins")),
     # Your stuff: custom urls includes go here
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 if settings.DEBUG:

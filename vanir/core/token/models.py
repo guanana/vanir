@@ -4,24 +4,18 @@ from vanir.core.token.choices import TokenTypes
 from vanir.utils.models import BaseObject
 
 
-class Coin(BaseObject):
-    name = models.CharField(max_length=40, unique=True)
+class Coin(models.Model):
     symbol = models.CharField(max_length=6, unique=True)
     last_value = models.FloatField(null=True)
 
     class Meta:
-        unique_together = ("name", "symbol")
+        abstract = True
 
     def __str__(self):
         return self.symbol
 
     def natural_key(self):
         return (self.symbol,)
-
-    def get_absolute_url(self):
-        from django.urls import reverse
-
-        return reverse("token:coin_detail", kwargs={"pk": self.pk})
 
     def set_value(self, account=None):
         from vanir.utils.helpers import fetch_default_account, value_pair
@@ -50,8 +44,11 @@ class Coin(BaseObject):
             return 1
 
 
-class Token(Coin):
+class Token(BaseObject, Coin):
     token_type = models.CharField(max_length=9, choices=TokenTypes.choices, null=True)
+
+    class Meta:
+        unique_together = ("name", "symbol")
 
     def get_absolute_url(self):
         from django.urls import reverse

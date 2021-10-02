@@ -1,38 +1,26 @@
-- model: token.coin
+- model: token.token
   pk: 1
   fields:
     name: Binance Coin
     symbol: BNB
     last_value: 1
-
-- model: token.token
-  pk: 1
-  fields:
     token_type: BEP_20
 
 
-- model: token.coin
+- model: token.token
   pk: 2
   fields:
     name: Tether
     symbol: USDT
     last_value: 1
-
-- model: token.token
-  pk: 2
-  fields:
     token_type: ERC-20
 
 
 
-- model: token.coin
+- model: token.token
   pk: 3
   fields:
     name: Etherum
     symbol: ETH
     last_value: 1
-
-- model: token.token
-  pk: 3
-  fields:
     token_type: ERC-20
