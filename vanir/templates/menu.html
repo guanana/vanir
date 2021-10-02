@@ -17,10 +17,10 @@
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item" href="{% url app|get_viewname:'add' %}">Add</a>
                 </div>
-              </li>
-              <div class="container"> </div>
+              </li>&nbsp;&nbsp;
             {% endfor %}
-          {% include "utils_menu.html" %}
+            {% include "utils_menu.html" %}
+            {% include "plugins_menu.html" %}
         {% endwith %}
       </ul>
   </div>
