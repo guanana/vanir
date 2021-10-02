@@ -1,10 +1,12 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 
-from .scrappers import ScrapBinance
+from vanir.plugins.new_coin_bot.scrappers_model import ScrapBinanceModel
 
 
 def start():
-    scrap_obj = ScrapBinance()
+    scrap_obj = ScrapBinanceModel()
     scheduler = BackgroundScheduler()
-    scheduler.add_job(scrap_obj.import_token_announcements(), "interval", minutes=5)
+    scrapbinancemodel_job = scheduler.add_job(  # noqa F841
+        scrap_obj.import_token_announcements(), "interval", minutes=10
+    )
     scheduler.start()
