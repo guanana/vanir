@@ -1,0 +1,33 @@
+{% extends "object_base.html" %}
+{% block title %}
+New Token Detail
+{% endblock title %}
+{% block extra_controls %}
+  <div class="p-2">
+    <a href="{% url 'plugins:new_coin_bot:binancenewtoken_promote' object.pk %}" class="btn btn-sm btn-info" role="button">
+      <span class="mdi mdi-pencil" aria-hidden="true"></span>&nbsp;Promote to normal token
+    </a>
+  </div>
+{% endblock extra_controls %}
+{% block content %}
+<div class="container-fluid">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Symbol</th>
+        <th scope="col">Listing day</th>
+        <th scope="col">Discovered method</th>
+        <th scope="col">Updated</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">{{ object.symbol }}</th>
+        <td>{{ object.listing_day }}</td>
+        <td>{{ object.discovered_method }}</td>
+        <td>{{ object.updated }}</td>
+      </tr>
+      </tbody>
+  </table>
+</div>
+{% endblock %}

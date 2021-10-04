@@ -1,0 +1,24 @@
+{% extends "object_base.html" %}
+{% block title %}
+Config Detail
+{% endblock title %}
+{% block content %}
+<div class="container-fluid">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Config</th>
+        <th scope="col">Interval</th>
+        <th scope="col">Active</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">{{ object.scrapper_class_name }}</th>
+        <td>{{ object.scrapping_interval }}</td>
+        <td>{{ object.activate_scheduler }}</td>
+      </tr>
+      </tbody>
+  </table>
+</div>
+{% endblock %}
