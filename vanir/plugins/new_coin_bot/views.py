@@ -2,6 +2,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 
+from vanir.plugins.new_coin_bot.helpers import run_scrap
 from vanir.plugins.new_coin_bot.models import (
     BinanceNewToken,
     NewCoinConfig,
@@ -82,7 +83,7 @@ class BinanceNewTokenUpdateValueView(PluginListView, SuccessMessageMixin):
     success_message = "Scrap completed"
 
     def get(self, request, *args, **kwargs):
-        ScrapBinanceModel().run()
+        run_scrap(ScrapBinanceModel())
         return redirect(reverse("plugins:new_coin_bot:binancenewtoken_list"))
 
 
