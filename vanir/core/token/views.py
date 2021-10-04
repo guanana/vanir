@@ -18,7 +18,7 @@ from vanir.utils.views import (
 
 class TokenCreateView(ObjectCreateView):
     model = Token
-    fields = ("name", "symbol", "blockchain", "last_value")
+    fields = ("name", "symbol", "last_value")
 
 
 class TokenListView(ObjectListFilterView):

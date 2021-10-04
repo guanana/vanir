@@ -3,9 +3,11 @@
 Token Detail
 {% endblock title %}
 {% block extra_controls %}
-  <a href="{% url 'token:token_update_price' token.pk %}" class="btn btn-sm btn-info" role="button">
-    <span class="mdi mdi-pencil" aria-hidden="true"></span>&nbsp;Refresh price
-  </a>
+  <div class="p-2">
+    <a href="{% url 'token:token_update_price' token.pk %}" class="btn btn-sm btn-info" role="button">
+      <span class="mdi mdi-pencil" aria-hidden="true"></span>&nbsp;Refresh price
+    </a>
+  </div>
 {% endblock extra_controls %}
 {% block content %}
 <div class="container-fluid">
@@ -14,7 +16,6 @@ Token Detail
       <tr>
         <th scope="col">Symbol</th>
         <th scope="col">Name</th>
-        <th scope="col">Blockchain</th>
         <th scope="col">Last update price</th>
       </tr>
     </thead>
@@ -22,7 +23,6 @@ Token Detail
       <tr>
         <th scope="row">{{ token.symbol }}</th>
         <td>{{ token.name }}</td>
-        <td>{{ token.blockchain }}</td>
         <td>{{ token.last_value }}</td>
       </tr>
       </tbody>

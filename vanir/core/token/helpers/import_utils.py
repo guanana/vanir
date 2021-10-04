@@ -3,9 +3,7 @@ import logging
 from django.core.exceptions import ValidationError
 from django.db.models import QuerySet
 
-from vanir.core.account.models import Account
-from vanir.core.account.models_relation import AccountTokens
-from vanir.core.blockchain.models import Blockchain
+from vanir.core.account.models import Account, AccountTokens
 from vanir.core.token.models import Token
 from vanir.utils.helpers import fetch_default_account, value_pair
 
@@ -41,17 +39,11 @@ def token_import(
     return token_obj
 
 
-def import_token_account(
-    token_obj: Token, account: Account, blockchain: Blockchain, quantity: float
-):
+def import_token_account(token_obj: Token, account: Account, quantity: float):
     try:
-        account_token = AccountTokens.objects.get(
-            account=account, token=token_obj, blockchain=blockchain
-        )
+        account_token = AccountTokens.objects.get(account=account, token=token_obj)
     except AccountTokens.DoesNotExist:
-        account_token = AccountTokens.objects.create(
-            account=account, token=token_obj, blockchain=blockchain
-        )
+        account_token = AccountTokens.objects.create(account=account, token=token_obj)
     account_token.quantity = quantity
     account_token.save()
     return token_obj

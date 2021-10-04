@@ -30,7 +30,6 @@ class AccountCreateView(ObjectCreateView):
         "user",
         "api_key",
         "secret",
-        "tld",
         "default_fee_rate",
         "token_pair",
         "default",
@@ -126,7 +125,6 @@ def exchange_importtokens(request, pk):
             account=account,
             token_obj=token,
             quantity=float(row["free"]) + float(row["locked"]),
-            blockchain=account.exchange_obj.default_blockchain,
         )
         response.append(row["asset"])
     bulk_update()
