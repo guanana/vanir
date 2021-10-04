@@ -7,7 +7,7 @@ from django.utils.functional import cached_property
 from vanir.core.exchange.models import Exchange
 from vanir.core.token.models import Token
 from vanir.utils.helpers import fetch_exchange_obj, value_pair
-from vanir.utils.models import BaseObject
+from vanir.utils.models import BaseObject, TimeStampedMixin
 
 
 class Account(BaseObject):
@@ -90,3 +90,16 @@ class Account(BaseObject):
     @property
     def total_value_account_table(self):
         return f"{self.total_value_account} {self.token_pair}"
+
+
+class AccountTokens(TimeStampedMixin):
+    """
+    Relation between account and tokens
+    """
+
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    token = models.ForeignKey("token.Token", on_delete=models.CASCADE)
+    quantity = models.FloatField(default=0)
+
+    class Meta:
+        unique_together = ("account", "token")
