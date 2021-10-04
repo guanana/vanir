@@ -4,12 +4,12 @@ from vanir.utils.models import BaseObject
 class PluginBase(BaseObject):
     class Meta:
         abstract = True
-        app_label = "plugins"
 
     def get_absolute_url(self):
         from django.urls import reverse
 
-        class_name = self.__class__.__name__.lower()
+        app_label = self._meta.app_label
+        model_name = self._meta.model_name
         return reverse(
-            f"plugins:{class_name}:{class_name}_detail", kwargs={"pk": self.pk}
+            f"plugins:{app_label}:{model_name}_detail", kwargs={"pk": self.pk}
         )

@@ -12,8 +12,13 @@ List {{ title }}
   <div class="d-flex flex-row-reverse">
     <div class="p-2">
       {% if model_name == "token" %}
-      <a href="{% url model_name|get_viewname:'bulk_update_price' %}" class="btn btn-sm btn-warning" role="button">
+      <a href="{% get_viewname app_label model_name 'bulk_update_price' %}" class="btn btn-sm btn-warning" role="button">
         <span class="mdi mdi-pencil" aria-hidden="true"></span>&nbsp;Bulk price update
+      </a>
+      {% endif %}
+      {% if model_name == "binancenewtoken" %}
+      <a href="{% get_viewname app_label model_name 'update' True %}" class="btn btn-sm btn-warning" role="button">
+        <span class="mdi mdi-pencil" aria-hidden="true"></span>&nbsp;Run manual scrap
       </a>
       {% endif %}
     </div>

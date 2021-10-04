@@ -22,8 +22,9 @@ class BaseObject(models.Model):
     def get_add_url(self):
         from django.urls import reverse
 
-        class_name = self.__name__.lower()
-        return reverse(f"{class_name}:{class_name}_add")
+        app_label = self._meta.app_label
+        model_name = self._meta.model_name
+        return reverse(f"{app_label}:{model_name}_add")
 
 
 class TimeStampedMixin(models.Model):
