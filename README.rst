@@ -1,7 +1,7 @@
-Vanir
+vanir
 =====
 
-Crypto Manager
+Crypto asset management and bot control, all one place
 
 .. image:: https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg?logo=cookiecutter
      :target: https://github.com/pydanny/cookiecutter-django/
@@ -10,7 +10,7 @@ Crypto Manager
      :target: https://github.com/ambv/black
      :alt: Black code style
 
-:License: MIT
+:License: Apache Software License 2.0
 
 Settings
 --------
@@ -64,6 +64,20 @@ Live reloading and Sass CSS compilation
 Moved to `Live reloading and SASS compilation`_.
 
 .. _`Live reloading and SASS compilation`: http://cookiecutter-django.readthedocs.io/en/latest/live-reloading-and-sass-compilation.html
+
+Celery
+^^^^^^
+
+This app comes with Celery.
+
+To run a celery worker:
+
+.. code-block:: bash
+
+    cd vanir
+    celery -A config.celery_app worker -l info
+
+Please note: For Celery's import magic to work, it is important *where* the celery commands are run. If you are in the same folder with *manage.py*, you should be right.
 
 Email Server
 ^^^^^^^^^^^^

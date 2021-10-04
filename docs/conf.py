@@ -21,14 +21,15 @@ if os.getenv("READTHEDOCS", default=False) == "True":
 else:
     sys.path.insert(0, os.path.abspath("/app"))
 os.environ["DATABASE_URL"] = "sqlite:///readthedocs.db"
+os.environ["CELERY_BROKER_URL"] = os.getenv("REDIS_URL", "redis://redis:6379")
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
 django.setup()
 
 # -- Project information -----------------------------------------------------
 
-project = "Vanir"
-copyright = """2021, Guanana"""
-author = "Guanana"
+project = "vanir"
+copyright = """2021, guanana"""
+author = "guanana"
 
 
 # -- General configuration ---------------------------------------------------
