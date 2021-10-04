@@ -14,6 +14,7 @@ class BinanceNewTokenTable(ObjectTable):
             "listing_day",
             "discovered_method",
         )
+        order_by = "-listing_day"
 
 
 class NewCoinConfigTable(ObjectTable):
