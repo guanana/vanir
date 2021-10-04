@@ -1,13 +1,13 @@
 import json
 import logging
 
-from celery import shared_task
 from django.db import models
 from django.utils import timezone
 from django_celery_beat.models import IntervalSchedule, PeriodicTask
 
 from vanir.core.token.models import Coin, Token
 from vanir.plugins.models import PluginBase
+from vanir.plugins.new_coin_bot import helpers
 from vanir.plugins.new_coin_bot.choices import (
     DiscoverMethod,
     ScheduleScrap,
@@ -39,21 +39,24 @@ class ScrapBinanceModel(ScrapBinance):
             new_coin, created = BinanceNewToken.objects.get_or_create(
                 name=token_symbol, symbol=token_symbol
             )
-            new_coin.discovered_method = self.DISCOVER_METHOD
-            new_coin.listing_day = self.release_date(self.match_lines[token_symbol])
+            if created:
+                new_coin.discovered_method = self.DISCOVER_METHOD
+                new_coin.listing_day = self.release_date(self.match_lines[token_symbol])
+                new_coin.save()
+            if new_coin.listing_day != self.release_date(
+                self.match_lines[token_symbol]
+            ):
+                new_coin.listing_day = self.release_date(self.match_lines[token_symbol])
+                new_coin.save()
 
             new_coin.increase_announcement_seen()
-            new_coin.save()
             if created:
-                logger.info(f"Token {token_symbol} added")
+                logger.debug(f"Token {token_symbol} added")
             else:
-                logger.info(f"Token {token_symbol} updated")
+                logger.debug(f"Token {token_symbol} updated")
 
-    @shared_task(name="ScrapBinanceModelWithDate")
-    def run(self):
-        logger.info(f"Running {self.__class__.__name__}")
-        self.import_token_announcements()
-        logger.info("Run finished")
+    def run_scrap(self):
+        helpers.run_scrap(self)
 
 
 class NewCoinConfig(PluginBase, TimeStampedMixin):
@@ -81,34 +84,42 @@ class NewCoinConfig(PluginBase, TimeStampedMixin):
         related_name="task_auto_clean",
     )
 
-    def save(self, *args, **kwargs):
-        if self._state.adding:
-            self.name = self.scrapper_class_name
-            IntervalSchedule.objects.create(
-                every=self.scrapping_interval, period="minutes"
-            )
+    def create_update_main_task(self):
+        interval, interval_created = IntervalSchedule.objects.get_or_create(
+            every=self.scrapping_interval, period="minutes"
+        )
         self.task, created = PeriodicTask.objects.get_or_create(
             name=self.scrapper_class_name,
-            task=self.scrapper_class_name,
-            interval=IntervalSchedule.objects.get(
-                every=self.scrapping_interval, period="minutes"
-            ),
-            args=json.dumps([self.scrapper_class_name]),
-            start_time=timezone.now(),
         )
+        self.task.task = (self.scrapper_class_name,)
+        self.task.args = (json.dumps([self.scrapper_class_name]),)
+        self.task.start_time = (timezone.now(),)
+        self.task.interval = (interval,)
         self.task.enabled = self.activate_scheduler
         self.task.save()
 
+    def create_update_auto_clean(self):
         self.task_auto_clean, created_auto_clean = PeriodicTask.objects.get_or_create(
             name=f"{self.scrapper_class_name}_auto_clean",
-            task=f"{self.scrapper_class_name}_auto_clean",
-            interval=IntervalSchedule.objects.get(
+        )
+        self.task_auto_clean.task = (f"{self.scrapper_class_name}_auto_clean",)
+        self.task_auto_clean.args = (
+            json.dumps([f"{self.scrapper_class_name}_auto_clean"]),
+        )
+        self.task_auto_clean.start_time = (timezone.now(),)
+        self.task_auto_clean.interval = (
+            IntervalSchedule.objects.get(
                 every=self.scrapping_interval, period="minutes"
             ),
-            args=json.dumps([f"{self.scrapper_class_name}_auto_clean"]),
-            start_time=timezone.now(),
         )
-        self.task_auto_clean = self.auto_clean
+        self.task_auto_clean.enabled = self.auto_clean
+        self.task_auto_clean.save()
+
+    def save(self, *args, **kwargs):
+        if self._state.adding:
+            self.name = self.scrapper_class_name
+        self.create_update_main_task()
+        self.create_update_auto_clean()
         super().save(*args, **kwargs)
 
 
