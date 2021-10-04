@@ -1,10 +1,11 @@
 import logging
 import re
 from datetime import datetime
-from functools import cached_property
+from functools import cache, cached_property
 
 import requests
 from bs4 import BeautifulSoup
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -99,7 +100,7 @@ class ScrapBinance(AnnouncementScrap):
             return True
         return False
 
-    @cached_property
+    @cache
     def direct_list_tokens(self):
         """
         Scrapes new listings page for and returns new Symbol when appropriate
@@ -117,7 +118,7 @@ class ScrapBinance(AnnouncementScrap):
                     pass
         return direct_list_tokens
 
-    @cached_property
+    @cache
     def new_pair_tokens(self):
         """
         Scrapes new pairs and returns new pairs when appropriate
@@ -138,13 +139,16 @@ class ScrapBinance(AnnouncementScrap):
 
     @cached_property
     def _last_token_announcements(self):
-        return self.direct_list_tokens + self.new_pair_tokens
+        self.direct_list_tokens()
+        self.new_pair_tokens()
+        return list(self.match_lines.keys())
 
-    def release_date(self, symbol):
+    @cache
+    def release_date(self, line):
         scrap_timestamp_obj = ScrapTimestamp()
         if len(self._last_token_announcements) > 0:
             try:
-                url = self.url_lines[self.match_lines[symbol]]
+                url = self.url_lines[line]
                 scrap_timestamp_obj.url = url
                 token_date = scrap_timestamp_obj.get_date()
                 return token_date
@@ -194,6 +198,8 @@ class ScrapTimestamp(BaseScrap):
                 date = datetime.strptime(
                     content_24h.group("all"), "%Y-%m-%d %H:%M (%Z)"
                 )
+                current_tz = timezone.utc
+                date = current_tz.localize(date)
             except ValueError:
                 logger.error(
                     f'Something happened wit this time import {content_24h.group("all")}'
@@ -203,6 +209,8 @@ class ScrapTimestamp(BaseScrap):
                 date = datetime.strptime(
                     content_am_pm.group("all"), "%Y-%m-%d %I:%M %p (%Z)"
                 )
+                current_tz = timezone.utc
+                date = current_tz.localize(date)
             except ValueError:
                 logger.error(
                     f'Something happened wit this time import {content_24h.group("all")}'
