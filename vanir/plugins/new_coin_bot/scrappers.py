@@ -3,11 +3,14 @@ import re
 from datetime import datetime
 from functools import cache, cached_property
 
+import lxml  # noqa # pylint: disable=unused-impo
 import requests
 from bs4 import BeautifulSoup
 from django.utils import timezone
 
 logger = logging.getLogger(__name__)
+
+requests_session = requests.Session()
 
 
 class BaseScrap:
@@ -16,10 +19,10 @@ class BaseScrap:
         self.match_lines = dict()
 
     def _raw_content(self):
-        page = requests.get(self.url)
+        page = requests_session.get(self.url, headers={"User-Agent": ""})
         if not page:
             raise ValueError(f"There was a problem with the connection to {self.url}")
-        soup = BeautifulSoup(page.content, "html.parser")
+        soup = BeautifulSoup(page.content, "lxml")
         return soup
 
 
@@ -150,13 +153,14 @@ class ScrapBinance(AnnouncementScrap):
             try:
                 url = self.url_lines[line]
                 scrap_timestamp_obj.url = url
-                token_date = scrap_timestamp_obj.get_date()
+                token_date = scrap_timestamp_obj.get_date(line)
                 return token_date
             except KeyError:
                 logger.error("Problem finding the match line")
 
 
 class ScrapTimestamp(BaseScrap):
+    match_lines = list()
     year_pattern = "(?P<year>(19|20)\d{2})"  # noqa W605
     month_pattern = "(?P<month>0[1-9]|1[0-2])"
     day_pattern = "(?P<day>0[1-9]|[12][0-9]|3[01])"
@@ -179,7 +183,11 @@ class ScrapTimestamp(BaseScrap):
         f"(.*(?P<all>{TIMESTAMP_PATTERN_BASIC}{am_pm_pattern}\s{timezone_pattern}))"
     )  # noqa W605
 
-    def get_date(self):
+    def get_date(self, line):
+        try:
+            return self.match_lines[line]
+        except KeyError:
+            pass
         date = None
         article_content = self._raw_content().find_all("article")
         try:
@@ -189,10 +197,10 @@ class ScrapTimestamp(BaseScrap):
             )
         except IndexError:
             logger.error(f"No article tag found for {self.url}")
-            return date
+            return
         if not content_24h and not content_am_pm:
             logger.error(f"No date found for {self.url}")
-            return date
+            return
         if content_24h:
             try:
                 date = datetime.strptime(
@@ -213,6 +221,16 @@ class ScrapTimestamp(BaseScrap):
                 date = current_tz.localize(date)
             except ValueError:
                 logger.error(
-                    f'Something happened wit this time import {content_24h.group("all")}'
+                    f'Something happened with this time import {content_am_pm.group("all")}'
                 )
+        self.match_lines[line] = date
+        return date
+
+    def get_news_publish_date(self):
+        news_publish = self._raw_content().find("div", {"class": "css-17s7mnd"})
+        try:
+            date = datetime.strptime(news_publish.text, "%Y-%m-%d %H:%M")
+        except ValueError:
+            logger.error(f"Something happened with this time import {news_publish}")
+            return
         return date

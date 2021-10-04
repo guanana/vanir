@@ -32,3 +32,4 @@ django-bootstrap4==3.0.1
 
 # New Coin Bot requirements
 beautifulsoup4==4.10.0
+lxml==4.6.3
