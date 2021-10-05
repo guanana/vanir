@@ -1,3 +1,4 @@
+import logging
 from abc import abstractmethod
 
 import pandas as pd
@@ -7,6 +8,8 @@ from django.utils.functional import cached_property
 
 from vanir.core.blockchain.models import Blockchain
 from vanir.utils.table_helpers import change_table_align, change_table_style
+
+logger = logging.getLogger(__name__)
 
 
 class ExtendedExchangeRegistry(type):
@@ -135,12 +138,13 @@ class VanirBinance(ExtendedExchange, Client, metaclass=ExtendedExchangeRegistry)
             price = self.get_avg_price(symbol=f"{pair}")["price"]
         except BinanceAPIException as binanceexception:
             if binanceexception.code == -1121:
-                raise ValueError(f"Pair {pair} not supported")
+                logger.error(f"Pair {pair} not supported")
+            return
 
         try:
             return float(price)
         except ValueError:
-            return None
+            return
 
     @property
     def all_assets_prices(self):
