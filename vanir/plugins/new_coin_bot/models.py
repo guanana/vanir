@@ -1,4 +1,3 @@
-import json
 import logging
 
 from django.db import models
@@ -7,7 +6,6 @@ from django_celery_beat.models import IntervalSchedule, PeriodicTask
 
 from vanir.core.token.models import Coin, Token
 from vanir.plugins.models import PluginBase
-from vanir.plugins.new_coin_bot import helpers
 from vanir.plugins.new_coin_bot.choices import (
     DiscoverMethod,
     ScheduleScrap,
@@ -55,9 +53,6 @@ class ScrapBinanceModel(ScrapBinance):
             else:
                 logger.debug(f"Token {token_symbol} updated")
 
-    def run_scrap(self):
-        helpers.run_scrap(self)
-
 
 class NewCoinConfig(PluginBase, TimeStampedMixin):
     scrapper_class_name = models.CharField(
@@ -73,10 +68,10 @@ class NewCoinConfig(PluginBase, TimeStampedMixin):
         "be promoted to regular tokens automatically",
     )
     activate_scheduler = models.BooleanField(default=False)
-    task = models.OneToOneField(
+    task = models.ForeignKey(
         PeriodicTask, on_delete=models.CASCADE, null=True, blank=True
     )
-    task_auto_clean = models.OneToOneField(
+    task_auto_clean = models.ForeignKey(
         PeriodicTask,
         on_delete=models.CASCADE,
         null=True,
@@ -84,36 +79,54 @@ class NewCoinConfig(PluginBase, TimeStampedMixin):
         related_name="task_auto_clean",
     )
 
+    def interval(self):
+        try:
+            interval = IntervalSchedule.objects.get(
+                every=self.scrapping_interval, period="minutes"
+            )
+        except IntervalSchedule.DoesNotExist:
+            interval = IntervalSchedule.objects.create(
+                every=self.scrapping_interval, period="minutes"
+            )
+        return interval
+
     def create_update_main_task(self):
-        interval, interval_created = IntervalSchedule.objects.get_or_create(
-            every=self.scrapping_interval, period="minutes"
-        )
-        self.task, created = PeriodicTask.objects.get_or_create(
-            name=self.scrapper_class_name,
-        )
-        self.task.task = (self.scrapper_class_name,)
-        self.task.args = (json.dumps([self.scrapper_class_name]),)
-        self.task.start_time = (timezone.now(),)
-        self.task.interval = (interval,)
-        self.task.enabled = self.activate_scheduler
-        self.task.save()
+
+        try:
+            self.task = PeriodicTask.objects.get(name=self.scrapper_class_name)
+            self.task.enabled = self.activate_scheduler
+            self.task.start_time = timezone.now() + timezone.timedelta(seconds=5)
+            self.task.interval = self.interval()
+            self.task.save()
+
+        except PeriodicTask.DoesNotExist:
+            self.task = PeriodicTask.objects.create(
+                name=self.scrapper_class_name,
+                task=self.scrapper_class_name,
+                start_time=timezone.now() + timezone.timedelta(seconds=5),
+                interval=self.interval(),
+                enabled=self.activate_scheduler,
+            )
 
     def create_update_auto_clean(self):
-        self.task_auto_clean, created_auto_clean = PeriodicTask.objects.get_or_create(
-            name=f"{self.scrapper_class_name}_auto_clean",
-        )
-        self.task_auto_clean.task = (f"{self.scrapper_class_name}_auto_clean",)
-        self.task_auto_clean.args = (
-            json.dumps([f"{self.scrapper_class_name}_auto_clean"]),
-        )
-        self.task_auto_clean.start_time = (timezone.now(),)
-        self.task_auto_clean.interval = (
-            IntervalSchedule.objects.get(
-                every=self.scrapping_interval, period="minutes"
-            ),
-        )
-        self.task_auto_clean.enabled = self.auto_clean
-        self.task_auto_clean.save()
+        try:
+            self.task_auto_clean = PeriodicTask.objects.get(
+                name=f"{self.scrapper_class_name}_auto_clean"
+            )
+            self.task_auto_clean.enabled = self.auto_clean
+            self.task_auto_clean.start_time = timezone.now() + timezone.timedelta(
+                seconds=5
+            )
+            self.task_auto_clean.interval = self.interval()
+            self.task_auto_clean.save()
+        except PeriodicTask.DoesNotExist:
+            PeriodicTask.objects.create(
+                name=f"{self.scrapper_class_name}_auto_clean",
+                task=f"{self.scrapper_class_name}_auto_clean",
+                start_time=timezone.now() + timezone.timedelta(seconds=5),
+                interval=self.interval(),
+                enabled=self.auto_clean,
+            )
 
     def save(self, *args, **kwargs):
         if self._state.adding:
@@ -121,6 +134,13 @@ class NewCoinConfig(PluginBase, TimeStampedMixin):
         self.create_update_main_task()
         self.create_update_auto_clean()
         super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if self.task:
+            self.task.delete()
+        if self.task_auto_clean:
+            self.task_auto_clean.delete()
+        return super(self.__class__, self).delete(*args, **kwargs)
 
 
 class NewCoin(PluginBase, Coin, TimeStampedMixin):

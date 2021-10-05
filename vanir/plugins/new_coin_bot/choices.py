@@ -8,11 +8,10 @@ class DiscoverMethod(models.TextChoices):
 
 
 class ScrapperOptions(models.TextChoices):
-    BINANCE_SCRAPPER = "ScrapBinanceModelWithDate"
+    BINANCE_SCRAPPER = "ScrapBinanceModel"
 
 
 class ScheduleScrap(models.IntegerChoices):
-    EVERY_2_MINS = 2
     EVERY_5_MINS = 5
     EVERY_10_MINS = 10
     EVERY_15_MINS = 15

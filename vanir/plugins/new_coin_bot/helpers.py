@@ -17,7 +17,7 @@ def token_already_exists(symbol):
         return False
 
 
-@shared_task(name="ScrapBinanceModelWithDate_auto_clean")
+@shared_task(name="ScrapBinanceModel_auto_clean")
 def auto_promote():
     from .models import BinanceNewToken
 
@@ -25,8 +25,11 @@ def auto_promote():
         new_token.promote_to_standard_token()
 
 
-@shared_task(name="ScrapBinanceModelWithDate")
-def run_scrap(scrapbinancemodel_obj):
-    logger.info(f"Running {scrapbinancemodel_obj.__class__.__name__}")
-    scrapbinancemodel_obj.import_token_announcements()
+@shared_task(name="ScrapBinanceModel")
+def run_scrap():
+    from .models import ScrapBinanceModel
+
+    obj = ScrapBinanceModel()
+    logger.info(f"Running {obj.DISCOVER_METHOD}")
+    obj.import_token_announcements()
     logger.info("Run finished")
