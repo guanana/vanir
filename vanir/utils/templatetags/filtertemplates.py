@@ -1,9 +1,6 @@
 import json
-import os
 
 from django import template
-from django.conf import settings
-from django.templatetags.static import static as templatetags_static
 from django.urls import NoReverseMatch, reverse
 
 from vanir.utils.helpers import fetch_default_account
@@ -66,11 +63,6 @@ def get_model_image(model_name, image_name: str = ""):
         if not image_name
         else f"images/{model_name}/{image_name}"
     )
-    if settings.DEBUG:
-        if os.path.exists(f"{settings.APPS_DIR}{templatetags_static(path_name)}"):
-            return path_name
-        else:
-            return None
     return path_name
 
 
