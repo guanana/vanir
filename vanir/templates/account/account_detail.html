@@ -2,6 +2,8 @@
 {% load static %}
 {% load buttons %}
 {% load filtertemplates %}
+{% load render_table from django_tables2 %}
+{% load bootstrap4 %}
 {% block title %}
 Account Detail
 {% endblock title %}
@@ -17,52 +19,15 @@ Account Detail
       </a>
     </div>
   {% endblock extra_controls %}
-{% block content %}
-<div class="container">
-  <div class="container-fluid">
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th scope="col">Name</th>
-          <th scope="col">Exchange</th>
-          <th scope="col">Account Value</th>
-          <th scope="col">Token Pair</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <th scope="row">{{ account.name }}</th>
-          <th scope="row">{{ account.exchange.name }}</th>
-          <td>{{ account.total_value_account }} {{ account.token_pair.symbol }}</td>
-          <td>{{ account.token_pair }}</td>
-        </tr>
-        </tbody>
-      </table>
-    <div class="container-fluid">
-    <table class="table table-striped">
-      <thead class="thead-dark">
-        <tr>
-          <th scope="col">Token Name</th>
-          <th scope="col">Symbol</th>
-          <th scope="col">Qty</th>
-          <th scope="col">Last Value ({{ account.token_pair }})</th>
-          <th scope="col">Total Value ({{ account.token_pair }})</th>
-
-        </tr>
-      </thead>
-      <tbody>
-          {% for tokenqty in account.accounttokens_set.all %}
-          <tr>
-            <th scope="row">{{ tokenqty.token.name }}</th>
-            <td>{{ tokenqty.token.symbol }}</td>
-            <td>{{ tokenqty.quantity }}</td>
-            <td>{{ tokenqty.token.last_value }}</td>
-            <td>{{ account|account_token_value:tokenqty.token.name }} </td>
-          </tr>
-          {% endfor %}
-      </tbody>
-    </table>
-    </div>
+{% block backbutton %}
+  <div class="p-2">
+    {% back_button object %}
   </div>
-</div>
+{% endblock backbutton %}
+
+{% block content %}
+  <div class="container-lg">
+    {% render_table table_account 'django_tables2/bootstrap4.html' %}
+    {% render_table table 'django_tables2/bootstrap4.html' %}
+  </div>
 {% endblock %}
