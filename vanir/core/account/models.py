@@ -85,7 +85,7 @@ class Account(BaseObject):
                 total_value += price_dict[pair] * token_account.quantity
             except KeyError:
                 tokens_not_found.append(token_obj.name)
-        return round(total_value, 2)
+        return round(total_value, 4)
 
     @property
     def total_value_account_table(self):
