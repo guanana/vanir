@@ -16,9 +16,19 @@ class BaseObject(models.Model):
     def get_absolute_url(self):
         from django.urls import reverse
 
+        app_label = self._meta.app_label
         class_name = self.__class__.__name__.lower()
-        return reverse(f"{class_name}:{class_name}_detail", kwargs={"pk": self.pk})
+        return reverse(f"{app_label}:{class_name}_detail", kwargs={"pk": self.pk})
 
+    @property
+    def get_list_url(self):
+        from django.urls import reverse
+
+        app_label = self._meta.app_label
+        class_name = self.__class__.__name__.lower()
+        return reverse(f"{app_label}:{class_name}_list")
+
+    @property
     def get_add_url(self):
         from django.urls import reverse
 
