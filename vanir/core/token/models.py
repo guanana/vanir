@@ -28,8 +28,12 @@ class Coin(models.Model):
         self.last_value = account.exchange_obj.get_token_price(
             value_pair(self, account.token_pair)
         )
-        self.save()
-        return self.last_value
+        if self.last_value:
+            self.last_value = round(self.last_value, 4)
+            self.save()
+            return self.last_value
+        else:
+            return False
 
     def check_exceptions_value(self, account):
         dollar_pairs = ("BUSD", "USDT", "USDC", "DAI", "UST", "TUSD", "USDP")
