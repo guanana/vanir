@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
+from django.views.generic import DetailView
 
 from vanir.core.account.models import Account
 from vanir.core.account.tables import AccountTable
@@ -13,10 +14,10 @@ from vanir.core.token.helpers.import_utils import (
     token_import,
 )
 from vanir.core.token.models import Token
+from vanir.core.token.tables import TokenTableValue
 from vanir.utils.views import (
     ObjectCreateView,
     ObjectDeleteView,
-    ObjectDetailView,
     ObjectListView,
     ObjectUpdateView,
 )
@@ -61,19 +62,24 @@ class AccountUpdateView(ObjectUpdateView):
     )
 
 
-class AccountDetailView(ObjectDetailView):
+class AccountDetailView(DetailView):
     model = Account
-    # TODO: Check how to pass into table
-    # template_name = "account/account_detail.html"
-    #
-    # def get_table_data(self):
-    #     account_pk = self.request.resolver_match.kwargs.get("pk")
-    #     if account_pk:
-    #         data = Account.objects.filter(pk=account_pk)
-    #         return data
+    table_class = AccountTable
+    template_name = "account/account_detail.html"
+
+    def get_context_data(self, **kwargs):
+        table = self.table_class(self.model.objects.filter(pk=self.kwargs["pk"]))
+        table_accounttokens = TokenTableValue(
+            Token.objects.filter(accounttokens__account__pk=self.kwargs["pk"]),
+            account_pk=self.kwargs["pk"],
+        )
+        context = super().get_context_data()
+        context["table_account"] = table
+        context["table"] = table_accounttokens
+        return super().get_context_data(**context)
 
 
-class AccountTokenBulkUpdateValueView(ObjectDetailView):
+class AccountTokenBulkUpdateValueView(DetailView):
     model = Account
 
     def get(self, request, *args, **kwargs):
