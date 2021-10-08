@@ -1,6 +1,7 @@
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
+from django.views.generic import DetailView
 
 from vanir.plugins.new_coin_bot.helpers import run_scrap
 from vanir.plugins.new_coin_bot.models import BinanceNewToken, NewCoinConfig
@@ -37,6 +38,7 @@ class NewCoinConfigUpdateView(PluginUpdateView):
 
 class NewCoinConfigDetailView(PluginDetailView):
     model = NewCoinConfig
+    table_class = NewCoinConfigTable
 
 
 class NewCoinConfigDeleteView(PluginDeleteView):
@@ -66,6 +68,8 @@ class BinanceNewTokenUpdateView(PluginUpdateView):
 
 class BinanceNewTokenDetailView(PluginDetailView):
     model = BinanceNewToken
+    table_class = BinanceNewTokenTable
+    template_name = "new_coin_bot/binancenewtoken_detail.html"
 
 
 class BinanceNewTokenDeleteView(PluginDeleteView):
@@ -83,7 +87,7 @@ class BinanceNewTokenUpdateValueView(PluginListView, SuccessMessageMixin):
         return redirect(reverse("plugins:new_coin_bot:binancenewtoken_list"))
 
 
-class BinanceNewTokenPromoteView(PluginDetailView):
+class BinanceNewTokenPromoteView(DetailView):
     model = BinanceNewToken
 
     def get(self, request, *args, **kwargs):

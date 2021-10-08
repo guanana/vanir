@@ -33,6 +33,8 @@ class TokenUpdateView(ObjectUpdateView):
 
 class TokenDetailView(ObjectDetailView):
     model = Token
+    table_class = TokenTable
+    template_name = "token/token_detail.html"
 
 
 class TokenDeleteView(ObjectDeleteView):
@@ -42,10 +44,17 @@ class TokenDeleteView(ObjectDeleteView):
 
 class TokenDetailUpdateValueView(ObjectDetailView):
     model = Token
+    table_class = TokenTable
 
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
-        self.object.set_value()
+        if not self.object.set_value():
+            messages.info(
+                message="Last value not updated, you can update it manually",
+                request=request,
+            )
+        else:
+            messages.success(message="Last value updated correctly", request=request)
         return redirect(reverse("token:token_detail", kwargs={"pk": self.object.pk}))
 
 

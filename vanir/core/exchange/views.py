@@ -27,6 +27,7 @@ class ExchangeUpdateView(ObjectUpdateView):
 
 class ExchangeDetailView(ObjectDetailView):
     model = Exchange
+    table_class = ExchangeTable
 
 
 class ExchangeDeleteView(ObjectDeleteView):

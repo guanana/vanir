@@ -59,6 +59,13 @@ class ObjectUpdateView(LoginRequiredMixin, UpdateView):
 
 class ObjectDetailView(DetailView):
     model = None
+    table_class = None
+    template_name = "object_detail.html"
+
+    def get_context_data(self, **kwargs):
+        table = self.table_class(self.model.objects.filter(pk=self.kwargs["pk"]))
+        context = {"table": table}
+        return super().get_context_data(**context)
 
 
 # TODO: Check how to pass into table

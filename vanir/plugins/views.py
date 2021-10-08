@@ -40,6 +40,7 @@ class PluginUpdateView(ObjectUpdateView):
 
 class PluginDetailView(ObjectDetailView):
     model = None
+    template_name = "object_detail.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
