@@ -8,12 +8,16 @@ Update {{ title }}
 {% endblock title %}
 
 {% block buttons %}
-<div class="control-group float-right">
-  {# Extra buttons #}
-  {% block extra_controls %}
-  {% endblock %}
-  {% delete_button object %}
-</div>
+  <div class="container-fluid">
+    <div class="d-flex flex-row-reverse">
+      {# Extra buttons #}
+      {% block extra_controls %}
+      {% endblock %}
+        <div class="p-2">
+          {% delete_button object %}
+        </div>
+    </div>
+  </div>
 {% endblock buttons %}
 
 {% block model %}
