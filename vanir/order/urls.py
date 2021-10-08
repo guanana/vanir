@@ -1,13 +1,81 @@
 from django.urls import path
 
-from .views import OrderListView, OrderCreateView, OrderDetailView
+from . import views
 
 app_name = "order"
 urlpatterns = [
-        path('', OrderListView.as_view(), name="order_list"),
-        path('add/', OrderCreateView.as_view(), name="order_add"),
-        path('<int:pk>/', OrderDetailView.as_view(), name='order_detail'),
-        # path('<int:pk>/edit/', BlockchainUpdateView.as_view(), name='blockchain_update'),
-        # path('<int:pk>/delete/', BlockchainDeleteView.as_view(), name='blockchain_delete'),
-
+    # STOP PRICE ORDER
+    path(
+        "stoplossortakeprofitorder/",
+        views.StopPriceOrderListView.as_view(),
+        name="stoppriceorder_list",
+    ),
+    path(
+        "stoplossortakeprofitorder/add/",
+        views.StopPriceOrderCreateView.as_view(),
+        name="stoppriceorder_add",
+    ),
+    path(
+        "stoplossortakeprofitorder/<int:pk>/",
+        views.StopPriceOrderDetailView.as_view(),
+        name="stoppriceorder_detail",
+    ),
+    path(
+        "stoplossortakeprofitorder/<int:pk>/delete/",
+        views.StopPriceOrderDeleteView.as_view(),
+        name="stoppriceorder_delete",
+    ),
+    # STOPLOSS OR TAKEPROFIT LIMIT ORDER
+    path(
+        "stoplossortakeprofitorderlimit/",
+        views.StopLossOrTakeProfitLimitOrderListView.as_view(),
+        name="stoplossortakeprofitorderlimit_list",
+    ),
+    path(
+        "stoplossortakeprofitorderlimit/add/",
+        views.StopLossOrTakeProfitLimitOrderCreateView.as_view(),
+        name="stoplossortakeprofitorderlimit_add",
+    ),
+    path(
+        "stoplossortakeprofitorderlimit/<int:pk>/",
+        views.StopLossOrTakeProfitLimitOrderDetailView.as_view(),
+        name="stoplossortakeprofitorderlimit_detail",
+    ),
+    path(
+        "stoplossortakeprofitorderlimit/<int:pk>/delete/",
+        views.StopLossOrTakeProfitLimitOrderDeleteView.as_view(),
+        name="stoplossortakeprofitorderlimit_delete",
+    ),
+    # LIMIT ORDER
+    path("limitorder/", views.LimitOrderListView.as_view(), name="limitorder_list"),
+    path(
+        "limitorder/add/", views.LimitOrderCreateView.as_view(), name="limitorder_add"
+    ),
+    path(
+        "limitorder/<int:pk>/",
+        views.LimitOrderDetailView.as_view(),
+        name="limitorder_detail",
+    ),
+    path(
+        "limitorder/<int:pk>/delete/",
+        views.LimitOrderDeleteView.as_view(),
+        name="limitorder_delete",
+    ),
+    # MARKET
+    path("marketorder/", views.MarketOrderListView.as_view(), name="marketorder_list"),
+    path(
+        "marketorder/add/",
+        views.MarketOrderCreateView.as_view(),
+        name="marketorder_add",
+    ),
+    path(
+        "marketorder/<int:pk>/",
+        views.MarketOrderDetailView.as_view(),
+        name="marketorder_detail",
+    ),
+    path(
+        "marketorder/<int:pk>/delete/",
+        views.MarketOrderDeleteView.as_view(),
+        name="marketorder_delete",
+    ),
 ]
