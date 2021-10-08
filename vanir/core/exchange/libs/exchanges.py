@@ -7,6 +7,7 @@ from binance.exceptions import BinanceAPIException
 from django.utils.functional import cached_property
 
 from vanir.core.blockchain.models import Blockchain
+from vanir.utils.exceptions import ExchangeNotEnoughPrivilegesError
 from vanir.utils.table_helpers import change_table_align, change_table_style
 
 logger = logging.getLogger(__name__)
@@ -41,6 +42,7 @@ class ExtendedExchangeRegistry(type):
 class BasicExchange:
     @abstractmethod
     def __init__(self, account):
+        self.account = account
         self.api_key = account.api_key
         self.api_secret = account.secret
         self.tld = account.tld
@@ -68,8 +70,7 @@ class BasicExchange:
 
 
 class ExtendedExchange(BasicExchange, metaclass=ExtendedExchangeRegistry):
-    def __init__(self, account):
-        self.account = account
+    pass
 
 
 #
@@ -152,3 +153,10 @@ class VanirBinance(ExtendedExchange, Client, metaclass=ExtendedExchangeRegistry)
         for asset in self.get_all_tickers():
             temp_prices[asset["symbol"]] = float(asset["price"])
         return temp_prices
+
+    def test_order(self, **kwargs):
+        try:
+            self.con.create_test_order(**kwargs)
+        except BinanceAPIException as binanceexception:
+            if binanceexception.code == -2015:
+                raise ExchangeNotEnoughPrivilegesError(account=self.account)
