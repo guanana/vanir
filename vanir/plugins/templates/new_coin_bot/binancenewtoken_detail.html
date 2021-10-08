@@ -1,6 +1,6 @@
-{% extends "object_base.html" %}
+{% extends "object_detail.html" %}
 {% block title %}
-New Token Detail
+New Token {{ object.name }}
 {% endblock title %}
 {% block extra_controls %}
   <div class="p-2">
@@ -9,25 +9,3 @@ New Token Detail
     </a>
   </div>
 {% endblock extra_controls %}
-{% block content %}
-<div class="container-fluid">
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th scope="col">Symbol</th>
-        <th scope="col">Listing day</th>
-        <th scope="col">Discovered method</th>
-        <th scope="col">Updated</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <th scope="row">{{ object.symbol }}</th>
-        <td>{{ object.listing_day }}</td>
-        <td>{{ object.discovered_method }}</td>
-        <td>{{ object.updated }}</td>
-      </tr>
-      </tbody>
-  </table>
-</div>
-{% endblock %}
