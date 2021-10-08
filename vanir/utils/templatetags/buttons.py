@@ -54,3 +54,15 @@ def add_button(context):
     return {
         "add_url": url,
     }
+
+
+#
+# Detail buttons
+#
+
+
+@register.inclusion_tag("buttons/back.html")
+def back_button(instance):
+    return {
+        "back_url": instance.get_list_url,
+    }
