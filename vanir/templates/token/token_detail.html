@@ -1,4 +1,4 @@
-{% extends "object_base.html" %}
+{% extends "object_detail.html" %}
 {% block title %}
 Token Detail
 {% endblock title %}
@@ -9,23 +9,3 @@ Token Detail
     </a>
   </div>
 {% endblock extra_controls %}
-{% block content %}
-<div class="container-fluid">
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th scope="col">Symbol</th>
-        <th scope="col">Name</th>
-        <th scope="col">Last update price</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <th scope="row">{{ token.symbol }}</th>
-        <td>{{ token.name }}</td>
-        <td>{{ token.last_value }}</td>
-      </tr>
-      </tbody>
-  </table>
-</div>
-{% endblock %}
