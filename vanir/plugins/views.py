@@ -1,3 +1,4 @@
+from vanir.utils.templatetags.filtertemplates import get_display_name
 from vanir.utils.views import (
     ObjectCreateView,
     ObjectDeleteView,
@@ -18,7 +19,7 @@ class PluginListView(ObjectListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["plugin"] = True
-        context["title"] = f" plugin {context['model_name']}"
+        context["title"] = f"Plugin {get_display_name(self.model)}"
         return set_context_data(context, self)
 
 
@@ -26,7 +27,7 @@ class PluginListFilterView(ObjectListFilterView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["plugin"] = True
-        context["title"] = f" plugin {context['model_name']}"
+        context["title"] = f"Plugin {get_display_name(self.model)}"
         return set_context_data(context, self)
 
 
@@ -34,7 +35,7 @@ class PluginUpdateView(ObjectUpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["plugin"] = True
-        context["title"] = f" plugin {context['model_name']}"
+        context["title"] = f"Plugin {get_display_name(self.model)}"
         return set_context_data(context, self)
 
 
@@ -52,5 +53,5 @@ class PluginDeleteView(ObjectDeleteView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["plugin"] = True
-        context["title"] = f" plugin {context['model_name']}"
+        context["title"] = f"Plugin {get_display_name(self.model)}"
         return set_context_data(context, self)
