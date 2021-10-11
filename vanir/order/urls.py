@@ -6,22 +6,22 @@ app_name = "order"
 urlpatterns = [
     # STOP PRICE ORDER
     path(
-        "stoplossortakeprofitorder/",
+        "stoppriceorder/",
         views.StopPriceOrderListView.as_view(),
         name="stoppriceorder_list",
     ),
     path(
-        "stoplossortakeprofitorder/add/",
+        "stoppriceorder/add/",
         views.StopPriceOrderCreateView.as_view(),
         name="stoppriceorder_add",
     ),
     path(
-        "stoplossortakeprofitorder/<int:pk>/",
+        "stoppriceorder/<int:pk>/",
         views.StopPriceOrderDetailView.as_view(),
         name="stoppriceorder_detail",
     ),
     path(
-        "stoplossortakeprofitorder/<int:pk>/delete/",
+        "stoppriceorder/<int:pk>/delete/",
         views.StopPriceOrderDeleteView.as_view(),
         name="stoppriceorder_delete",
     ),
@@ -29,22 +29,22 @@ urlpatterns = [
     path(
         "stoplossortakeprofitorderlimit/",
         views.StopLossOrTakeProfitLimitOrderListView.as_view(),
-        name="stoplossortakeprofitorderlimit_list",
+        name="stoplossortakeprofitlimitorder_list",
     ),
     path(
         "stoplossortakeprofitorderlimit/add/",
         views.StopLossOrTakeProfitLimitOrderCreateView.as_view(),
-        name="stoplossortakeprofitorderlimit_add",
+        name="stoplossortakeprofitlimitorder_add",
     ),
     path(
         "stoplossortakeprofitorderlimit/<int:pk>/",
         views.StopLossOrTakeProfitLimitOrderDetailView.as_view(),
-        name="stoplossortakeprofitorderlimit_detail",
+        name="stoplossortakeprofitlimitorder_detail",
     ),
     path(
         "stoplossortakeprofitorderlimit/<int:pk>/delete/",
         views.StopLossOrTakeProfitLimitOrderDeleteView.as_view(),
-        name="stoplossortakeprofitorderlimit_delete",
+        name="stoplossortakeprofitlimitorder_delete",
     ),
     # LIMIT ORDER
     path("limitorder/", views.LimitOrderListView.as_view(), name="limitorder_list"),
@@ -77,5 +77,15 @@ urlpatterns = [
         "marketorder/<int:pk>/delete/",
         views.MarketOrderDeleteView.as_view(),
         name="marketorder_delete",
+    ),
+    path(
+        "tokento-autocomplete/",
+        views.TokenToAutocomplete.as_view(),
+        name="tokento_autocomplete",
+    ),
+    path(
+        "tokenfrom-autocomplete/",
+        views.TokenFromAutocomplete.as_view(),
+        name="tokenfrom_autocomplete",
     ),
 ]
