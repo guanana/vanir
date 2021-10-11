@@ -7,7 +7,10 @@ from binance.exceptions import BinanceAPIException
 from django.utils.functional import cached_property
 
 from vanir.core.blockchain.models import Blockchain
-from vanir.utils.exceptions import ExchangeNotEnoughPrivilegesError
+from vanir.utils.exceptions import (
+    ExchangeInvalidSymbolError,
+    ExchangeNotEnoughPrivilegesError,
+)
 from vanir.utils.table_helpers import change_table_align, change_table_style
 
 logger = logging.getLogger(__name__)
@@ -78,6 +81,7 @@ class ExtendedExchange(BasicExchange, metaclass=ExtendedExchangeRegistry):
 #
 class VanirBinance(ExtendedExchange, Client, metaclass=ExtendedExchangeRegistry):
     def __init__(self, account):
+        self.name = "VanirBinance"
         self.testnet = False
         super(ExtendedExchange, self).__init__(account)
         super(Client, self).__init__(
@@ -127,6 +131,19 @@ class VanirBinance(ExtendedExchange, Client, metaclass=ExtendedExchangeRegistry)
         return response
 
     @cached_property
+    def pairs_info(self):
+        full_info = self.get_exchange_info()
+        pairs_info = {}
+        # First iteration to create all the keys
+        for symbol_raw in full_info["symbols"]:
+            if symbol_raw["status"] == "TRADING":
+                try:
+                    pairs_info[symbol_raw["baseAsset"]].append(symbol_raw["quoteAsset"])
+                except KeyError:
+                    pairs_info[symbol_raw["baseAsset"]] = []
+        return pairs_info
+
+    @cached_property
     def all_margin_assets(self):
         all_margin_assets = {}
         margin_assets = self.con.get_margin_all_assets()
@@ -156,7 +173,10 @@ class VanirBinance(ExtendedExchange, Client, metaclass=ExtendedExchangeRegistry)
 
     def test_order(self, **kwargs):
         try:
-            self.con.create_test_order(**kwargs)
+            order_test = self.con.create_test_order(**kwargs)
+            return order_test
         except BinanceAPIException as binanceexception:
             if binanceexception.code == -2015:
                 raise ExchangeNotEnoughPrivilegesError(account=self.account)
+            if binanceexception.code == -1121:
+                raise ExchangeInvalidSymbolError(account=self.account)
