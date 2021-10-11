@@ -74,6 +74,14 @@ def get_model_name(model):
 
 
 @register.filter()
+def get_display_name(model):
+    try:
+        return model.get_title()
+    except AttributeError:
+        return model._meta.model_name.capitalize()
+
+
+@register.filter()
 def account_token_value(account, token_name):
     for tokenqty in account.accounttokens_set.all():
         if tokenqty.token.name == token_name:
