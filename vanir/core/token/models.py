@@ -5,7 +5,7 @@ from vanir.utils.models import BaseObject
 
 
 class Coin(models.Model):
-    symbol = models.CharField(max_length=6, unique=True)
+    symbol = models.CharField(max_length=10, unique=True)
     last_value = models.FloatField(null=True)
 
     class Meta:
