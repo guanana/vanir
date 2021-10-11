@@ -8,7 +8,7 @@
     </a>
   <div class="container">
       <ul class="navbar-nav">
-        {% with 'Exchange Token Account Order' as list %}
+        {% with 'Exchange Token Account' as list %}
             {% for app in list.split %}
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" href="{% get_viewname app app 'list' %}">{{app}}</a>
@@ -19,6 +19,7 @@
                 </div>
               </li>&nbsp;&nbsp;
             {% endfor %}
+            {% include "order_menu.html" %}
             {% include "utils_menu.html" %}
             {% include "plugins_menu.html" %}
         {% endwith %}
