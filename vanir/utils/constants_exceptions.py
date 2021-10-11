@@ -12,3 +12,4 @@ EXCHANGEPRIVILEGESERROR = (
     "Problem executing the action on the Exchange, "
     "please check the permissions assign to the API key provided"
 )
+EXCHANGEINVALIDSYMBOLERROR = "Problem trying to fetch symbol on the Exchange, probably the symbol is NOT supported"

@@ -40,3 +40,17 @@ class ExchangeNotEnoughPrivilegesError(ExchangeError):
     ):
         self.message = message
         super().__init__(self.message, account)
+
+
+class ExchangeInvalidSymbolError(ExchangeError):
+    """
+    Invalid symbol
+    """
+
+    def __init__(
+        self,
+        message: str = constants_exceptions.EXCHANGEINVALIDSYMBOLERROR,
+        account=None,
+    ):
+        self.message = message
+        super().__init__(self.message, account)
