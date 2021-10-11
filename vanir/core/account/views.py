@@ -3,16 +3,12 @@ from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView
 
+from vanir.core.account.helpers.balance import update_balance
 from vanir.core.account.models import Account
 from vanir.core.account.tables import AccountTable
 from vanir.core.account.utils import exchange_view_render
 from vanir.core.exchange.libs.exchanges import ExtendedExchange
-from vanir.core.token.helpers.import_utils import (
-    bulk_update,
-    import_token_account,
-    qs_update,
-    token_import,
-)
+from vanir.core.token.helpers.import_utils import qs_update
 from vanir.core.token.models import Token
 from vanir.core.token.tables import TokenTableValue
 from vanir.utils.views import (
@@ -84,9 +80,10 @@ class AccountTokenBulkUpdateValueView(DetailView):
 
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
+        update_balance(self.object)
         token_subset = self.object.accounttokens_set
-        messages.info(request, "Tokens updated")
         qs_update(token_subset.all(), self.object)
+        messages.info(request, "Tokens updated")
         return redirect(
             reverse("account:account_detail", kwargs={"pk": self.object.pk})
         )
@@ -120,18 +117,5 @@ def exchange_balanceview(request, pk):
 
 def exchange_importtokens(request, pk):
     account = Account.objects.get(pk=pk)
-    df = account.exchange_obj.get_balance()
-    response = []
-    for index, row in df.iterrows():
-        try:
-            token = Token.objects.get(symbol=row["asset"])
-        except Token.DoesNotExist:
-            token = token_import(account=account, token_symbol=row["asset"])
-        import_token_account(
-            account=account,
-            token_obj=token,
-            quantity=float(row["free"]) + float(row["locked"]),
-        )
-        response.append(row["asset"])
-    bulk_update()
+    response = update_balance(account)
     return exchange_view_render("account/account_import.html", response, request)
