@@ -41,6 +41,16 @@ def delete_button(instance):
     }
 
 
+@register.inclusion_tag("buttons/cancel_order.html")
+def cancel_order_button(instance):
+    viewname = validated_viewname(instance, "delete")
+    url = reverse(viewname, kwargs={"pk": instance.pk})
+
+    return {
+        "url": url,
+    }
+
+
 #
 # List buttons
 #
