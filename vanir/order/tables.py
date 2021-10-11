@@ -33,8 +33,8 @@ class MarketOrderTable(ObjectTable):
             "token_from",
             "token_to",
             "side",
-            "ORDER_TYPE",
             "quoteOrderQty",
+            "order_status",
         )
 
 
