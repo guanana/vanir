@@ -20,15 +20,19 @@ class BaseOrder(BaseObject):
     """
 
     ORDER_TYPE = None
-    order_id = models.CharField(max_length=250, editable=False)
-    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    order_id = models.CharField(max_length=150, editable=False)
+    account = models.ForeignKey(
+        Account, on_delete=models.CASCADE, help_text=constants.ACCOUNT
+    )
     token_from = models.ForeignKey(
         Token, related_name="token_from", on_delete=models.CASCADE, null=False
     )
     token_to = models.ForeignKey(
         Token, related_name="token_to", on_delete=models.CASCADE, null=False
     )
-    side = models.CharField(max_length=4, choices=OrderSide.choices, null=False)
+    side = models.CharField(
+        max_length=4, choices=OrderSide.choices, null=False, default=OrderSide.SIDE_SELL
+    )
     quoteOrderQty = models.FloatField(default=0.1, null=False)
 
     class Meta:
@@ -54,27 +58,34 @@ class BaseOrder(BaseObject):
 
     @property
     def new_client_order_id(self):
-        return f"{datetime.datetime.today()}{self.symbol}"
+        return f"{datetime.datetime.today().strftime('%Y%m%d%H%M%S')}{self.symbol}"
 
     def save(self, *args, **kwargs):
         self.name = f"{datetime.datetime.today().strftime('%X %x')}:{self.token_from.symbol}/{self.token_to.symbol}"
-        self.orden_id = self.new_client_order_id
+        self.order_id = self.new_client_order_id
         try:
-            test = self.account.exchange_obj.test_order(**self.order_args)  # noqa F841
+            order = self.account.exchange_obj.create_order(  # noqa F841
+                **self.order_args, newClientOrderId=self.order_id
+            )  # noqa F841
         except ValidationError as e:
             logger.error(e)
-        super().save(*args, **kwargs)
+        return super(BaseOrder, self).save(*args, **kwargs)
 
     def execute_order(self, **kwargs):
         return self.account.exchange_obj.create_order(**self.order_args, **kwargs)
 
-    # def test_order(self, **kwargs):
-    #     return self.account.exchange_obj.create_test_order(**self.order_args, **kwargs)
+    @property
+    def order_full_info(self):
+        return self.account.exchange_obj.get_order(
+            symbol=self.symbol, origClientOrderId=self.order_id
+        )
 
-    def get_absolute_url(self):
-        from django.urls import reverse
-
-        return reverse("order:order_detail", kwargs={"pk": self.pk})
+    @property
+    def order_status(self):
+        try:
+            return self.order_full_info["status"]
+        except AttributeError:
+            return
 
 
 class BasePriceOrder(BaseOrder):
@@ -82,8 +93,10 @@ class BasePriceOrder(BaseOrder):
 
     @property
     def order_args(self):
-        self.base_order_args.update({"price": self.price})
-        return self.base_order_args
+        add_on = {"price": self.price}
+        base = self.base_order_args
+        base.update(add_on)
+        return base
 
     class Meta:
         abstract = True
@@ -100,18 +113,6 @@ class BasePriceLimitOrder(BasePriceOrder):
     class Meta:
         abstract = True
 
-    @property
-    def order_args(self):
-        self.base_order_args.update(
-            {"price": self.price, "timeInForce": self.timeInForce}
-        )
-        return self.base_order_args
-
-    def get_absolute_url(self):
-        from django.urls import reverse
-
-        return reverse("order:limitorder_detail", kwargs={"pk": self.pk})
-
 
 class LimitOrder(BasePriceLimitOrder):
     ORDER_TYPE = "LIMIT"
@@ -124,6 +125,17 @@ class LimitOrder(BasePriceLimitOrder):
         on_delete=models.CASCADE,
         null=False,
     )
+
+    @staticmethod
+    def get_title():
+        return "Limit Order"
+
+    @property
+    def order_args(self):
+        add_on = {"timeInForce": self.timeInForce, "price": self.price}
+        base = self.base_order_args
+        base.update(add_on)
+        return base
 
 
 class MarketOrder(BaseOrder):
@@ -146,6 +158,10 @@ class MarketOrder(BaseOrder):
     def order_args(self):
         return self.base_order_args
 
+    @staticmethod
+    def get_title():
+        return "Market Order"
+
 
 class StopPriceOrder(BaseOrder):
     stopprice = models.FloatField(help_text=constants.PRICE, default=0)
@@ -167,13 +183,14 @@ class StopPriceOrder(BaseOrder):
 
     @property
     def order_args(self):
-        self.base_order_args.update({"stopPrice": self.stopprice})
-        return self.base_order_args
+        add_on = {"stopPrice": self.stopprice}
+        base = self.base_order_args
+        base.update(add_on)
+        return base
 
-    def get_absolute_url(self):
-        from django.urls import reverse
-
-        return reverse("order:stoplossortakeprofitorder_detail", kwargs={"pk": self.pk})
+    @staticmethod
+    def get_title():
+        return "Stop Price Order"
 
 
 class StopLossOrTakeProfitLimitOrder(BasePriceLimitOrder):
@@ -196,18 +213,15 @@ class StopLossOrTakeProfitLimitOrder(BasePriceLimitOrder):
 
     @property
     def order_args(self):
-        self.base_order_args.update(
-            {
-                "price": self.price,
-                "timeInForce": self.timeInForce,
-                "stopPrice": self.stopprice,
-            }
-        )
-        return self.base_order_args
+        add_on = {
+            "price": self.price,
+            "timeInForce": self.timeInForce,
+            "stopPrice": self.stopprice,
+        }
+        base = self.base_order_args
+        base.update(add_on)
+        return base
 
-    def get_absolute_url(self):
-        from django.urls import reverse
-
-        return reverse(
-            "order:stoplossortakeprofitlimitorder_detail", kwargs={"pk": self.pk}
-        )
+    @staticmethod
+    def get_title():
+        return "Stop Loss Or Take Profit Limit Order"
