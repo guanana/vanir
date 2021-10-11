@@ -32,8 +32,8 @@ List {{ title }}
 <div class="container-lg">
   {% if filter %}
     <form action="" method="get" class="form form-inline">
-        {% bootstrap_form filter.form layout='inline' %}
-        {% bootstrap_button 'filter' %}
+        {% bootstrap_form filter.form %}
+        &nbsp;&nbsp;{% bootstrap_button 'filter' %}
     </form>
   {% endif %}
 </div>
