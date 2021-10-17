@@ -74,7 +74,6 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "bootstrap4",
     "simple_history",
-    "bulk_update_or_create",
 ]
 
 LOCAL_APPS = [

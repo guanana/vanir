@@ -1,4 +1,4 @@
-from bulk_update_or_create import BulkUpdateOrCreateQuerySet
+# from bulk_update_or_create import BulkUpdateOrCreateQuerySet
 from django.db import models
 
 from vanir.core.blockchain.models import Blockchain
@@ -29,7 +29,7 @@ class AllowedPairs(models.Model):
     pair = models.CharField(max_length=15, unique=True)
     price = models.DecimalField(max_digits=30, decimal_places=8, null=True)
     # history = HistoricalRecords()
-    objects = BulkUpdateOrCreateQuerySet.as_manager()
+    # objects = BulkUpdateOrCreateQuerySet.as_manager()
 
     # Make it abstract for now to now have the tables created
     class Meta:
