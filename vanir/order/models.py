@@ -41,10 +41,16 @@ class BaseOrder(BaseObject):
 
     @property
     def order_args(self):
+        """
+        To be implemented by child classes
+        """
         raise NotImplementedError
 
     @property
     def base_order_args(self):
+        """
+        Base arguments common to all the types of orders
+        """
         return {
             "symbol": self.symbol,
             "side": self.side,
@@ -54,19 +60,32 @@ class BaseOrder(BaseObject):
 
     @property
     def symbol(self):
+        """
+        Construct symbol to send to exchange
+        """
         return f"{self.token_from.symbol}{self.token_to.symbol}"
 
     @property
     def new_client_order_id(self):
+        """
+        Construct order id to send to the exchange
+        """
         return f"{datetime.datetime.today().strftime('%Y%m%d%H%M%S')}{self.symbol}"
 
     def save(self, *args, **kwargs):
+        """
+        Construct name and order id then send the order with the proper parameters
+        """
         self.name = f"{datetime.datetime.today().strftime('%X %x')}:{self.token_from.symbol}/{self.token_to.symbol}"
         self.order_id = self.new_client_order_id
         try:
-            order = self.account.exchange_obj.create_order(  # noqa F841
+            order = self.account.exchange_obj.create_order(
                 **self.order_args, newClientOrderId=self.order_id
-            )  # noqa F841
+            )
+            if not order:
+                raise ValidationError(
+                    "Order not able to process, please check the details"
+                )
         except ValidationError as e:
             logger.error(e)
         return super(BaseOrder, self).save(*args, **kwargs)
