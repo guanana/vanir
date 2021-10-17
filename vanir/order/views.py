@@ -1,5 +1,6 @@
 from dal import autocomplete
 from django.db.models import Q
+from django.http import HttpResponse
 from django.urls import reverse_lazy
 
 from vanir.utils.views import (
@@ -9,9 +10,6 @@ from vanir.utils.views import (
     ObjectListFilterView,
 )
 
-###
-# LimitOrder
-###
 from ..core.account.models import Account
 from ..core.token.models import Token
 from .filtersets import (
@@ -35,10 +33,18 @@ from .tables import (
 )
 
 
-class LimitOrderCreateView(ObjectCreateView):
+class BaseOrderCreateView(ObjectCreateView):
+    template_name = "order/order_form.html"
+
+
+###
+# LimitOrder
+###
+
+
+class LimitOrderCreateView(BaseOrderCreateView):
     form_class = LimitForm
     model = LimitOrder
-    # TODO: Explore django-autocomplete-light to filter token_from
 
 
 class LimitOrderListView(ObjectListFilterView):
@@ -61,7 +67,7 @@ class LimitOrderDeleteView(ObjectDeleteView):
 ###
 # MarketOrder
 ###
-class MarketOrderCreateView(ObjectCreateView):
+class MarketOrderCreateView(BaseOrderCreateView):
     model = MarketOrder
     form_class = MarketForm
 
@@ -86,7 +92,7 @@ class MarketOrderDeleteView(ObjectDeleteView):
 ###
 # StopPriceOrder
 ###
-class StopPriceOrderCreateView(ObjectCreateView):
+class StopPriceOrderCreateView(BaseOrderCreateView):
     model = StopPriceOrder
     form_class = StopPriceForm
 
@@ -111,7 +117,7 @@ class StopPriceOrderDeleteView(ObjectDeleteView):
 ###
 # StopLossOrTakeProfitLimitOrder
 ###
-class StopLossOrTakeProfitLimitOrderCreateView(ObjectCreateView):
+class StopLossOrTakeProfitLimitOrderCreateView(BaseOrderCreateView):
     model = StopLossOrTakeProfitLimitOrder
     form_class = StopLossOrTakeProfitLimitForm
 
@@ -171,3 +177,21 @@ class TokenToAutocomplete(autocomplete.Select2QuerySetView):
         else:
             return Token.objects.none()
         return qs
+
+
+def TokenPriceAutocomplete(request):
+    if not request.user.is_authenticated:
+        return HttpResponse("")
+    try:
+        token_from = request.GET["token_from"]
+        token_to = request.GET["token_to"]
+        account_name = request.GET["account_name"]
+        account = Account.objects.get(name=account_name)
+    except AttributeError:
+        return HttpResponse("")
+    except Account.DoesNotExist:
+        return HttpResponse("")
+    current_price = account.exchange_obj.get_symbol_ticker(
+        symbol=f"{token_from}{token_to}"
+    )
+    return HttpResponse(current_price["price"])
