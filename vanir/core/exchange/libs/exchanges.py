@@ -4,10 +4,13 @@ from abc import abstractmethod
 import pandas as pd
 from binance import Client
 from binance.exceptions import BinanceAPIException
+from django.core.exceptions import ValidationError
 from django.utils.functional import cached_property
 
 from vanir.core.blockchain.models import Blockchain
+from vanir.core.exchange.libs.orders import Orders
 from vanir.utils.exceptions import (
+    ExchangeInvalidQuantityError,
     ExchangeInvalidSymbolError,
     ExchangeNotEnoughPrivilegesError,
 )
@@ -69,6 +72,18 @@ class BasicExchange:
 
     @abstractmethod
     def all_assets_prices(self) -> dict:
+        pass
+
+    @abstractmethod
+    def order_process(self, *args, **kwargs):
+        raise NotImplementedError
+
+    @abstractmethod
+    def order_validation(self, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def order_correction(self, *args, **kwargs):
         pass
 
 
@@ -171,12 +186,35 @@ class VanirBinance(ExtendedExchange, Client, metaclass=ExtendedExchangeRegistry)
             temp_prices[asset["symbol"]] = float(asset["price"])
         return temp_prices
 
-    def test_order(self, **kwargs):
+    def order_test(self, **kwargs):
         try:
             order_test = self.con.create_test_order(**kwargs)
             return order_test
         except BinanceAPIException as binanceexception:
             if binanceexception.code == -2015:
                 raise ExchangeNotEnoughPrivilegesError(account=self.account)
-            if binanceexception.code == -1121:
+            elif binanceexception.code == -1121:
                 raise ExchangeInvalidSymbolError(account=self.account)
+            elif binanceexception.code == -1013:
+                if kwargs.get("quantity") <= 0:
+                    raise ValidationError("Value cannot be 0 for an order")
+                else:
+                    raise ExchangeInvalidQuantityError(account=self.account)
+            else:
+                return binanceexception
+
+    def order_validation(self, **kwargs):
+        order_obj = Orders(**kwargs)
+        try:
+            self.order_test(**order_obj.binance_args)
+            order_obj.validated = True
+        except ExchangeInvalidQuantityError:
+            order_obj.validated = self.order_quantity_correction(order_obj)
+        return order_obj, order_obj.validated
+
+    def order_quantity_correction(self, order_obj):
+        symbol_info = self.con.get_symbol_info(order_obj.symbol)
+        mandatory_precision = symbol_info["baseAssetPrecision"]
+        # Fix precision
+        corrected = order_obj.correct_precision(mandatory_precision)
+        return corrected
