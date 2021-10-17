@@ -8,18 +8,22 @@ Update {{ title }}
 {% endblock title %}
 
 {% block buttons %}
-<div class="control-group float-right">
-  {# Extra buttons #}
-  {% block extra_controls %}
-  {% endblock %}
-  {% delete_button object %}
-</div>
+  <div class="container-fluid">
+    <div class="d-flex flex-row-reverse">
+      {# Extra buttons #}
+      {% block extra_controls %}
+      {% endblock %}
+        <div class="p-2">
+          {% delete_button object %}
+        </div>
+    </div>
+  </div>
 {% endblock buttons %}
 
 {% block model %}
 <div class="py-5 text-center">
-  <img class="d-block mx-auto mb-4" src="{% static model_name|get_model_image %}" alt="{{ model_name }}" width="30%" height="30%">
-  <h2>Edit {{ model_name }}</h2>
-  <p class="lead">Edit the desired fields on the {{ model_name }}</p>
+  <img class="d-block mx-auto mb-4" src="{% static model_name|get_model_image %}" alt="{{ model_name }}" width="10%" height="30%">
+  <h2>Edit {{ title }}</h2>
+  <p class="lead">Edit the desired fields on the {{ title }}</p>
 </div>
 {% endblock model %}

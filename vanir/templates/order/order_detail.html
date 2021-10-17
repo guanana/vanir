@@ -1,31 +1,33 @@
 {% extends "object_base.html" %}
+{% load filtertemplates %}
+{% load buttons %}
+{% load static %}
+{% load render_table from django_tables2 %}
+{% load bootstrap4 %}
 {% block title %}
-Order Detail
+{{ object.name }}
 {% endblock title %}
 
-{% block content %}
-<div class="container-fluid">
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th scope="col">Name</th>
-        <th scope="col">Account</th>
-        <th scope="col">Symbol</th>
-        <th scope="col">Side</th>
-        <th scope="col">Order Type</th>
-        <th scope="col">Quantity</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <th scope="row">{{ order.name }}</th>
-        <td>{{ order.account.name }}</td>
-        <td>{{ order.symbol }}</td>
-        <td>{{ order.side }}</td>
-        <td>{{ order.orderType }}</td>
-        <td>{{ order.quoteOrderQty }}</td>
-      </tr>
-    </tbody>
-  </table>
+{# No edit button for orders #}
+{% block buttons %}
+<div class="d-flex flex-row-reverse">
+  <div class="p-2">
+  {% cancel_order_button object %}
+  </div>
 </div>
-{% endblock %}
+{% endblock buttons %}
+
+
+{% block content %}
+<div class="container-lg">
+  {% if filter %}
+    <form action="" method="get" class="form form-inline">
+        {% bootstrap_form filter.form layout='inline' %}
+        {% bootstrap_button 'filter' %}
+    </form>
+  {% endif %}
+</div>
+<div class="container-lg">
+  {% render_table table 'django_tables2/bootstrap4.html' %}
+</div>
+{% endblock content %}

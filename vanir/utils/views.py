@@ -8,6 +8,7 @@ from django_tables2 import SingleTableView
 from django_tables2.views import SingleTableMixin
 
 from vanir.utils.forms import PopulateDBBinanceForm
+from vanir.utils.templatetags.filtertemplates import get_display_name
 
 
 def set_context_data(context, view):
@@ -15,13 +16,17 @@ def set_context_data(context, view):
     model_name = view.model._meta.model_name
     context["app_label"] = app_label
     context["model_name"] = model_name
-    context["title"] = model_name.capitalize()
+    context["title"] = get_display_name(view.model)
     return context
 
 
-class ObjectCreateView(LoginRequiredMixin, CreateView):
+class ObjectCreateView(LoginRequiredMixin, CreateView, SuccessMessageMixin):
     model = None
     template_name = "object_form.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return set_context_data(context, self)
 
 
 class ObjectListView(LoginRequiredMixin, SingleTableView):
@@ -59,6 +64,13 @@ class ObjectUpdateView(LoginRequiredMixin, UpdateView):
 
 class ObjectDetailView(DetailView):
     model = None
+    table_class = None
+    template_name = "object_detail.html"
+
+    def get_context_data(self, **kwargs):
+        table = self.table_class(self.model.objects.filter(pk=self.kwargs["pk"]))
+        context = {"table": table}
+        return super().get_context_data(**context)
 
 
 # TODO: Check how to pass into table

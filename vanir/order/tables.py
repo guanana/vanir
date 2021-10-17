@@ -1,11 +1,76 @@
-from django_tables2 import tables
-from .models import Order
+from vanir.utils.tables import ObjectTable
 
-# Orders are not allowed to be edited (at least for now, that's why not inheriting from utils like rest of obj
+from .models import (
+    LimitOrder,
+    MarketOrder,
+    StopLossOrTakeProfitLimitOrder,
+    StopPriceOrder,
+)
 
 
-class OrderTable(tables.Table):
+class LimitOrderTable(ObjectTable):
     class Meta:
-        model = Order
+        model = LimitOrder
         template_name = "django_tables2/bootstrap.html"
-        fields = ("name", "account", "token_from", "token_to", "side", "orderType", "quoteOrderQty")
+        fields = (
+            "name",
+            "account",
+            "token_from",
+            "token_to",
+            "side",
+            "quoteOrderQty",
+            "price",
+            "timeInForce",
+            "order_status",
+        )
+
+
+class MarketOrderTable(ObjectTable):
+    class Meta:
+        model = MarketOrder
+        template_name = "django_tables2/bootstrap.html"
+        fields = (
+            "name",
+            "account",
+            "token_from",
+            "token_to",
+            "side",
+            "quoteOrderQty",
+            "order_status",
+        )
+
+
+class StopPriceOrderTable(ObjectTable):
+    class Meta:
+        model = StopPriceOrder
+        template_name = "django_tables2/bootstrap.html"
+        fields = (
+            "name",
+            "account",
+            "token_from",
+            "token_to",
+            "side",
+            "ORDER_TYPE",
+            "quoteOrderQty",
+            "stopprice",
+            "order_status",
+        )
+
+
+class StopLossOrTakeProfitLimitOrderTable(ObjectTable):
+    class Meta:
+        model = StopLossOrTakeProfitLimitOrder
+        template_name = "django_tables2/bootstrap.html"
+        fields = (
+            "name",
+            "account",
+            "token_from",
+            "token_to",
+            "side",
+            "quoteOrderQty",
+            "ORDER_TYPE",
+            "timeInForce",
+            "price",
+            "stopprice",
+            "order_status",
+        )

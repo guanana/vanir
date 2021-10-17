@@ -3,11 +3,11 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import SET_NULL
 from django.utils.functional import cached_property
+from simple_history.models import HistoricalRecords
 
-from vanir.core.exchange.models import Exchange
 from vanir.core.token.models import Token
 from vanir.utils.helpers import fetch_exchange_obj, value_pair
-from vanir.utils.models import BaseObject
+from vanir.utils.models import BaseObject, TimeStampedMixin
 
 
 class Account(BaseObject):
@@ -15,7 +15,9 @@ class Account(BaseObject):
     Exchange Account
     """
 
-    exchange = models.ForeignKey(Exchange, on_delete=models.CASCADE, null=False)
+    exchange = models.ForeignKey(
+        "exchange.Exchange", on_delete=models.CASCADE, null=False
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     api_key = models.CharField(max_length=250)
     secret = models.CharField(max_length=250)
@@ -76,7 +78,6 @@ class Account(BaseObject):
     @property
     def total_value_account(self):
         total_value = 0
-        tokens_not_found = []
         price_dict = self.exchange_obj.all_assets_prices
         for token_account in self.accounttokens_set.all():
             token_obj = token_account.token
@@ -84,9 +85,23 @@ class Account(BaseObject):
             try:
                 total_value += price_dict[pair] * token_account.quantity
             except KeyError:
-                tokens_not_found.append(token_obj.name)
-        return round(total_value, 2)
+                pass
+        return round(total_value, 4)
 
     @property
     def total_value_account_table(self):
         return f"{self.total_value_account} {self.token_pair}"
+
+
+class AccountTokens(TimeStampedMixin):
+    """
+    Relation between account and tokens
+    """
+
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    token = models.ForeignKey("token.Token", on_delete=models.CASCADE)
+    quantity = models.FloatField(default=0)
+    history = HistoricalRecords()
+
+    class Meta:
+        unique_together = ("account", "token")

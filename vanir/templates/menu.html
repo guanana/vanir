@@ -8,19 +8,20 @@
     </a>
   <div class="container">
       <ul class="navbar-nav">
-        {% with 'Exchange Blockchain Token Account Order' as list %}
+        {% with 'Exchange Token Account' as list %}
             {% for app in list.split %}
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" href="{% url app|get_viewname:'list' %}">{{app}}</a>
+                <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" href="{% get_viewname app app 'list' %}">{{app}}</a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <a class="dropdown-item" href="{% url app|get_viewname:'list' %}">List</a>
+                  <a class="dropdown-item" href="{% get_viewname app app 'list' %}">List</a>
                   <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="{% url app|get_viewname:'add' %}">Add</a>
+                  <a class="dropdown-item" href="{% get_viewname app app 'add' %}">Add</a>
                 </div>
-              </li>
-              <div class="container"> </div>
+              </li>&nbsp;&nbsp;
             {% endfor %}
-          {% include "utils_menu.html" %}
+            {% include "order_menu.html" %}
+            {% include "utils_menu.html" %}
+            {% include "plugins_menu.html" %}
         {% endwith %}
       </ul>
   </div>

@@ -29,9 +29,9 @@ class PopulateDBBinance:
         return blockchain
 
     def create_all_tokens(self):
-        for symbol, fullname in self.con.all_margin_assets.items():
+        for symbol in self.con.get_asset_details().keys():
             token = token_import(
-                account=self.account, token_symbol=symbol, token_fullname=fullname
+                account=self.account, token_symbol=symbol, token_fullname=symbol
             )
             self.tokens.append(token)
         bulk_update(self.account)

@@ -11,6 +11,13 @@ def _validated_viewname_by_context(context, action):
     if not context or not action:
         raise ValidationError("Something went wrong with viewname validation")
     viewname = f'{context["app_label"]}:{context["model_name"]}_{action}'
+    try:
+        if context["plugin"]:
+            viewname = (
+                f'plugins:{context["app_label"]}:{context["model_name"]}_{action}'
+            )
+    except KeyError:
+        pass
     return viewname
 
 
@@ -34,6 +41,16 @@ def delete_button(instance):
     }
 
 
+@register.inclusion_tag("buttons/cancel_order.html")
+def cancel_order_button(instance):
+    viewname = validated_viewname(instance, "delete")
+    url = reverse(viewname, kwargs={"pk": instance.pk})
+
+    return {
+        "url": url,
+    }
+
+
 #
 # List buttons
 #
@@ -46,4 +63,16 @@ def add_button(context):
 
     return {
         "add_url": url,
+    }
+
+
+#
+# Detail buttons
+#
+
+
+@register.inclusion_tag("buttons/back.html")
+def back_button(instance):
+    return {
+        "back_url": instance.get_list_url,
     }

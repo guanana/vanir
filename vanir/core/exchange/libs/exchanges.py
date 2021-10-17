@@ -1,12 +1,22 @@
+import logging
 from abc import abstractmethod
 
 import pandas as pd
 from binance import Client
 from binance.exceptions import BinanceAPIException
+from django.core.exceptions import ValidationError
 from django.utils.functional import cached_property
 
 from vanir.core.blockchain.models import Blockchain
+from vanir.core.exchange.libs.orders import Orders
+from vanir.utils.exceptions import (
+    ExchangeInvalidQuantityError,
+    ExchangeInvalidSymbolError,
+    ExchangeNotEnoughPrivilegesError,
+)
 from vanir.utils.table_helpers import change_table_align, change_table_style
+
+logger = logging.getLogger(__name__)
 
 
 class ExtendedExchangeRegistry(type):
@@ -38,6 +48,7 @@ class ExtendedExchangeRegistry(type):
 class BasicExchange:
     @abstractmethod
     def __init__(self, account):
+        self.account = account
         self.api_key = account.api_key
         self.api_secret = account.secret
         self.tld = account.tld
@@ -63,10 +74,21 @@ class BasicExchange:
     def all_assets_prices(self) -> dict:
         pass
 
+    @abstractmethod
+    def order_process(self, *args, **kwargs):
+        raise NotImplementedError
+
+    @abstractmethod
+    def order_validation(self, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def order_correction(self, *args, **kwargs):
+        pass
+
 
 class ExtendedExchange(BasicExchange, metaclass=ExtendedExchangeRegistry):
-    def __init__(self, account):
-        self.account = account
+    pass
 
 
 #
@@ -74,6 +96,7 @@ class ExtendedExchange(BasicExchange, metaclass=ExtendedExchangeRegistry):
 #
 class VanirBinance(ExtendedExchange, Client, metaclass=ExtendedExchangeRegistry):
     def __init__(self, account):
+        self.name = "VanirBinance"
         self.testnet = False
         super(ExtendedExchange, self).__init__(account)
         super(Client, self).__init__(
@@ -123,6 +146,19 @@ class VanirBinance(ExtendedExchange, Client, metaclass=ExtendedExchangeRegistry)
         return response
 
     @cached_property
+    def pairs_info(self):
+        full_info = self.get_exchange_info()
+        pairs_info = {}
+        # First iteration to create all the keys
+        for symbol_raw in full_info["symbols"]:
+            if symbol_raw["status"] == "TRADING":
+                try:
+                    pairs_info[symbol_raw["baseAsset"]].append(symbol_raw["quoteAsset"])
+                except KeyError:
+                    pairs_info[symbol_raw["baseAsset"]] = []
+        return pairs_info
+
+    @cached_property
     def all_margin_assets(self):
         all_margin_assets = {}
         margin_assets = self.con.get_margin_all_assets()
@@ -135,12 +171,13 @@ class VanirBinance(ExtendedExchange, Client, metaclass=ExtendedExchangeRegistry)
             price = self.get_avg_price(symbol=f"{pair}")["price"]
         except BinanceAPIException as binanceexception:
             if binanceexception.code == -1121:
-                raise ValueError(f"Pair {pair} not supported")
+                logger.error(f"Pair {pair} not supported")
+            return
 
         try:
             return float(price)
         except ValueError:
-            return None
+            return
 
     @property
     def all_assets_prices(self):
@@ -148,3 +185,36 @@ class VanirBinance(ExtendedExchange, Client, metaclass=ExtendedExchangeRegistry)
         for asset in self.get_all_tickers():
             temp_prices[asset["symbol"]] = float(asset["price"])
         return temp_prices
+
+    def order_test(self, **kwargs):
+        try:
+            order_test = self.con.create_test_order(**kwargs)
+            return order_test
+        except BinanceAPIException as binanceexception:
+            if binanceexception.code == -2015:
+                raise ExchangeNotEnoughPrivilegesError(account=self.account)
+            elif binanceexception.code == -1121:
+                raise ExchangeInvalidSymbolError(account=self.account)
+            elif binanceexception.code == -1013:
+                if kwargs.get("quantity") <= 0:
+                    raise ValidationError("Value cannot be 0 for an order")
+                else:
+                    raise ExchangeInvalidQuantityError(account=self.account)
+            else:
+                return binanceexception
+
+    def order_validation(self, **kwargs):
+        order_obj = Orders(**kwargs)
+        try:
+            self.order_test(**order_obj.binance_args)
+            order_obj.validated = True
+        except ExchangeInvalidQuantityError:
+            order_obj.validated = self.order_quantity_correction(order_obj)
+        return order_obj, order_obj.validated
+
+    def order_quantity_correction(self, order_obj):
+        symbol_info = self.con.get_symbol_info(order_obj.symbol)
+        mandatory_precision = symbol_info["baseAssetPrecision"]
+        # Fix precision
+        corrected = order_obj.correct_precision(mandatory_precision)
+        return corrected

@@ -1,0 +1,10 @@
+<li class="nav-item dropdown">
+  <a class="nav-link dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" href="#">Orders</a>
+  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+    <a class="dropdown-item" href="{% url 'order:marketorder_list' %}">Market Orders</a>
+    <a class="dropdown-item" href="{% url 'order:limitorder_list' %}">Limit Orders</a>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item" href="{% url 'order:stoppriceorder_list' %}">Stop/Take profit Orders</a>
+    <a class="dropdown-item" href="{% url 'order:stoplossortakeprofitlimitorder_list' %}">Stop/Take profit Limit Orders</a>
+  </div>
+</li>

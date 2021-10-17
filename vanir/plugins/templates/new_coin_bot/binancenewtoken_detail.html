@@ -1,0 +1,11 @@
+{% extends "object_detail.html" %}
+{% block title %}
+New Token {{ object.name }}
+{% endblock title %}
+{% block extra_controls %}
+  <div class="p-2">
+    <a href="{% url 'plugins:new_coin_bot:binancenewtoken_promote' object.pk %}" class="btn btn-sm btn-info" role="button">
+      <span class="mdi mdi-pencil" aria-hidden="true"></span>&nbsp;Promote to normal token
+    </a>
+  </div>
+{% endblock extra_controls %}
