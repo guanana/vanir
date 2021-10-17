@@ -88,4 +88,9 @@ urlpatterns = [
         views.TokenFromAutocomplete.as_view(),
         name="tokenfrom_autocomplete",
     ),
+    path(
+        "price-autocomplete/",
+        views.TokenPriceAutocomplete,
+        name="price_autocomplete",
+    ),
 ]
