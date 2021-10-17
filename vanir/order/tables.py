@@ -19,7 +19,9 @@ class LimitOrderTable(ObjectTable):
             "token_to",
             "side",
             "quoteOrderQty",
+            "price",
             "timeInForce",
+            "order_status",
         )
 
 
@@ -51,6 +53,7 @@ class StopPriceOrderTable(ObjectTable):
             "ORDER_TYPE",
             "quoteOrderQty",
             "stopprice",
+            "order_status",
         )
 
 
@@ -69,4 +72,5 @@ class StopLossOrTakeProfitLimitOrderTable(ObjectTable):
             "timeInForce",
             "price",
             "stopprice",
+            "order_status",
         )
