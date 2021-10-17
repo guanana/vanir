@@ -1,0 +1,33 @@
+{% extends "object_base.html" %}
+{% load filtertemplates %}
+{% load static %}
+{% load bootstrap4 %}
+{% block title %}
+{{ title }}
+{% endblock title %}
+{% block buttons %}{% endblock buttons %}
+
+{% block content %}
+{% block model %}{% endblock model %}
+
+  {% block form %}
+    <div class="container-fluid">
+      <form method="post">
+        {% csrf_token %}
+      {% for field in form %}
+        {% if field.name == "price" or field.name == "stopprice" %}
+          <script defer src="{% static 'js/getprice.js' %}"></script>
+          <button type="button" id="getprice" onclick="getPrice('{% url "order:price_autocomplete"%}')">Get live price</button>
+          {% bootstrap_field field show_label=True label_class="price" %}
+        {% else %}
+          {% bootstrap_field field %}
+        {% endif %}
+      {% endfor %}
+        {{ form.media }}
+        {% buttons %}
+        <button class="btn btn-success btn-sm" type="submit" value="Submit">{{ form_button|default:"Create order" }}</button>
+        {% endbuttons %}
+      </form>
+    </div>
+  {% endblock form %}
+{% endblock content %}
