@@ -54,3 +54,17 @@ class ExchangeInvalidSymbolError(ExchangeError):
     ):
         self.message = message
         super().__init__(self.message, account)
+
+
+class ExchangeInvalidQuantityError(ExchangeError):
+    """
+    Invalid Quantity
+    """
+
+    def __init__(
+        self,
+        message: str = constants_exceptions.EXCHANGEINVALIDQUANTITYERROR,
+        account=None,
+    ):
+        self.message = message
+        super().__init__(self.message, account)
