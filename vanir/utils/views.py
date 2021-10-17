@@ -20,7 +20,7 @@ def set_context_data(context, view):
     return context
 
 
-class ObjectCreateView(LoginRequiredMixin, CreateView):
+class ObjectCreateView(LoginRequiredMixin, CreateView, SuccessMessageMixin):
     model = None
     template_name = "object_form.html"
 
