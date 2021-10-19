@@ -18,6 +18,8 @@ Crypto asset management and bot control, all one place
   * [Quick Start Docker](#quick-start-docker)
   * [Installation](#installation-the-hard-way)
   * [Usage](#usage)
+    * [Default data](#default-data)
+      * [Default username/password](#how-to-change-default-username-and-password)
 * [Contribute](#contribute)
   * [Test Coverage](#test-coverage)
 * [License](#license)
@@ -119,6 +121,19 @@ supported exchanges ;-)
 you may want to protect it from unwanted eyes ;-)
 - **Admin**: This is a Django app, and as such you have access to admin interface. *This is a dangerous zone*, there shouldn't
 be any need for you to access it, but if you want to investigate access it by login and going to: http://localhost/admin/
+
+### Default data
+The app comes with some really basic data. As soon as you configure a supported exchange you can
+auto import all the real data. It's supposed to be just a simple guide and assistance for quick start.
+
+The first time you login the default username and password is `admin`. **PLEASE CHANGE IT!**
+
+#### How to change default username and password
+Once login with the default user and password (admin). Click on Admin (right top corner) and click again on admin.
+Fill the desired fields and click on Password:
+
+*Raw passwords are not stored, so there is no way to see this user’s
+password, but you can change the password using CLICK ME--> __this form__ <-- CLICK ME.*
 
 ## Contribute
 To start contributing just fork the project and run the local environment by running:
