@@ -1,10 +1,13 @@
 import logging
 
-from django.core.exceptions import ValidationError
 from django.db.models import QuerySet
 
 from vanir.core.account.models import Account, AccountTokens
 from vanir.core.token.models import Token
+from vanir.utils.exceptions import (
+    AccountRequiredError,
+    ExchangeExtendedFunctionalityError,
+)
 from vanir.utils.helpers import fetch_default_account, value_pair
 
 logger = logging.getLogger(__name__)
@@ -49,8 +52,8 @@ def import_token_account(token_obj: Token, account: Account, quantity: float):
     return token_obj
 
 
-def token_update(token: Token, account: Account, price_dict: dict):
-    pair = value_pair(token, account.token_pair)
+def token_update(token: Token, price_dict: dict):
+    pair = value_pair(token)
     try:
         token.last_value = price_dict[pair]
         token.save()
@@ -64,7 +67,7 @@ def qs_update(token_qs: QuerySet[Token], account: Account = None):
         account = fetch_default_account()
     price_dict = account.exchange_obj.all_assets_prices
     for token in token_qs:
-        token_update(token.token, account, price_dict)
+        token_update(token.token, price_dict)
         token.save()
 
 
@@ -72,7 +75,10 @@ def bulk_update(account: Account = None):
     if not account:
         account = fetch_default_account()
         if not account:
-            raise ValidationError("You need to have at least one account configured")
-    price_dict = account.exchange_obj.all_assets_prices
+            raise AccountRequiredError
+    try:
+        price_dict = account.exchange_obj.all_assets_prices
+    except AttributeError:
+        raise ExchangeExtendedFunctionalityError
     for token_obj in Token.objects.all():
-        token_update(token_obj, account, price_dict)
+        token_update(token_obj, price_dict)
