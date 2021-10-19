@@ -36,6 +36,10 @@ class AccountCreateView(ObjectCreateView):
         context["SUPPORTED_EXCHANGES"] = ExtendedExchange.all_supported()
         return context
 
+    def form_valid(self, form):
+        form.instance.token_pair = Token.objects.get(symbol="USDT")
+        return super().form_valid(form)
+
 
 class AccountListView(ObjectListView):
     model = Account

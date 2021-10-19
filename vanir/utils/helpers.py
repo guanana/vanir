@@ -2,6 +2,7 @@ from django.core.exceptions import ValidationError
 
 from vanir.core.exchange.libs.exchanges import ExtendedExchangeRegistry
 from vanir.core.token.models import Coin
+from vanir.utils.exceptions import ExchangeExtendedFunctionalityError
 
 
 def fetch_default_account():
@@ -30,12 +31,12 @@ def fetch_exchange_obj(exchange_name: str):
             exchange_name.split(" ")[0]
         )
     except KeyError:
-        raise ValidationError(
+        raise ExchangeExtendedFunctionalityError(
             f"Please create an account with a supported Exchange to get extra functionalities"
             f"{[item for item in ExtendedExchangeRegistry.registered.keys()]}"
         )
     return class_obj
 
 
-def value_pair(tkn: Coin, tkn2: Coin):
-    return f"{tkn.symbol}{tkn2.symbol}"
+def value_pair(tkn: Coin, tkn2: str = "USDT"):
+    return f"{tkn.symbol}{tkn2}"
