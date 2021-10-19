@@ -16,3 +16,11 @@ EXCHANGEINVALIDSYMBOLERROR = "Problem trying to fetch symbol on the Exchange, pr
 EXCHANGEINVALIDQUANTITYERROR = (
     "The quantity introduced is not within the Exchange allowed parameters"
 )
+EXCHANGEEXTENDEDFUNCTIONALITYERROR = (
+    "Please to use enchance functionalities add a supported exchange"
+)
+
+##
+# Account
+##
+ACCOUNTREQUIREDERROR = "You need to have at least one account configured"
