@@ -57,18 +57,14 @@ please go [here](https://docs.docker.com/compose/install/)
 ## How to start
 
 ### Quick Start Docker
-Clone the repo
+1. Clone the repo: `git clone https://github.com/guanana/vanir.git`
 
-`git clone https://github.com/guanana/vanir.git`
-
-Edit the default passwords **this is for your own extra peace of mind**.
+2. Edit the default passwords **this is for your own extra peace of mind**.
 _(data is always within your computer so unless you modify the default settings
 and expose on purpose your installation, this credentials will only be local to you)_
-You can find them in .envs/.production
+You can find them in .envs/production-example. Once changed, rename the folder to `.envs/.production`
 
-Finally just run:
-
-`docker-compose -f production.yml up -d`
+3. Finally, just run: `docker-compose -f production.yml up -d`
 
 ### Installation (the hard way!)
 **There's no reason for you to use this option**. It's harder and it will most likely give you headaches and problems,
