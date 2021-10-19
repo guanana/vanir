@@ -334,3 +334,4 @@ vanir/media/
 .env
 .envs/*
 !.envs/.local/
+!.envs/production-example/

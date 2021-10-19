@@ -5,15 +5,15 @@ volumes:
   local_postgres_data_backups: {}
 
 services:
-  django: &django
+  django-dev: &django-dev
     build:
       context: .
       dockerfile: ./compose/local/django/Dockerfile
     image: vanir_local_django
-    container_name: django
+    container_name: django-dev
     depends_on:
-      - postgres
-      - mailhog
+      - postgres-dev
+      - mailhog-dev
     volumes:
       - .:/app:z
     env_file:
@@ -23,21 +23,21 @@ services:
       - "8000:8000"
     command: /start
 
-  postgres:
+  postgres-dev:
     build:
       context: .
-      dockerfile: ./compose/production/postgres/Dockerfile
+      dockerfile: compose/postgres/Dockerfile
     image: vanir_production_postgres
-    container_name: postgres
+    container_name: postgres-dev
     volumes:
       - local_postgres_data:/var/lib/postgresql/data:Z
       - local_postgres_data_backups:/backups:z
     env_file:
       - ./.envs/.local/.postgres
 
-  docs:
+  docs-dev:
     image: vanir_local_docs
-    container_name: docs
+    container_name: docs-dev
     build:
       context: .
       dockerfile: ./compose/local/docs/Dockerfile
@@ -48,45 +48,45 @@ services:
       - ./config:/app/config:z
       - ./vanir:/app/vanir:z
     ports:
-      - "7000:7000"
+      - "7001:7000"
     command: /start-docs
 
-  mailhog:
+  mailhog-dev:
     image: mailhog/mailhog:v1.0.0
-    container_name: mailhog
+    container_name: mailhog-dev
     ports:
-      - "8025:8025"
+      - "8026:8025"
 
-  redis:
+  redis-dev:
     image: redis:6
-    container_name: redis
+    container_name: redis-dev
 
-  celeryworker:
-    <<: *django
+  celeryworker-dev:
+    <<: *django-dev
     image: vanir_local_celeryworker
-    container_name: celeryworker
+    container_name: celeryworker-dev
     depends_on:
-      - redis
-      - postgres
-      - mailhog
+      - redis-dev
+      - postgres-dev
+      - mailhog-dev
     ports: []
     command: /start-celeryworker
 
-  celerybeat:
-    <<: *django
+  celerybeat-dev:
+    <<: *django-dev
     image: vanir_local_celerybeat
-    container_name: celerybeat
+    container_name: celerybeat-dev
     depends_on:
-      - redis
-      - postgres
-      - mailhog
+      - redis-dev
+      - postgres-dev
+      - mailhog-dev
     ports: []
     command: /start-celerybeat
 
-  flower:
-    <<: *django
+  flower-dev:
+    <<: *django-dev
     image: vanir_local_flower
-    container_name: flower
+    container_name: flower-dev
     ports:
-      - "5555:5555"
+      - "5556:5555"
     command: /start-flower

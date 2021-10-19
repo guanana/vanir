@@ -1,6 +1,6 @@
 # PostgreSQL
 # ------------------------------------------------------------------------------
-POSTGRES_HOST=postgres
+POSTGRES_HOST=postgres-dev
 POSTGRES_PORT=5432
 POSTGRES_DB=vanir
 POSTGRES_USER=jKjOlKrhryeOMfQpNCKzfdGfgvBqIrKZ

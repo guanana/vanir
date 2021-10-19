@@ -92,7 +92,7 @@ class HomeView(TemplateView):
     template_name = "pages/home.html"
 
 
-class PopulateDBBinanceView(SuccessMessageMixin, FormView):
+class PopulateDBBinanceView(LoginRequiredMixin, FormView, SuccessMessageMixin):
     form_class = PopulateDBBinanceForm
     template_name = "basic_form.html"
     success_url = reverse_lazy("token:token_list")

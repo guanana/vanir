@@ -5,24 +5,36 @@ volumes:
   production_postgres_data_backups: {}
   production_traefik: {}
 
+x-common-build:
+  build: &build
+    context: .
+    dockerfile: ./compose/production/django/Dockerfile
+
+x-db-depends:
+  depends_on: &db-depends
+    - postgres
+    - redis
+  env_file: &db-env
+    - ./.envs/.production/.django
+    - ./.envs/.production/.postgres
+
 services:
-  django: &django
-    build:
-      context: .
-      dockerfile: ./compose/production/django/Dockerfile
+  django:
+    build: *build
+    depends_on: *db-depends
+    env_file: *db-env
     image: vanir_production_django
-    depends_on:
-      - postgres
-      - redis
-    env_file:
-      - ./.envs/.production/.django
-      - ./.envs/.production/.postgres
     command: /start
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:5000" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   postgres:
     build:
       context: .
-      dockerfile: ./compose/production/postgres/Dockerfile
+      dockerfile: compose/postgres/Dockerfile
     image: vanir_production_postgres
     volumes:
       - production_postgres_data:/var/lib/postgresql/data:Z
@@ -35,10 +47,9 @@ services:
       context: .
       dockerfile: ./compose/production/traefik/Dockerfile
     image: vanir_production_traefik
+    command: --api.insecure=true --providers.docker
     depends_on:
       - django
-    volumes:
-      - production_traefik:/etc/traefik/acme:z
     ports:
       - "0.0.0.0:80:80"
       - "0.0.0.0:443:443"
@@ -48,16 +59,25 @@ services:
     image: redis:6
 
   celeryworker:
-    <<: *django
+    build: *build
+    depends_on: *db-depends
+    env_file: *db-env
     image: vanir_production_celeryworker
     command: /start-celeryworker
 
   celerybeat:
-    <<: *django
+    build: *build
+    depends_on:
+      - postgres
+      - redis
+      - django
+    env_file: *db-env
     image: vanir_production_celerybeat
     command: /start-celerybeat
 
   flower:
-    <<: *django
+    build: *build
+    depends_on: *db-depends
+    env_file: *db-env
     image: vanir_production_flower
     command: /start-flower

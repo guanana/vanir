@@ -1,38 +1,36 @@
 from django.urls import path
 from django.views.generic import TemplateView
 
-from .views import (
-    AccountCreateView,
-    AccountDeleteView,
-    AccountDetailView,
-    AccountListView,
-    AccountTokenBulkUpdateValueView,
-    AccountUpdateView,
-    delete_tokens_account,
-    exchange_balanceview,
-    exchange_importtokens,
-    exchange_testview,
-)
+from . import views
 
 app_name = "account"
 urlpatterns = [
-    path("", AccountListView.as_view(), name="account_list"),
-    path("add/", AccountCreateView.as_view(), name="account_add"),
-    path("<int:pk>/", AccountDetailView.as_view(), name="account_detail"),
-    path("<int:pk>/edit/", AccountUpdateView.as_view(), name="account_edit"),
-    path("<int:pk>/delete/", AccountDeleteView.as_view(), name="account_delete"),
+    path("", views.AccountListView.as_view(), name="account_list"),
+    path("add/", views.AccountCreateView.as_view(), name="account_add"),
+    path("<int:pk>/", views.AccountDetailView.as_view(), name="account_detail"),
+    path("<int:pk>/edit/", views.AccountUpdateView.as_view(), name="account_edit"),
+    path(
+        "<int:pk>/tokens/add/",
+        views.AccountTokensCreateView.as_view(),
+        name="account_tokens_add",
+    ),
+    path("<int:pk>/delete/", views.AccountDeleteView.as_view(), name="account_delete"),
     path(
         "<int:pk>/refresh/",
-        AccountTokenBulkUpdateValueView.as_view(),
+        views.AccountTokenBulkUpdateValueView.as_view(),
         name="account_refresh",
     ),
-    path("<int:pk>/test/", exchange_testview, name="account_test"),
+    path("<int:pk>/test/", views.exchange_testview, name="account_test"),
     path(
-        "<int:pk>/delete_tokens/", delete_tokens_account, name="account_delete_tokens"
+        "<int:pk>/delete_tokens/",
+        views.delete_tokens_account,
+        name="account_delete_tokens",
     ),
-    path("<int:pk>/balance/", exchange_balanceview, name="account_balance"),
+    path("<int:pk>/balance/", views.exchange_balanceview, name="account_balance"),
     path(
-        "<int:pk>/balance/import/", exchange_importtokens, name="account_balance_import"
+        "<int:pk>/balance/import/",
+        views.exchange_importtokens,
+        name="account_balance_import",
     ),
     path(
         "<int:pk>/more/",

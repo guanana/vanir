@@ -15,4 +15,4 @@ class AccountTable(ObjectTable):
     class Meta:
         model = Account
         template_name = "django_tables2/bootstrap.html"
-        fields = ("name", "exchange", "total_value", "default_fee_rate")
+        fields = ("name", "exchange", "token_pair", "total_value")

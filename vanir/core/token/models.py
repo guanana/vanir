@@ -6,7 +6,7 @@ from vanir.utils.models import BaseObject
 
 class Coin(models.Model):
     symbol = models.CharField(max_length=10, unique=True)
-    last_value = models.FloatField(null=True)
+    last_value = models.FloatField(null=True, verbose_name="Last value in USDT")
 
     class Meta:
         abstract = True
@@ -25,9 +25,7 @@ class Coin(models.Model):
         exceptions_value = self.check_exceptions_value(account)
         if exceptions_value:
             return exceptions_value
-        self.last_value = account.exchange_obj.get_token_price(
-            value_pair(self, account.token_pair)
-        )
+        self.last_value = account.exchange_obj.get_token_price(value_pair(self))
         if self.last_value:
             self.last_value = round(self.last_value, 4)
             self.save()
