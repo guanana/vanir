@@ -25,9 +25,6 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v2
 
-      - name: Build the Docker image
-        run: docker build . --file compose/production/django/Dockerfile --tag vanir:$(date +%s)
-
       - name: Log in to the Container registry
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v1
@@ -54,7 +51,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: .
+          context: compose/production/django/
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
