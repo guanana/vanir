@@ -30,13 +30,14 @@ List {{ title }}
 
 {% block content %}
 <div class="container-lg">
-  {% if filter %}
-    <form action="" method="get" class="form form-inline">
-        {% bootstrap_form filter.form %}
-        &nbsp;&nbsp;{% bootstrap_button 'filter' %}
-    </form>
-  {% endif %}
-</div>
+    {% if filter %}
+      <form action="" method="get" class="form form-inline form-control-sm">
+          {% bootstrap_form filter.form layout='inline' %}
+          &nbsp;&nbsp;{% bootstrap_button 'filter' %}
+      </form>
+    {% endif %}
+</div><p></p>
+
 <div class="container-lg">
   {% render_table table 'django_tables2/bootstrap4.html' %}
 </div>
