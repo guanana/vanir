@@ -21,5 +21,5 @@ def update_balance(account, update_price=True):
         )
         response.append(row["asset"])
     if update_price:
-        bulk_update()
+        bulk_update(account)
     return response

@@ -6,6 +6,10 @@ from vanir.core.token.filtersets import TokenFilter
 from vanir.core.token.helpers.import_utils import bulk_update
 from vanir.core.token.models import Token
 from vanir.core.token.tables import TokenTable
+from vanir.utils.exceptions import (
+    AccountRequiredError,
+    ExchangeExtendedFunctionalityError,
+)
 from vanir.utils.views import (
     ObjectCreateView,
     ObjectDeleteView,
@@ -63,6 +67,19 @@ class TokenBulkUpdateValueView(ObjectListView):
     table_class = TokenTable
 
     def get(self, request, *args, **kwargs):
-        bulk_update()
+        try:
+            bulk_update()
+        except AccountRequiredError:
+            # TODO: Add coingecko https://pypi.org/project/pycoingecko/
+            messages.error(
+                request,
+                "You need to have a supported exchange account configured as default",
+            )
+            return super(TokenBulkUpdateValueView, self).get(request, *args, **kwargs)
+        except ExchangeExtendedFunctionalityError:
+            messages.warning(
+                request, "You need to configure a supported exchange for this operation"
+            )
+            return super(TokenBulkUpdateValueView, self).get(request, *args, **kwargs)
         messages.info(request, "Bulk update completed")
         return super(TokenBulkUpdateValueView, self).get(request, *args, **kwargs)

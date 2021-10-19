@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import SET_NULL
@@ -6,6 +5,7 @@ from django.utils.functional import cached_property
 from simple_history.models import HistoricalRecords
 
 from vanir.core.token.models import Token
+from vanir.utils.exceptions import ExchangeExtendedFunctionalityError
 from vanir.utils.helpers import fetch_exchange_obj, value_pair
 from vanir.utils.models import BaseObject, TimeStampedMixin
 
@@ -18,9 +18,17 @@ class Account(BaseObject):
     exchange = models.ForeignKey(
         "exchange.Exchange", on_delete=models.CASCADE, null=False
     )
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    api_key = models.CharField(max_length=250)
-    secret = models.CharField(max_length=250)
+    extended_exchange = models.BooleanField(editable=False, default=False)
+    api_key = models.CharField(
+        max_length=250,
+        help_text="API key for the exchange, do not touch if you're adding a manual exchange",
+        default="None",
+    )
+    secret = models.CharField(
+        max_length=250,
+        help_text="API secret for the exchange, do not touch if you're adding a manual exchange",
+        default="None",
+    )
     tld = models.CharField(max_length=10, default="com")
     default_fee_rate = models.FloatField(default=0.1)
     token = models.ManyToManyField(
@@ -45,14 +53,21 @@ class Account(BaseObject):
         ordering = ["name"]
 
     def clean(self):
-        if not self.exchange_obj.test():
-            raise ValidationError(
-                "Api key and Secret are not correct, unable to connect"
-            )
+        if self.exchange_obj:
+            if not self.exchange_obj.test():
+                raise ValidationError(
+                    "Api key and Secret are not correct, unable to connect"
+                )
 
     def save(self, *args, **kwargs):
         self.check_default()
+        if self.exchange_obj:
+            self.extended_exchange = True
         super().save(*args, **kwargs)
+        if self.extended_exchange:
+            from vanir.core.account.helpers.balance import update_balance
+
+            update_balance(self)
 
     def check_default(self):
         # Check if there are more accounts with default setting
@@ -72,18 +87,29 @@ class Account(BaseObject):
 
     @cached_property
     def exchange_obj(self):
-        class_obj = fetch_exchange_obj(self.exchange.name)
+        try:
+            class_obj = fetch_exchange_obj(self.exchange.name)
+            self.extended_exchange = True
+        except ExchangeExtendedFunctionalityError:
+            self.extended_exchange = False
+            return False
         return class_obj(self)
 
     @property
     def total_value_account(self):
+        if self.extended_exchange:
+            price_dict = self.exchange_obj.all_assets_prices
         total_value = 0
-        price_dict = self.exchange_obj.all_assets_prices
         for token_account in self.accounttokens_set.all():
             token_obj = token_account.token
-            pair = value_pair(token_obj, self.token_pair)
+            pair = value_pair(token_obj)
             try:
-                total_value += price_dict[pair] * token_account.quantity
+                if self.extended_exchange:
+                    total_value += price_dict[pair] * token_account.quantity
+                else:
+                    total_value += (
+                        token_account.token.last_value * token_account.quantity
+                    )
             except KeyError:
                 pass
         return round(total_value, 4)
@@ -105,3 +131,10 @@ class AccountTokens(TimeStampedMixin):
 
     class Meta:
         unique_together = ("account", "token")
+
+    def get_absolute_url(self):
+        return self.account.get_absolute_url()
+
+    @staticmethod
+    def get_title():
+        return "tokens to the account"

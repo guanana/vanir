@@ -4,7 +4,7 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView
 
 from vanir.core.account.helpers.balance import update_balance
-from vanir.core.account.models import Account
+from vanir.core.account.models import Account, AccountTokens
 from vanir.core.account.tables import AccountTable
 from vanir.core.account.utils import exchange_view_render
 from vanir.core.exchange.libs.exchanges import ExtendedExchange
@@ -24,11 +24,9 @@ class AccountCreateView(ObjectCreateView):
     fields = (
         "name",
         "exchange",
-        "user",
         "api_key",
         "secret",
         "default_fee_rate",
-        "token_pair",
         "default",
         "testnet",
     )
@@ -49,11 +47,8 @@ class AccountUpdateView(ObjectUpdateView):
     fields = (
         "name",
         "exchange",
-        "user",
         "api_key",
         "secret",
-        "tld",
-        "testnet",
         "default",
     )
 
@@ -80,10 +75,15 @@ class AccountTokenBulkUpdateValueView(DetailView):
 
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
-        update_balance(self.object)
-        token_subset = self.object.accounttokens_set
-        qs_update(token_subset.all(), self.object)
-        messages.info(request, "Tokens updated")
+        if self.object.extended_exchange:
+            update_balance(self.object)
+            token_subset = self.object.accounttokens_set
+            qs_update(token_subset.all(), self.object)
+            messages.info(request, "Tokens updated")
+        else:
+            messages.warning(
+                request, "You need to configure a supported exchange for this operation"
+            )
         return redirect(
             reverse("account:account_detail", kwargs={"pk": self.object.pk})
         )
@@ -95,8 +95,14 @@ class AccountDeleteView(ObjectDeleteView):
 
 
 def exchange_testview(request, pk):
-    response = Account.objects.get(pk=pk).exchange_obj.test()
-    return exchange_view_render("account/account_test.html", response, request)
+    if Account.objects.get(pk=pk).extended_exchange:
+        response = Account.objects.get(pk=pk).exchange_obj.test()
+        return exchange_view_render("account/account_test.html", response, request)
+    else:
+        messages.warning(
+            request, "You need to configure a supported exchange for this operation"
+        )
+        return redirect(reverse("account:account_more", kwargs={"pk": pk}))
 
 
 def delete_tokens_account(request, pk):
@@ -106,16 +112,33 @@ def delete_tokens_account(request, pk):
 
 
 def exchange_balanceview(request, pk):
-    response = Account.objects.get(pk=pk).exchange_obj.get_balance_html()
-    return exchange_view_render(
-        "account/account_balance.html",
-        response,
-        request,
-        object=Account.objects.get(pk=pk),
-    )
+    if Account.objects.get(pk=pk).extended_exchange:
+        response = Account.objects.get(pk=pk).exchange_obj.get_balance_html()
+        return exchange_view_render(
+            "account/account_balance.html",
+            response,
+            request,
+            object=Account.objects.get(pk=pk),
+        )
+    else:
+        messages.warning(
+            request, "You need to configure a supported exchange for this operation"
+        )
+        return redirect(reverse("account:account_more", kwargs={"pk": pk}))
 
 
 def exchange_importtokens(request, pk):
     account = Account.objects.get(pk=pk)
-    response = update_balance(account)
-    return exchange_view_render("account/account_import.html", response, request)
+    if account.extended_exchange:
+        response = update_balance(account)
+        return exchange_view_render("account/account_import.html", response, request)
+    return redirect(reverse("account:account_detail", kwargs={"pk": pk}))
+
+
+class AccountTokensCreateView(ObjectCreateView):
+    model = AccountTokens
+    fields = ("token", "quantity")
+
+    def form_valid(self, form):
+        form.instance.account = Account.objects.get(pk=self.kwargs["pk"])
+        return super().form_valid(form)
