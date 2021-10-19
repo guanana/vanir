@@ -1,4 +1,4 @@
-ARG PYTHON_VERSION=3.9-slim-buster
+ARG PYTHON_VERSION=3.10-slim-buster
 
 
 
@@ -90,5 +90,6 @@ COPY --chown=django:django . ${APP_HOME}
 RUN chown django:django ${APP_HOME}
 
 USER django
+LABEL name="Vanir"
 
 ENTRYPOINT ["/entrypoint"]

@@ -1,7 +1,7 @@
 # Vanir
 [![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-390/)
-[![Django 3.1.13](https://img.shields.io/badge/Django-3.1.13-blue.svg)](https://docs.djangoproject.com/en/3.1/)
+[![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-390/)
+[![Django 3.2.8](https://img.shields.io/badge/Django-3.2.8-blue.svg)](https://docs.djangoproject.com/en/3.2/)
 [![Docker-Compose](https://img.shields.io/badge/Docker-Docker%20Compose-orange.svg)](https://docs.docker.com/compose/gettingstarted/)
 
 Crypto asset management and bot control, all one place
@@ -116,7 +116,8 @@ supported exchanges ;-)
 - **Login**: Create your account and login (username and password) to access the tools, because even if it's local
 you may want to protect it from unwanted eyes ;-)
 - **Admin**: This is a Django app, and as such you have access to admin interface. *This is a dangerous zone*, there shouldn't
-be any need for you to access it, but if you want to investigate access it by login and going to: http://localhost/admin/
+be any need for you to access it, but if you want to investigate access it by login and going to: http://localhost/<admin_url_in_config>/
+or just click on the name of your user in the right top corner.
 
 ### Default data
 The app comes with some really basic data. As soon as you configure a supported exchange you can
