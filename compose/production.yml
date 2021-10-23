@@ -15,8 +15,8 @@ x-db-depends:
     - postgres
     - redis
   env_file: &db-env
-    - ../.envs/.production/.django
-    - ../.envs/.production/.postgres
+    - ./production/base_env/.django
+    - ./production/base_env/.postgres
 
 services:
   vanir:
@@ -40,19 +40,18 @@ services:
       - production_postgres_data:/var/lib/postgresql/data:Z
       - production_postgres_data_backups:/backups:z
     env_file:
-      - ../.envs/.production/.postgres
+      - ./production/base_env/.postgres
 
   traefik:
     build:
       context: ..
       dockerfile: ./compose/production/traefik/Dockerfile
     image: vanir_production_traefik
-    command: --api.insecure=true --providers.docker
+    command: --api.insecure=true
     depends_on:
       - vanir
     ports:
       - "0.0.0.0:80:80"
-      - "0.0.0.0:443:443"
       - "0.0.0.0:5555:5555"
 
   redis:

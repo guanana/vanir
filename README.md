@@ -72,7 +72,7 @@ please go [here](https://docs.docker.com/compose/install/)
 _(data is always within your computer so unless you modify the default settings
 and expose on purpose your installation, this credentials will only be local to you)_
 You can find them in .envs/production-example. Once changed, rename the folder to `.envs/.production`
-3. Customize your config
+3. Add the new env path (.envs/.production) on the compose/production.yml file
 4. Finally, just run: `docker-compose -f compose/production.yml up -d`
 
 ### No docker install
