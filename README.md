@@ -16,10 +16,13 @@ Crypto asset management and bot control, all one place
 * [Pre-reqs](#pre-reqs)
 * [How to start](#how-to-start)
   * [Quick Start Docker](#quick-start-docker)
-  * [Installation](#installation-the-hard-way)
-  * [Usage](#usage)
-    * [Default data](#default-data)
-      * [Default username/password](#how-to-change-default-username-and-password)
+    * [Easy](#easy)
+    * [Custom](#custom-build)
+  * [No docker install](#no-docker-install)
+    * [Installation](#installation-the-hard-way)
+* [Usage](#usage)
+  * [Default data](#default-data)
+    * [Default username/password](#how-to-change-default-username-and-password)
 * [Contribute](#contribute)
   * [Test Coverage](#test-coverage)
 * [License](#license)
@@ -57,16 +60,23 @@ please go [here](https://docs.docker.com/compose/install/)
 ## How to start
 
 ### Quick Start Docker
-1. Clone the repo: `git clone https://github.com/guanana/vanir.git`
 
+#### Easy
+1. Copy/Download the file [docker-compose.yml](https://github.com/guanana/vanir/blob/main/docker-compose.yml) on your computer
+2. Edit the default passwords **this is for your own extra peace of mind**.
+3. Run `docker-compose up`
+
+#### Custom build
+1. Clone the repo: `git clone https://github.com/guanana/vanir.git`
 2. Edit the default passwords **this is for your own extra peace of mind**.
 _(data is always within your computer so unless you modify the default settings
 and expose on purpose your installation, this credentials will only be local to you)_
 You can find them in .envs/production-example. Once changed, rename the folder to `.envs/.production`
+3. Customize your config
+4. Finally, just run: `docker-compose -f compose/production.yml up -d`
 
-3. Finally, just run: `docker-compose -f production.yml up -d`
-
-### Installation (the hard way!)
+### No docker install
+#### Installation (the hard way!)
 **There's no reason for you to use this option**. It's harder and it will most likely give you headaches and problems,
 still I thought I will just mention in case you really feel adventurous.
 
