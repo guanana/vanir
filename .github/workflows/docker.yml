@@ -25,6 +25,7 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v2
 
+      #LOGIN
       - name: Log in to the Container registry
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v1
@@ -40,19 +41,55 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
+      #METADATA
+      - name: Extract metadata (tags, labels) for Vanir Docker
+        id: meta_vanir
         uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
         with:
           images: |
             ${{ secrets.DOCKERHUB_USERNAME }}/vanir
             ghcr.io/${{ github.repository }}
 
+      - name: Extract metadata (tags, labels) for Traefik Docker
+        id: meta_traefik
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/vanir-traefik
+            ghcr.io/${{ github.repository }}-traefik
+
+      - name: Extract metadata (tags, labels) for Postgres Docker
+        id: meta_postgres
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/vanir-postgres
+            ghcr.io/${{ github.repository }}-postgres
+
+      #BUILD
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
           context: .
           file: compose/production/django/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta_vanir.outputs.tags }}
+          labels: ${{ steps.meta_vanir.outputs.labels }}
+
+      - name: Build and push traefik
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: compose/production/traefik/Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta_traefik.outputs.tags }}
+          labels: ${{ steps.meta_traefik.outputs.labels }}
+
+      - name: Build and push postgres
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: compose/postgres/Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta_postgres.outputs.tags }}
+          labels: ${{ steps.meta_postgres.outputs.labels }}

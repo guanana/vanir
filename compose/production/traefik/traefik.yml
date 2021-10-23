@@ -1,28 +1,12 @@
 log:
-  level: DEBUG
+  level: INFO
 
 entryPoints:
   web:
-    # http
     address: ":80"
-#    http:
-#      # https://docs.traefik.io/routing/entrypoints/#entrypoint
-#      redirections:
-#        entryPoint:
-#          to: web-secure
 
   flower:
     address: ":5555"
-
-#certificatesResolvers:
-#  letsencrypt:
-#    # https://docs.traefik.io/master/https/acme/#lets-encrypt
-#    acme:
-#      email: "guanana@example.com"
-#      storage: /etc/traefik/acme/acme.json
-#      # https://docs.traefik.io/master/https/acme/#httpchallenge
-#      httpChallenge:
-#        entryPoint: web
 
 http:
   routers:
@@ -32,19 +16,13 @@ http:
         - web
       middlewares:
         - csrf
-      service: django
-#      tls:
-#        # https://docs.traefik.io/master/routing/routers/#certresolver
-#        certResolver: letsencrypt
+      service: vanir
 
     flower-secure-router:
       rule: "Host(`localhost`)"
       entryPoints:
         - flower
       service: flower
-#      tls:
-#        # https://docs.traefik.io/master/routing/routers/#certresolver
-#        certResolver: letsencrypt
 
   middlewares:
     csrf:
@@ -54,10 +32,10 @@ http:
         hostsProxyHeaders: ["X-CSRFToken"]
 
   services:
-    django:
+    vanir:
       loadBalancer:
         servers:
-          - url: http://django:5000
+          - url: http://vanir:5000
 
     flower:
       loadBalancer:
@@ -65,7 +43,6 @@ http:
           - url: http://flower:5555
 
 providers:
-  # https://docs.traefik.io/master/providers/file/
   file:
     filename: /etc/traefik/traefik.yml
     watch: true
