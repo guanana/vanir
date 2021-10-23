@@ -31,9 +31,17 @@ FROM python as python-run-stage
 ARG BUILD_ENVIRONMENT=production
 ARG APP_HOME=/app
 
+# Python default env
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV BUILD_ENV ${BUILD_ENVIRONMENT}
+# Django default env
+ENV DJANGO_SETTINGS_MODULE=config.settings.production
+ENV DJANGO_SECURE_SSL_REDIRECT=False
+ENV DJANGO_ACCOUNT_ALLOW_REGISTRATION=True
+ENV DJANGO_ALLOWED_HOSTS=.localhost
+ENV REDIS_URL=redis://redis:6379/0
+
 
 WORKDIR ${APP_HOME}
 
@@ -61,25 +69,19 @@ RUN pip install --no-cache-dir --no-index --find-links=/wheels/ /wheels/* \
 
 
 COPY --chown=django:django ./compose/production/django/entrypoint /entrypoint
-RUN sed -i 's/\r$//g' /entrypoint
 RUN chmod +x /entrypoint
 
 
 COPY --chown=django:django ./compose/production/django/start /start
-RUN sed -i 's/\r$//g' /start
 RUN chmod +x /start
+
 COPY --chown=django:django ./compose/production/django/celery/worker/start /start-celeryworker
-RUN sed -i 's/\r$//g' /start-celeryworker
 RUN chmod +x /start-celeryworker
 
-
 COPY --chown=django:django ./compose/production/django/celery/beat/start /start-celerybeat
-RUN sed -i 's/\r$//g' /start-celerybeat
 RUN chmod +x /start-celerybeat
 
-
 COPY ./compose/production/django/celery/flower/start /start-flower
-RUN sed -i 's/\r$//g' /start-flower
 RUN chmod +x /start-flower
 
 
@@ -90,6 +92,6 @@ COPY --chown=django:django . ${APP_HOME}
 RUN chown django:django ${APP_HOME}
 
 USER django
-LABEL name="Vanir"
+LABEL name="vanir"
 
 ENTRYPOINT ["/entrypoint"]

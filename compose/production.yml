@@ -7,7 +7,7 @@ volumes:
 
 x-common-build:
   build: &build
-    context: .
+    context: ..
     dockerfile: ./compose/production/django/Dockerfile
 
 x-db-depends:
@@ -15,15 +15,15 @@ x-db-depends:
     - postgres
     - redis
   env_file: &db-env
-    - ./.envs/.production/.django
-    - ./.envs/.production/.postgres
+    - ./production/base_env/.django
+    - ./production/base_env/.postgres
 
 services:
-  django:
+  vanir:
     build: *build
     depends_on: *db-depends
     env_file: *db-env
-    image: vanir_production_django
+    image: vanir_production_vanir
     command: /start
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:5000" ]
@@ -33,26 +33,25 @@ services:
 
   postgres:
     build:
-      context: .
-      dockerfile: compose/postgres/Dockerfile
+      context: ..
+      dockerfile: ./compose/postgres/Dockerfile
     image: vanir_production_postgres
     volumes:
       - production_postgres_data:/var/lib/postgresql/data:Z
       - production_postgres_data_backups:/backups:z
     env_file:
-      - ./.envs/.production/.postgres
+      - ./production/base_env/.postgres
 
   traefik:
     build:
-      context: .
+      context: ..
       dockerfile: ./compose/production/traefik/Dockerfile
     image: vanir_production_traefik
-    command: --api.insecure=true --providers.docker
+    command: --api.insecure=true
     depends_on:
-      - django
+      - vanir
     ports:
       - "0.0.0.0:80:80"
-      - "0.0.0.0:443:443"
       - "0.0.0.0:5555:5555"
 
   redis:
@@ -70,7 +69,7 @@ services:
     depends_on:
       - postgres
       - redis
-      - django
+      - vanir
     env_file: *db-env
     image: vanir_production_celerybeat
     command: /start-celerybeat

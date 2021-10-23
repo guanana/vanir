@@ -7,7 +7,7 @@ volumes:
 services:
   django-dev: &django-dev
     build:
-      context: .
+      context: ..
       dockerfile: ./compose/local/django/Dockerfile
     image: vanir_local_django
     container_name: django-dev
@@ -17,32 +17,32 @@ services:
     volumes:
       - .:/app:z
     env_file:
-      - ./.envs/.local/.django
-      - ./.envs/.local/.postgres
+      - ../.envs/.local/.django
+      - ../.envs/.local/.postgres
     ports:
       - "8000:8000"
     command: /start
 
   postgres-dev:
     build:
-      context: .
-      dockerfile: compose/postgres/Dockerfile
-    image: vanir_production_postgres
+      context: ..
+      dockerfile: ./compose/postgres/Dockerfile
+    image: vanir_local_postgres
     container_name: postgres-dev
     volumes:
       - local_postgres_data:/var/lib/postgresql/data:Z
       - local_postgres_data_backups:/backups:z
     env_file:
-      - ./.envs/.local/.postgres
+      - ../.envs/.local/.postgres
 
   docs-dev:
     image: vanir_local_docs
     container_name: docs-dev
     build:
-      context: .
+      context: ..
       dockerfile: ./compose/local/docs/Dockerfile
     env_file:
-      - ./.envs/.local/.django
+      - ../.envs/.local/.django
     volumes:
       - ./docs:/docs:z
       - ./config:/app/config:z

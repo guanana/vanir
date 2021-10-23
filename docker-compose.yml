@@ -1,0 +1,85 @@
+version: '3'
+
+x-db-depends:
+  depends_on: &db-depends
+    - postgres
+    - redis
+
+x-env:
+  env: &env_full
+    - DJANGO_SECRET_KEY=SEYXk9IFBvg1clnwpxv6FFcJz0cyje8pjM8n2Ey5DogrX6LPqEr5GIuQltnseKX1
+    - DJANGO_ADMIN_URL=IR09cY25ao77Lm2jByTUhh7LomRfXNBD/
+    - CELERY_FLOWER_USER=wuxvzgQvgUtdbiMcAYKqAHuhVMgEuEym
+    - CELERY_FLOWER_PASSWORD=t4KaEu92esVy6mg5HSGdRrngDG5SkHRHjOZ0ceOGRmd7WPKyEJb5FmfuwD5Ave2X
+    - &POSTGRESS_USER POSTGRES_USER=jKjOlKrhryeOMfQpNCKzfdGfgvBqIrKX
+    - &POSTGRESS_PASS POSTGRES_PASSWORD=C0qXbr6qtTGYg3ct6z0qCGznYtXq52qDWLWAz7PodxGWJcgBygaoc47ho1nBdhXW
+    - &POSTGRES_DB POSTGRES_DB=vanir
+
+services:
+  vanir:
+    depends_on: *db-depends
+    environment: *env_full
+    image: guanana2/vanir:main
+    restart: always
+    command: /start
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:5000" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  postgres:
+    image: guanana2/vanir-postgres:main
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data:Z
+      - postgres_data_backups:/backups:z
+    environment:
+      - *POSTGRESS_USER
+      - *POSTGRESS_PASS
+      - *POSTGRES_DB
+
+
+  traefik:
+    image: guanana2/vanir-traefik:main
+    restart: always
+    ports:
+      - "127.0.0.1:80:80"
+      - "127.0.0.1:5555:5555"
+    depends_on:
+      - vanir
+
+  redis:
+    image: redis:6
+    restart: always
+
+
+  celeryworker:
+    depends_on: *db-depends
+    environment: *env_full
+    image: guanana2/vanir:main
+    restart: always
+    command: /start-celeryworker
+
+  celerybeat:
+    depends_on:
+      - postgres
+      - redis
+      - vanir
+    environment: *env_full
+    image: guanana2/vanir:main
+    restart: always
+    command: /start-celerybeat
+
+  flower:
+    depends_on: *db-depends
+    environment: *env_full
+    restart: always
+    image: guanana2/vanir:main
+    command: /start-flower
+
+
+volumes:
+  postgres_data: {}
+  postgres_data_backups: {}
+  traefik: {}
