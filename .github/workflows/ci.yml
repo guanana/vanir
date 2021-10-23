@@ -47,10 +47,10 @@ jobs:
         run:  docker-compose -f compose/local.yml build
 
       - name: Run DB Migrations
-        run:  docker-compose -f compose/local.yml run -e POSTGRES_USER={secret.POSTGRES_USER} -e POSTGRES_PASSWORD={secret.POSTGRES_PASSWORD} -e POSTGRES_DB=vanir --rm vanir python manage.py migrate
+        run:  docker-compose -f compose/local.yml run -e POSTGRES_USER={secret.POSTGRES_USER} -e POSTGRES_PASSWORD={secret.POSTGRES_PASSWORD} -e POSTGRES_DB=vanir --rm django-dev python manage.py migrate
 
       - name: Run Django Tests
-        run:  docker-compose -f compose/local.yml run -e POSTGRES_USER={secret.POSTGRES_USER} -e POSTGRES_PASSWORD={secret.POSTGRES_PASSWORD} -e POSTGRES_DB=vanir vanir pytest
+        run:  docker-compose -f compose/local.yml run -e POSTGRES_USER={secret.POSTGRES_USER} -e POSTGRES_PASSWORD={secret.POSTGRES_PASSWORD} -e POSTGRES_DB=vanir django-dev pytest
 
       - name: Tear down the Stack
         run:  docker-compose -f compose/local.yml down
