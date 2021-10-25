@@ -55,14 +55,6 @@ class BasicExchange:
         self.testnet = account.testnet
 
     @abstractmethod
-    def default_blockchain(self) -> Blockchain:
-        raise NotImplementedError
-
-    @abstractmethod
-    def con(self):
-        raise NotImplementedError
-
-    @abstractmethod
     def test(self) -> bool:
         raise NotImplementedError
 
@@ -73,6 +65,9 @@ class BasicExchange:
     @abstractmethod
     def all_assets_prices(self) -> dict:
         pass
+
+    def get_token_price(self, token1, token2) -> float:
+        raise NotImplementedError
 
     @abstractmethod
     def order_process(self, *args, **kwargs):
@@ -166,12 +161,12 @@ class VanirBinance(ExtendedExchange, Client, metaclass=ExtendedExchangeRegistry)
             all_margin_assets.update({asset["assetName"]: asset["assetFullName"]})
         return all_margin_assets
 
-    def get_token_price(self, pair):
+    def get_token_price(self, token1, token2):
         try:
-            price = self.get_avg_price(symbol=f"{pair}")["price"]
+            price = self.get_avg_price(symbol=f"{token1}{token2}")["price"]
         except BinanceAPIException as binanceexception:
             if binanceexception.code == -1121:
-                logger.error(f"Pair {pair} not supported")
+                logger.error(f"Pair {token1}{token2} not supported")
             return
 
         try:
