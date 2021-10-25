@@ -62,9 +62,11 @@ please go [here](https://docs.docker.com/compose/install/)
 ### Quick Start Docker
 
 #### Easy
+0. You don't need to clone the repo
 1. Copy/Download the file [docker-compose.yml](https://github.com/guanana/vanir/blob/main/docker-compose.yml) on your computer
-2. Edit the default passwords **this is for your own extra peace of mind**.
-3. Run `docker-compose up`
+2. Edit the default passwords in the docker-compose.yml **this is for your own extra peace of mind**.
+3. Run `docker-compose up -d`
+4. Login with user `admin` and password `admin` and **[CHANGE ADMIN PASSWORD](#how-to-change-default-username-and-password)**
 
 #### Custom build
 1. Clone the repo: `git clone https://github.com/guanana/vanir.git`
@@ -74,6 +76,7 @@ and expose on purpose your installation, this credentials will only be local to 
 You can find them in .envs/production-example. Once changed, rename the folder to `.envs/.production`
 3. Add the new env path (.envs/.production) on the compose/production.yml file
 4. Finally, just run: `docker-compose -f compose/production.yml up -d`
+5. Login with user `admin` and password `admin` and **[CHANGE ADMIN PASSWORD](#how-to-change-default-username-and-password)**
 
 ### No docker install
 #### Installation (the hard way!)
@@ -137,10 +140,13 @@ The first time you login the default username and password is `admin`. **PLEASE 
 
 #### How to change default username and password
 Once login with the default user and password (admin). Click on Admin (right top corner) and click again on admin.
+![Change default password - Step 1](vanir/static/images/change_password/change_password_1.png)
+
 Fill the desired fields and click on Password:
 
 *Raw passwords are not stored, so there is no way to see this user’s
 password, but you can change the password using CLICK ME--> __this form__ <-- CLICK ME.*
+![Change default password - Step 1](vanir/static/images/change_password/change_password_2.png)
 
 ## Contribute
 To start contributing just fork the project and run the local environment by running:
