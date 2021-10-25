@@ -5,8 +5,9 @@ from django.utils.functional import cached_property
 from simple_history.models import HistoricalRecords
 
 from vanir.core.token.models import Token
+from vanir.utils.datasource.coingecko import CoinGeckoVanir
 from vanir.utils.exceptions import ExchangeExtendedFunctionalityError
-from vanir.utils.helpers import fetch_exchange_obj, value_pair
+from vanir.utils.helpers import fetch_exchange_obj
 from vanir.utils.models import BaseObject, TimeStampedMixin
 
 
@@ -61,13 +62,11 @@ class Account(BaseObject):
 
     def save(self, *args, **kwargs):
         self.check_default()
-        if self.exchange_obj:
-            self.extended_exchange = True
+        self.is_extended_exchange()
         super().save(*args, **kwargs)
-        if self.extended_exchange:
-            from vanir.core.account.helpers.balance import update_balance
+        from vanir.core.account.helpers.balance import update_balance
 
-            update_balance(self)
+        update_balance(self)
 
     def check_default(self):
         # Check if there are more accounts with default setting
@@ -85,6 +84,12 @@ class Account(BaseObject):
     def clear_tokens(self):
         self.accounttokens_set.all().delete()
 
+    def is_extended_exchange(self):
+        if isinstance(self.exchange_obj, CoinGeckoVanir):
+            return False
+        else:
+            return True
+
     @cached_property
     def exchange_obj(self):
         try:
@@ -92,24 +97,15 @@ class Account(BaseObject):
             self.extended_exchange = True
         except ExchangeExtendedFunctionalityError:
             self.extended_exchange = False
-            return False
+            return CoinGeckoVanir()
         return class_obj(self)
 
     @property
     def total_value_account(self):
-        if self.extended_exchange:
-            price_dict = self.exchange_obj.all_assets_prices
         total_value = 0
         for token_account in self.accounttokens_set.all():
-            token_obj = token_account.token
-            pair = value_pair(token_obj)
             try:
-                if self.extended_exchange:
-                    total_value += price_dict[pair] * token_account.quantity
-                else:
-                    total_value += (
-                        token_account.token.last_value * token_account.quantity
-                    )
+                total_value += token_account.token.last_value * token_account.quantity
             except KeyError:
                 pass
         return round(total_value, 4)
@@ -124,6 +120,7 @@ class AccountTokens(TimeStampedMixin):
     Relation between account and tokens
     """
 
+    id = models.BigAutoField(primary_key=True)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     token = models.ForeignKey("token.Token", on_delete=models.CASCADE)
     quantity = models.FloatField(default=0)
