@@ -61,8 +61,8 @@ class Account(BaseObject):
                 )
 
     def save(self, *args, **kwargs):
-        self.check_default()
         self.is_extended_exchange()
+        self.check_default()
         super().save(*args, **kwargs)
         from vanir.core.account.helpers.balance import update_balance
 
