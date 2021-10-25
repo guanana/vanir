@@ -13,4 +13,5 @@ class TokenTypes(models.TextChoices):
     EOS_EOSIO = "EOSIO"
     TEZOS_TZIP = "TZIP"
     NEO_NEP = "NEP"
+    FIAT = "FIAT"
     OTHER = "OTHER"
