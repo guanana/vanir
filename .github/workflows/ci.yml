@@ -4,7 +4,9 @@ name: CI
 env:
   DOCKER_BUILDKIT: 1
   COMPOSE_DOCKER_CLI_BUILD: 1
-
+  IMAGE_NAME: netbox-scanner
+  NETBOX_ADDRESS: http://test:8000
+  NETBOX_TOKEN: 12345
 on:
   pull_request:
     branches: [ main ]
@@ -47,7 +49,18 @@ jobs:
         run:  docker-compose -f compose/local.yml build
 
       - name: Run Django Tests
-        run:  docker-compose -f compose/local.yml run django-dev pytest --no-migrations --create-db
+        run:  docker-compose -f compose/local.yml run -v "$PWD/report:/report" django-dev pytest --no-migrations --create-db --cov=./ --cov-report=xml && mv coverage.xml report/
+
+      - uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: report/coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: true
+          verbose: true
 
       - name: Tear down the Stack
         run:  docker-compose -f compose/local.yml down
+
+
