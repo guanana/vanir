@@ -4,9 +4,6 @@ name: CI
 env:
   DOCKER_BUILDKIT: 1
   COMPOSE_DOCKER_CLI_BUILD: 1
-  IMAGE_NAME: netbox-scanner
-  NETBOX_ADDRESS: http://test:8000
-  NETBOX_TOKEN: 12345
 on:
   pull_request:
     branches: [ main ]
