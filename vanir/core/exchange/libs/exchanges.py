@@ -131,7 +131,10 @@ class VanirBinance(ExtendedExchange, Client, metaclass=ExtendedExchangeRegistry)
                 and float(asset["locked"]) <= 0.1 / 10e9
             )
         ]
-        df = pd.DataFrame(balance).sort_values(by=["free"], ascending=False)
+        try:
+            df = pd.DataFrame(balance).sort_values(by=["free"], ascending=False)
+        except KeyError:
+            df = pd.DataFrame(balance)
         return df
 
     def get_balance_html(self):

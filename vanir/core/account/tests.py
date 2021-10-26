@@ -1,40 +1,14 @@
 from unittest.mock import patch
 
 import pytest
-import requests_mock
 from binance.exceptions import BinanceAPIException
 from django.test import TestCase
 from django.urls import resolve, reverse
 
-from vanir.core.account.helpers.balance import update_balance
+from vanir.core.account.helpers.test_helpers import aux_create_basic_account
 from vanir.core.account.models import Account, AccountTokens
 from vanir.core.exchange.models import Exchange
 from vanir.core.token.models import Token
-
-
-def aux_create_basic_account(
-    name,
-    exchange,
-    token_pair,
-    api_key="account1_1234",
-    secret="1234secret",
-    default=True,
-):
-    account_create = Account.objects.create(
-        name=name,
-        exchange=exchange,
-        api_key=api_key,
-        secret=secret,
-        token_pair=token_pair,
-        default=default,
-    )
-    return account_create
-
-
-def aux_create_binance_exchange():
-    bnb, created = Token.objects.get_or_create(symbol="BNB", name="Binance Coin")
-    exchange, created = Exchange.objects.get_or_create(name="Binance", native_token=bnb)
-    return exchange
 
 
 class AccountModelTest(TestCase):
@@ -43,6 +17,8 @@ class AccountModelTest(TestCase):
         self.exchange = Exchange.objects.create(
             name="exchange_test", native_token=self.token
         )
+        self.bnb = Token.objects.create(symbol="BNB", name="Binance Coin")
+        self.binance = Exchange.objects.create(name="Binance", native_token=self.bnb)
 
     def test_create_account(self):
         account_create = aux_create_basic_account(
@@ -75,20 +51,18 @@ class AccountModelTest(TestCase):
         self.assertEqual(account1.total_value_account, 10.6848)
 
     def test_supported_exchange_binance_no_valid_key(self):
-        binance = aux_create_binance_exchange()
         with pytest.raises(BinanceAPIException):
             account1 = aux_create_basic_account(  # noqa F841
-                name="account1", exchange=binance, token_pair=self.token
+                name="account1", exchange=self.binance, token_pair=self.token
             )
 
     @patch("vanir.core.account.helpers.balance.update_balance")
     def test_supported_exchange_binance(self, mock_balance):
-        binance = aux_create_binance_exchange()
         account1 = aux_create_basic_account(
-            name="account1", exchange=binance, token_pair=self.token
+            name="account1", exchange=self.binance, token_pair=self.token
         )
         self.assertEqual(account1.extended_exchange, True)
-        self.assertEqual(mock_balance.called, 1)
+        self.assertEqual(mock_balance.called, True)
 
     @patch("vanir.core.account.helpers.balance.update_balance")
     def test_manual_exchange(self, mock_balance):
@@ -96,15 +70,7 @@ class AccountModelTest(TestCase):
             name="account1", exchange=self.exchange, token_pair=self.token
         )
         self.assertEqual(account1.extended_exchange, False)
-        self.assertEqual(mock_balance.called, 1)
-
-    # # @requests_mock.Mocker()
-    # def test_clear_tokens(self):
-    #     pass
-    #     # mock_api.get("https://api.binance.com/api/v3/account", status_code=200, json={})
-    #     account1 = aux_create_basic_account( # noqa F841
-    #         name="account1", exchange=self.exchange, token_pair=self.token
-    #     )
+        self.assertEqual(mock_balance.called, True)
 
 
 class TestAccountUrls(TestCase):
@@ -169,96 +135,3 @@ class TestAccountUrls(TestCase):
     def test_more_account_url(self):
         path = self.url_test("more", {"pk": 1})
         assert resolve(path).view_name == "account:account_more"
-
-
-account_mock_dict = {
-    "makerCommission": 10,
-    "takerCommission": 10,
-    "buyerCommission": 0,
-    "sellerCommission": 0,
-    "canTrade": True,
-    "canWithdraw": True,
-    "canDeposit": True,
-    "updateTime": 1635129047375,
-    "accountType": "SPOT",
-    "balances": [
-        {"asset": "BTC", "free": "0.00014051", "locked": "0.00000000"},
-        {"asset": "LTC", "free": "0.01530277", "locked": "0.07693000"},
-        {"asset": "ETH", "free": "0.00401792", "locked": "0.00000000"},
-        {"asset": "NEO", "free": "0.00000000", "locked": "0.00000000"},
-        {"asset": "BNB", "free": "0.09387603", "locked": "0.00000000"},
-        {"asset": "QTUM", "free": "0.00000000", "locked": "0.00000000"},
-        {"asset": "EOS", "free": "10.64085300", "locked": "10.00000000"},
-        {"asset": "SNT", "free": "0.00000000", "locked": "0.00000000"},
-        {"asset": "BCC", "free": "0.00000000", "locked": "0.00000000"},
-        {"asset": "USDT", "free": "0.00000000", "locked": "0.00000000"},
-        {"asset": "HSR", "free": "0.00000000", "locked": "0.00000000"},
-    ],
-    "permissions": ["SPOT"],
-}
-
-
-class TestAccountHelpers(TestCase):
-    def setUp(self):
-        self.token = Token.objects.create(name="Test Helper", symbol="TSTHELP")
-        self.manual_exchange = Exchange.objects.create(
-            name="exchange_test", native_token=self.token
-        )
-        self.manual_account = aux_create_basic_account(
-            name="account1", exchange=self.manual_exchange, token_pair=self.token
-        )
-        self.binance_exchange = aux_create_binance_exchange()
-
-    def mock_binance_account(self):
-        bnb, created = Token.objects.get_or_create(symbol="BNB", name="Binance Coin")
-        binance_exchange = aux_create_binance_exchange()
-        with requests_mock.Mocker() as mock_binance_connection:
-            mock_binance_connection.get(
-                "https://api.binance.com/api/v3/ping", status_code=200, json={}
-            )
-            binance_account = Account.objects.create(
-                name="Binance Account",
-                exchange=binance_exchange,
-                api_key="account1_1234",
-                secret="1234secret",
-                token_pair=bnb,
-                default=True,
-            )
-        return binance_account
-
-    def test_account_get_balance_manual(self):
-        df = self.manual_account.exchange_obj.get_balance()
-        self.assertIsNone(df)
-
-    def test_account_update_balance_no_price_manual(self):
-        response = update_balance(self.manual_account, update_price=False)
-        self.assertEqual(response, [])
-
-    def test_account_get_balance_binance(self):
-        binance_account = self.mock_binance_account()
-        df = binance_account.exchange_obj.get_balance()
-        self.assertIsNone(df)
-
-    def test_account_update_balance_no_price_binance(self, *mock_binance_account):
-        response = update_balance(mock_binance_account, update_price=False)
-        self.assertEqual(response, [])
-
-    @patch(
-        "vanir.core.exchange.libs.exchanges.VanirBinance.get_account",
-        return_value=account_mock_dict,
-    )
-    def test_account_update_mock_input_no_price(self, mock_get_account):
-        response = update_balance(self.manual_account, update_price=False)
-        self.assertEqual(response, [])
-        self.assertEqual(mock_get_account.called, False)
-
-    @patch(
-        "vanir.core.exchange.libs.exchanges.VanirBinance.get_account",
-        return_value=account_mock_dict,
-    )
-    def test_account_update_mock_input_no_price_binance(
-        self, mock_get_account, *mock_binance_account
-    ):
-        response = update_balance(mock_binance_account, update_price=False)
-        self.assertEqual(response, "a")
-        self.assertEqual(mock_get_account.called, False)
