@@ -16,11 +16,27 @@
     token_type: ERC-20
 
 
-
 - model: token.token
   pk: 3
+  fields:
+    name: Dollar
+    symbol: USD
+    last_value: 1
+    token_type: FIAT
+
+
+- model: token.token
+  pk: 4
   fields:
     name: Etherum
     symbol: ETH
     last_value: 1
     token_type: ERC-20
+
+- model: token.token
+  pk: 5
+  fields:
+    name: Euro
+    symbol: EUR
+    last_value: 1
+    token_type: FIAT

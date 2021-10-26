@@ -18,14 +18,15 @@ class Coin(models.Model):
         return (self.symbol,)
 
     def set_value(self, account=None):
-        from vanir.utils.helpers import fetch_default_account, value_pair
+        from vanir.utils.helpers import fetch_default_account
 
         if not account:
             account = fetch_default_account()
         exceptions_value = self.check_exceptions_value(account)
         if exceptions_value:
             return exceptions_value
-        self.last_value = account.exchange_obj.get_token_price(value_pair(self))
+        pair = account.token_pair
+        self.last_value = account.exchange_obj.get_token_price(self.symbol, pair.symbol)
         if self.last_value:
             self.last_value = round(self.last_value, 4)
             self.save()

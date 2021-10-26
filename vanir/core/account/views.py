@@ -8,7 +8,6 @@ from vanir.core.account.models import Account, AccountTokens
 from vanir.core.account.tables import AccountTable
 from vanir.core.account.utils import exchange_view_render
 from vanir.core.exchange.libs.exchanges import ExtendedExchange
-from vanir.core.token.helpers.import_utils import qs_update
 from vanir.core.token.models import Token
 from vanir.core.token.tables import TokenTableValue
 from vanir.utils.views import (
@@ -48,13 +47,7 @@ class AccountListView(ObjectListView):
 
 class AccountUpdateView(ObjectUpdateView):
     model = Account
-    fields = (
-        "name",
-        "exchange",
-        "api_key",
-        "secret",
-        "default",
-    )
+    fields = ("name", "exchange", "api_key", "secret", "default", "token_pair")
 
 
 class AccountDetailView(DetailView):
@@ -81,8 +74,6 @@ class AccountTokenBulkUpdateValueView(DetailView):
         super().get(request, *args, **kwargs)
         if self.object.extended_exchange:
             update_balance(self.object)
-            token_subset = self.object.accounttokens_set
-            qs_update(token_subset.all(), self.object)
             messages.info(request, "Tokens updated")
         else:
             messages.warning(

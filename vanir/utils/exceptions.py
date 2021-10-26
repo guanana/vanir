@@ -119,3 +119,37 @@ class AccountRequiredError(ExchangeError):
     ):
         self.message = message
         super().__init__(self.message, account)
+
+
+#
+# Utilities Exceptions
+#
+class UtilitiesError(Exception):
+    """
+    Base Exception Class for Utilities
+    """
+
+    def __init__(self, message: str = "UtilitiesError", account=None):
+        self.message = message
+        super().__init__(self.message)
+        self.account = account
+
+    def __str__(self):
+        if self.account:
+            return f"{self.account}: ***{self.account.name} -> {self.message}"
+        else:
+            return self.message
+
+
+class PairNotSupportedError(UtilitiesError):
+    """
+    At least one account is required
+    """
+
+    def __init__(
+        self,
+        message: str = constants_exceptions.PAIRNOTSUPPORTEDERROR,
+        account=None,
+    ):
+        self.message = message
+        super().__init__(self.message, account)

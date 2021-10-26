@@ -24,3 +24,11 @@ EXCHANGEEXTENDEDFUNCTIONALITYERROR = (
 # Account
 ##
 ACCOUNTREQUIREDERROR = "You need to have at least one account configured"
+
+
+##
+# Utilities
+##
+PAIRNOTSUPPORTEDERROR = (
+    "Please select another pair, this is not supported for the operation requested"
+)
