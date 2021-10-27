@@ -1,10 +1,5 @@
 name: CI
 
-# Enable Buildkit and let compose use it to speed up image building
-env:
-  DOCKER_BUILDKIT: 1
-  COMPOSE_DOCKER_CLI_BUILD: 1
-
 on:
   pull_request:
     branches: [ main ]
@@ -29,25 +24,59 @@ jobs:
           python-version: 3.9
 
       # Run all pre-commit hooks on all the files.
-      # Getting only staged files can be tricky in case a new PR is opened
-      # since the action is run on a branch in detached head state
+
       - name: Install and Run Pre-commit
         uses: pre-commit/action@v2.0.3
 
-  # With no caching at all the entire ci process takes 4m 30s to complete!
   pytest:
-    runs-on: ubuntu-latest
-
+    runs-on: ubuntu-20.04
     steps:
-
       - name: Checkout Code Repository
         uses: actions/checkout@v2
 
-      - name: Build the Stack
-        run:  docker-compose -f compose/local.yml build
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
 
-      - name: Run Django Tests
-        run:  docker-compose -f compose/local.yml run django-dev pytest --no-migrations --create-db
+      - name: Set up Redis
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y redis-server
+          sudo systemctl start redis-server
 
-      - name: Tear down the Stack
-        run:  docker-compose -f compose/local.yml down
+      - name: Start PostgreSQL
+        run: |
+          sudo systemctl start postgresql.service
+          sudo -u postgres createuser -s runner
+          sudo -u postgres createdb vanir
+          sudo -u postgres psql -c "ALTER USER runner WITH PASSWORD 'supersafe';"
+          sudo -u postgres psql -c "ALTER USER runner WITH SUPERUSER;"
+
+      - uses: actions/cache@v2
+        id: pycache
+        with:
+          path: ~/.cache/pip
+          key: ${{ env.pythonLocation }}-${{ hashFiles('requirements/production.txt') }}-${{ hashFiles('requirements/local.txt') }}
+
+      - name: Install Dependencies
+        run: pip install --upgrade --upgrade-strategy eager -r requirements/local.txt -r requirements/production.txt
+
+      - name: Run Tests
+        env:
+          DATABASE_URL: postgres://runner:supersafe@localhost/vanir
+          REDIS_URL: redis://localhost:6379/0
+          CELERY_BROKER_URL: ""
+        run: |
+          pytest --no-migrations --create-db --cov=./vanir/ --cov-report=xml
+
+      - uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: true
+          verbose: true
+
+
+
