@@ -3,6 +3,7 @@
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-390/)
 [![Django 3.2.8](https://img.shields.io/badge/Django-3.2.8-blue.svg)](https://docs.djangoproject.com/en/3.2/)
 [![Docker-Compose](https://img.shields.io/badge/Docker-Docker%20Compose-orange.svg)](https://docs.docker.com/compose/gettingstarted/)
+[![codecov](https://codecov.io/gh/guanana/vanir/branch/main/graph/badge.svg?token=CFWLAUD233)](https://codecov.io/gh/guanana/vanir)
 
 Crypto asset management and bot control, all one place
 
