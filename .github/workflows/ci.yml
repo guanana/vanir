@@ -39,10 +39,20 @@ jobs:
         with:
           python-version: 3.9
 
+      - name: Set up Redis
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y redis-server
+          sudo systemctl start redis-server
       - name: Start PostgreSQL
         run: |
           sudo systemctl start postgresql.service
           sudo -u postgres createuser -s runner
+
+      - uses: actions/cache@v2
+        with:
+          path: ${{ env.pythonLocation }}
+          key: ${{ env.pythonLocation }}-${{ hashFiles('requirements/production.txt') }}-${{ hashFiles('requirements/local.txt') }}
 
       - name: Install Dependencies
         run: |
@@ -51,9 +61,12 @@ jobs:
 
       - name: Run Tests
         env:
-          DB: vanir
-          DB_USER: runner
-          DB_PASSWORD: ""
+          POSTGRES_DB: vanir
+          POSTGRES_USER: runner
+          POSTGRES_PASSWORD: ""
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          REDIS_URL: redis://localhost:6379/0
         run: |
           pytest --no-migrations --create-db --cov=./vanir/ --cov-report=xml
 
