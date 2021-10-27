@@ -10,7 +10,7 @@ class CoinGeckoVanir(CoinGeckoAPI, BasicExchange):
         try:
             if response["gecko_says"]:
                 return True
-        except AttributeError:
+        except (AttributeError, KeyError):
             return False
 
     def get_balance(self):
@@ -30,7 +30,7 @@ class CoinGeckoVanir(CoinGeckoAPI, BasicExchange):
         name = [token["name"] for token in all_tokens if symbol == token["symbol"]]
         try:
             return name[0].lower()
-        except TypeError:
+        except (TypeError, IndexError):
             return "Unknown"
 
     def get_fiat_price(self, symbol1, fiat="usd"):
