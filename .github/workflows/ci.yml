@@ -49,6 +49,7 @@ jobs:
         run: |
           sudo systemctl start postgresql.service
           sudo -u postgres createuser -s runner
+          sudo -u postgres createdb vanir
 
       - uses: actions/cache@v2
         with:
