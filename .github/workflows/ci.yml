@@ -50,8 +50,11 @@ jobs:
           sudo systemctl start postgresql.service
           sudo -u postgres createuser -s runner
           sudo -u postgres createdb vanir
+          sudo -u postgres psql -c "ALTER USER runner WITH PASSWORD 'supersafe';"
+          sudo -u postgres psql -c "ALTER USER runner WITH SUPERUSER;"
 
       - uses: actions/cache@v2
+        id: pycache
         with:
           path: ~/.cache/pip
           key: ${{ env.pythonLocation }}-${{ hashFiles('requirements/production.txt') }}-${{ hashFiles('requirements/local.txt') }}
@@ -61,7 +64,7 @@ jobs:
 
       - name: Run Tests
         env:
-          DATABASE_URL: postgres://runner@localhost/vanir
+          DATABASE_URL: postgres://runner:supersafe@localhost/vanir
           REDIS_URL: redis://localhost:6379/0
           CELERY_BROKER_URL: ""
         run: |
