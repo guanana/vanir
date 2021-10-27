@@ -61,11 +61,7 @@ jobs:
 
       - name: Run Tests
         env:
-          POSTGRES_DB: vanir
-          POSTGRES_USER: runner
-          POSTGRES_PASSWORD: ""
-          POSTGRES_HOST: localhost
-          POSTGRES_PORT: 5432
+          DATABASE_URL: postgres://runner@localhost/vanir
           REDIS_URL: redis://localhost:6379/0
         run: |
           pytest --no-migrations --create-db --cov=./vanir/ --cov-report=xml
