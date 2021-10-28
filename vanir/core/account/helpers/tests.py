@@ -136,7 +136,7 @@ class TestAccountHelpers(TestCase):
     )  # noqa
     @patch.object(Client, "get_all_tickers", autospec=True)
     def test_account_update_balance_empty_binance_no_price(
-        self, mock_get_all_tickers, mock_get_account  # noqa
+        self, mock_get_all_tickers, mock_get_account
     ):
         with patch("vanir.core.account.helpers.balance.update_balance"):
             binance_account = Account.objects.create(
@@ -181,9 +181,14 @@ class TestAccountHelpers(TestCase):
         "binance.client.Client.get_account",
         autospec=True,
         return_value=account_mock_dict,
-    )  # noqa
+    )
+    @patch(
+        "vanir.core.token.helpers.import_utils.get_token_full_name",
+        autospec=True,
+        side_effect=side_effect_get_token_full_name,
+    )
     def test_account_update_balance_price_binance(
-        self, mock_get_account, mock_get_all_tickers
+        self, mock_get_token_full_name, mock_get_account, mock_get_all_tickers
     ):
         with patch("vanir.core.account.helpers.balance.update_balance"):
             binance_account = Account.objects.create(
@@ -198,3 +203,4 @@ class TestAccountHelpers(TestCase):
         self.assertEqual(response, ["EOS", "BNB", "LTC", "ETH", "BTC"])
         self.assertEqual(mock_get_account.call_count, 1)
         self.assertEqual(mock_get_all_tickers.call_count, 1)
+        self.assertEqual(mock_get_token_full_name.call_count, 4)
