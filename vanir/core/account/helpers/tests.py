@@ -1,5 +1,6 @@
 from unittest.mock import patch
 
+from binance import Client
 from django.test import TestCase
 
 from vanir.core.account.helpers.balance import update_balance
@@ -85,9 +86,28 @@ get_margin_all_assets_mock_dict = [
     },
 ]
 
+get_all_tickers_mock = [
+    {"symbol": "ETHUSD", "price": "1.06720800"},
+    {"symbol": "ETHUSDT", "price": "1.06720800"},
+    {"symbol": "LTCBTC", "price": "0.00306600"},
+    {"symbol": "BNBBTC", "price": "0.00768100"},
+    {"symbol": "EOSETH", "price": "0.00105500"},
+    {"symbol": "GASBTC", "price": "0.00014040"},
+    {"symbol": "BNBETH", "price": "0.11440000"},
+    {"symbol": "BTCUSDT", "price": "58410.13000000"},
+    {"symbol": "ICNETH", "price": "0.00166300"},
+    {"symbol": "MCOBTC", "price": "0.00021140"},
+    {"symbol": "WTCBTC", "price": "0.00001578"},
+]
+
+
+def side_effect_get_token_full_name(account, token_symbol):
+    return token_symbol
+
 
 class TestAccountHelpers(TestCase):
-    def setUp(self):
+    @patch("vanir.core.account.helpers.balance.update_balance")
+    def setUp(self, mock_update_balance):
         self.token = Token.objects.create(name="Test Helper", symbol="TSTHELP")
         self.manual_exchange = Exchange.objects.create(
             name="exchange_test", native_token=self.token
@@ -114,66 +134,67 @@ class TestAccountHelpers(TestCase):
         "binance.client.Client.get_account",
         return_value=account_mock_dict_empty_balance,
     )  # noqa
-    @patch("binance.client.Client.ping")
+    @patch.object(Client, "get_all_tickers", autospec=True)
     def test_account_update_balance_empty_binance_no_price(
-        self, mock_get_account, mock_binance_account  # noqa
+        self, mock_get_all_tickers, mock_get_account  # noqa
     ):
-        binance_account = Account.objects.create(
-            name="Binance Account",
-            exchange=self.binance,
-            api_key="account1_1234",
-            secret="1234secret",
-            token_pair=self.bnb,
-            default=True,
-        )
+        with patch("vanir.core.account.helpers.balance.update_balance"):
+            binance_account = Account.objects.create(
+                name="Binance Account",
+                exchange=self.binance,
+                api_key="account1_1234",
+                secret="1234secret",
+                token_pair=self.bnb,
+                default=True,
+            )
         response = update_balance(binance_account, update_price=False)
         self.assertEqual(response, [])
-        self.assertEqual(mock_binance_account.call_count, 2)
+        self.assertEqual(mock_get_account.call_count, 1)
+        self.assertEqual(mock_get_all_tickers.call_count, 0)
 
+    @patch.object(Client, "get_all_tickers", autospec=True)
     @patch(
         "binance.client.Client.get_account",
         return_value=account_mock_dict_empty_balance,
     )  # noqa
-    @patch("binance.client.Client.ping")
     def test_account_update_balance_empty_binance_price(
-        self, mock_get_account, mock_binance_account  # noqa
+        self, mock_get_account, mock_get_all_tickers
     ):
-        binance_account = Account.objects.create(
-            name="Binance Account",
-            exchange=self.binance,
-            api_key="account1_1234",
-            secret="1234secret",
-            token_pair=self.bnb,
-            default=True,
-        )
+        with patch("vanir.core.account.helpers.balance.update_balance"):
+            binance_account = Account.objects.create(
+                name="Binance Account",
+                exchange=self.binance,
+                api_key="account1_1234",
+                secret="1234secret",
+                token_pair=self.bnb,
+                default=True,
+            )
         response = update_balance(binance_account, update_price=True)
         self.assertEqual(response, [])
-        self.assertEqual(mock_binance_account.call_count, 2)
+        self.assertEqual(mock_get_account.call_count, 1)
+        self.assertEqual(mock_get_all_tickers.call_count, 1)
 
-    @patch("binance.client.Client.get_account", return_value=account_mock_dict)  # noqa
-    @patch("vanir.core.token.helpers.import_utils.token_import")
+    @patch.object(
+        Client, "get_all_tickers", autospec=True, return_value=get_all_tickers_mock
+    )
     @patch(
-        "binance.client.Client.get_margin_all_assets",
-        return_value=get_margin_all_assets_mock_dict,
+        "binance.client.Client.get_account",
+        autospec=True,
+        return_value=account_mock_dict,
     )  # noqa
-    @patch("binance.client.Client.ping")
-    def ttest_account_update_balance_price_binance(
-        self,
-        mock_get_account,
-        mock_import,
-        mock_get_margin_all_assets,  # noqa
-        mock_binance_account,
+    def test_account_update_balance_price_binance(
+        self, mock_get_account, mock_get_all_tickers
     ):
-        binance_account = Account.objects.create(
-            name="Binance Account",
-            exchange=self.binance,
-            api_key="account1_1234",
-            secret="1234secret",
-            token_pair=self.bnb,
-            default=True,
-        )
+        with patch("vanir.core.account.helpers.balance.update_balance"):
+            binance_account = Account.objects.create(
+                name="Binance Account",
+                exchange=self.binance,
+                api_key="account1_1234",
+                secret="1234secret",
+                token_pair=self.bnb,
+                default=True,
+            )
         response = update_balance(binance_account, update_price=True)
         self.assertEqual(response, ["EOS", "BNB", "LTC", "ETH", "BTC"])
         self.assertEqual(mock_get_account.call_count, 1)
-        self.assertEqual(mock_import.call_count, 1)
-        self.assertEqual(mock_binance_account.call_count, 2)
+        self.assertEqual(mock_get_all_tickers.call_count, 1)
