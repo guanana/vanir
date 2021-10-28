@@ -158,13 +158,25 @@ class VanirBinance(ExtendedExchange, Client, metaclass=ExtendedExchangeRegistry)
 
     @cached_property
     def all_margin_assets(self):
+        """
+        Get margin all assets from API
+        :return: Dictionary with symbol and asset name
+        :rtype: dict
+        """
         all_margin_assets = {}
         margin_assets = self.con.get_margin_all_assets()
         for asset in margin_assets:
             all_margin_assets.update({asset["assetName"]: asset["assetFullName"]})
         return all_margin_assets
 
-    def get_token_price(self, token1, token2):
+    def get_token_price(self, token1: str, token2: str):
+        """
+        Get the price of a single token
+        :param token1: String symbol first token
+        :param token2: String symbol second token
+        :return: None or price
+        :rtype: None or float
+        """
         try:
             price = self.get_avg_price(symbol=f"{token1}{token2}")["price"]
         except BinanceAPIException as binanceexception:
