@@ -20,14 +20,17 @@ class AccountModelTest(TestCase):
         self.bnb = Token.objects.create(symbol="BNB", name="Binance Coin")
         self.binance = Exchange.objects.create(name="Binance", native_token=self.bnb)
 
-    def test_create_account(self):
+    @patch("vanir.core.account.helpers.balance.update_balance")
+    def test_create_account(self, mock_update_balance):
         account_create = aux_create_basic_account(
             name="account1", exchange=self.exchange, token_pair=self.token
         )
         account_get = Account.objects.get(exchange=self.exchange.id)
         self.assertEqual(account_create, account_get)
+        self.assertEqual(mock_update_balance.called, True)
 
-    def test_default_account_auto_change(self):
+    @patch("vanir.core.account.helpers.balance.update_balance")
+    def test_default_account_auto_change(self, mock_update_balance):
         account1 = aux_create_basic_account(
             name="account1", exchange=self.exchange, token_pair=self.token
         )
@@ -39,8 +42,10 @@ class AccountModelTest(TestCase):
         account2.refresh_from_db()
         self.assertEqual(account1.default, False)
         self.assertEqual(account2.default, True)
+        self.assertEqual(mock_update_balance.call_count, 2)
 
-    def test_add_tokens(self):
+    @patch("vanir.core.account.helpers.balance.update_balance")
+    def test_add_tokens(self, mock_update_balance):
         account1 = aux_create_basic_account(
             name="account1", exchange=self.exchange, token_pair=self.token
         )
@@ -49,6 +54,7 @@ class AccountModelTest(TestCase):
         )
         AccountTokens.objects.create(account=account1, token=test_token, quantity=2)
         self.assertEqual(account1.total_value_account, 10.6848)
+        self.assertEqual(mock_update_balance.call_count, 1)
 
     def test_supported_exchange_binance_no_valid_key(self):
         with pytest.raises(BinanceAPIException):
@@ -57,24 +63,25 @@ class AccountModelTest(TestCase):
             )
 
     @patch("vanir.core.account.helpers.balance.update_balance")
-    def test_supported_exchange_binance(self, mock_balance):
+    def test_supported_exchange_binance(self, mock_update_balance):
         account1 = aux_create_basic_account(
             name="account1", exchange=self.binance, token_pair=self.token
         )
         self.assertEqual(account1.extended_exchange, True)
-        self.assertEqual(mock_balance.called, True)
+        self.assertEqual(mock_update_balance.call_count, 1)
 
     @patch("vanir.core.account.helpers.balance.update_balance")
-    def test_manual_exchange(self, mock_balance):
+    def test_manual_exchange(self, mock_update_balance):
         account1 = aux_create_basic_account(
             name="account1", exchange=self.exchange, token_pair=self.token
         )
         self.assertEqual(account1.extended_exchange, False)
-        self.assertEqual(mock_balance.called, True)
+        self.assertEqual(mock_update_balance.call_count, 1)
 
 
 class TestAccountUrls(TestCase):
-    def setUp(self):
+    @patch("vanir.core.account.helpers.balance.update_balance")
+    def setUp(self, mock_update_balance):
         self.token = Token.objects.create(name="Test", symbol="TST")
         self.exchange = Exchange.objects.create(
             name="exchange_test", native_token=self.token

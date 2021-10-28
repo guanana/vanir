@@ -3,6 +3,7 @@
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-390/)
 [![Django 3.2.8](https://img.shields.io/badge/Django-3.2.8-blue.svg)](https://docs.djangoproject.com/en/3.2/)
 [![Docker-Compose](https://img.shields.io/badge/Docker-Docker%20Compose-orange.svg)](https://docs.docker.com/compose/gettingstarted/)
+[![codecov](https://codecov.io/gh/guanana/vanir/branch/main/graph/badge.svg?token=CFWLAUD233)](https://codecov.io/gh/guanana/vanir)
 
 Crypto asset management and bot control, all one place
 
@@ -23,12 +24,15 @@ Crypto asset management and bot control, all one place
 * [Usage](#usage)
   * [Default data](#default-data)
     * [Default username/password](#how-to-change-default-username-and-password)
+* [Knowing issues](#knowing-issues)
 * [Contribute](#contribute)
   * [Test Coverage](#test-coverage)
 * [License](#license)
 * [Disclaimer](#disclaimer)
 
-
+## Data Sources and supported Exchanges
+[![CoinGecko](vanir/static/images/data_logos/coingecko.png)](https://www.coingecko.com)
+[![Binance](vanir/static/images/data_logos/binance.png)](https://www.binance.com/en)
 ## About Vanir
 Vanir is a Django app aiming to solve the current problems with proprietary
 software in the crypto world.
@@ -147,6 +151,11 @@ Fill the desired fields and click on Password:
 *Raw passwords are not stored, so there is no way to see this user’s
 password, but you can change the password using CLICK ME--> __this form__ <-- CLICK ME.*
 ![Change default password - Step 1](vanir/static/images/change_password/change_password_2.png)
+
+## Knowing issues
+- When using more than one account select same `Token Pair` to avoid constant update
+and temporary wrong quantities being displayed. Recommended, Tether
+- For now you can add tokens in accounts manually, but you cannot remove them
 
 ## Contribute
 To start contributing just fork the project and run the local environment by running:

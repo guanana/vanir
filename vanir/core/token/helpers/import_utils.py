@@ -52,7 +52,8 @@ def import_token_account(token_obj: Token, account: Account, quantity: float):
     return token_obj
 
 
-def token_update(token: Token, price_dict: dict, symboltopair="USDT"):
+def token_update(token: Token, price_dict: dict, account: Account):
+    symboltopair = account.token_pair.symbol
     pair = value_pair(token, symboltopair.upper())
     try:
         token.last_value = price_dict[pair]
@@ -67,7 +68,7 @@ def qs_update(token_qs: QuerySet[Token], account: Account = None):
         account = fetch_default_account()
     price_dict = account.exchange_obj.all_assets_prices
     for token in token_qs:
-        token_update(token.token, price_dict, account.token_pair.symbol)
+        token_update(token.token, price_dict, account, account.token_pair.symbol)
         token.save()
 
 
@@ -81,4 +82,4 @@ def bulk_update(account: Account = None):
     except AttributeError:
         raise ExchangeExtendedFunctionalityError
     for token_obj in Token.objects.all():
-        token_update(token_obj, price_dict, account.token_pair.symbol)
+        token_update(token_obj, price_dict, account)

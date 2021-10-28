@@ -61,13 +61,17 @@ class Account(BaseObject):
                 )
 
     def save(self, *args, **kwargs):
+        from vanir.core.account.helpers.balance import update_balance
+
         if self._state.adding:
             self.is_extended_exchange()
             self.check_default()
+            update_balance(self)
+        elif self.pk is not None:
+            orig = Account.objects.get(pk=self.pk)
+            if orig.token_pair != self.token_pair:
+                update_balance(self)
         super().save(*args, **kwargs)
-        from vanir.core.account.helpers.balance import update_balance
-
-        update_balance(self)
 
     def check_default(self):
         # Check if there are more accounts with default setting

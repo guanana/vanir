@@ -2,6 +2,7 @@ from pycoingecko import CoinGeckoAPI
 
 from vanir.core.exchange.libs.exchanges import BasicExchange
 from vanir.utils.exceptions import PairNotSupportedError
+from vanir.utils.token_constants import dollar_pairs
 
 
 class CoinGeckoVanir(CoinGeckoAPI, BasicExchange):
@@ -10,7 +11,7 @@ class CoinGeckoVanir(CoinGeckoAPI, BasicExchange):
         try:
             if response["gecko_says"]:
                 return True
-        except AttributeError:
+        except (AttributeError, KeyError):
             return False
 
     def get_balance(self):
@@ -23,6 +24,11 @@ class CoinGeckoVanir(CoinGeckoAPI, BasicExchange):
             temp_prices[f'{asset["symbol"].upper()}{vs_currency.upper()}'] = float(
                 asset["current_price"]
             )
+            if vs_currency == "usd":
+                # Add USDT as well by default
+                temp_prices[f'{asset["symbol"].upper()}{vs_currency.upper()}T'] = float(
+                    asset["current_price"]
+                )
         return temp_prices
 
     def get_name_by_symbol(self, symbol):
@@ -30,12 +36,11 @@ class CoinGeckoVanir(CoinGeckoAPI, BasicExchange):
         name = [token["name"] for token in all_tokens if symbol == token["symbol"]]
         try:
             return name[0].lower()
-        except TypeError:
+        except (TypeError, IndexError):
             return "Unknown"
 
     def get_fiat_price(self, symbol1, fiat="usd"):
         token1 = self.get_name_by_symbol(symbol1)
-        dollar_pairs = ("BUSD", "USDT", "USDC", "DAI", "UST", "TUSD", "USDP")
         if fiat.upper() in dollar_pairs:
             price = self.get_price(ids=token1, vs_currencies="USD")
             return float(price[token1]["usd"])

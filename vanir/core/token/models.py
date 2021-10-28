@@ -2,11 +2,12 @@ from django.db import models
 
 from vanir.core.token.choices import TokenTypes
 from vanir.utils.models import BaseObject
+from vanir.utils.token_constants import dollar_pairs
 
 
 class Coin(models.Model):
     symbol = models.CharField(max_length=10, unique=True)
-    last_value = models.FloatField(null=True, verbose_name="Last value in USDT")
+    last_value = models.FloatField(null=True, verbose_name="Last value")
 
     class Meta:
         abstract = True
@@ -35,7 +36,6 @@ class Coin(models.Model):
             return False
 
     def check_exceptions_value(self, account):
-        dollar_pairs = ("BUSD", "USDT", "USDC", "DAI", "UST", "TUSD", "USDP")
         # Special exception when calling same pair
         if self.symbol == account.token_pair.symbol:
             self.last_value = 1
