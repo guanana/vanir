@@ -35,7 +35,7 @@ class CoinGeckoVanir(CoinGeckoAPI, BasicExchange):
 
     def get_fiat_price(self, symbol1, fiat="usd"):
         token1 = self.get_name_by_symbol(symbol1)
-        dollar_pairs = ("BUSD", "USDT", "USDC", "DAI", "UST", "TUSD", "USDP")
+        dollar_pairs = ("BUSD", "USDT", "USDC", "DAI", "UST", "TUSD", "USDP", "USD")
         if fiat.upper() in dollar_pairs:
             price = self.get_price(ids=token1, vs_currencies="USD")
             return float(price[token1]["usd"])
