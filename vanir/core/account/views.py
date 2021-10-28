@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.db.models import Q
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView
@@ -10,6 +11,7 @@ from vanir.core.account.utils import exchange_view_render
 from vanir.core.exchange.libs.exchanges import ExtendedExchange
 from vanir.core.token.models import Token
 from vanir.core.token.tables import TokenTableValue
+from vanir.utils.datasource.coingecko import CoinGeckoVanir
 from vanir.utils.views import (
     ObjectCreateView,
     ObjectDeleteView,
@@ -49,6 +51,23 @@ class AccountUpdateView(ObjectUpdateView):
     model = Account
     fields = ("name", "exchange", "api_key", "secret", "default", "token_pair")
 
+    # Filter token_pair to only allow certain standard values and avoid
+    # user selecting random tokens
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        if isinstance(self.object.exchange_obj, CoinGeckoVanir):
+            form.fields["token_pair"].queryset = Token.objects.filter(
+                Q(token_type="FIAT") | Q(symbol="USDT")
+            )
+        else:
+            form.fields["token_pair"].queryset = Token.objects.filter(
+                Q(token_type="FIAT")
+                | Q(symbol="BTC")
+                | Q(symbol="ETH")
+                | Q(symbol="USDT")
+            )
+        return form
+
 
 class AccountDetailView(DetailView):
     model = Account
@@ -72,7 +91,9 @@ class AccountTokenBulkUpdateValueView(DetailView):
 
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
-        if self.object.extended_exchange:
+        if self.object.extended_exchange or isinstance(
+            self.object.exchange_obj, CoinGeckoVanir
+        ):
             update_balance(self.object)
             messages.info(request, "Tokens updated")
         else:
