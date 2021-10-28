@@ -9,20 +9,21 @@ from vanir.core.token.models import Token
 def update_balance(account, update_price=True):
     df = account.exchange_obj.get_balance()
     response = []
-    try:
-        for index, row in df.iterrows():
-            try:
-                token = Token.objects.get(symbol=row["asset"])
-            except Token.DoesNotExist:
-                token = token_import(account=account, token_symbol=row["asset"])
-            import_token_account(
-                account=account,
-                token_obj=token,
-                quantity=float(row["free"]) + float(row["locked"]),
-            )
-            response.append(row["asset"])
-    except AttributeError:
-        pass
+    if df is not None:
+        try:
+            for index, row in df.iterrows():
+                try:
+                    token = Token.objects.get(symbol=row["asset"])
+                except Token.DoesNotExist:
+                    token = token_import(account=account, token_symbol=row["asset"])
+                import_token_account(
+                    account=account,
+                    token_obj=token,
+                    quantity=float(row["free"]) + float(row["locked"]),
+                )
+                response.append(row["asset"])
+        except AttributeError:
+            pass
     if update_price:
         bulk_update(account)
     return response
