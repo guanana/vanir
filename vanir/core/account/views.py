@@ -37,10 +37,6 @@ class AccountCreateView(ObjectCreateView):
         context["SUPPORTED_EXCHANGES"] = ExtendedExchange.all_supported()
         return context
 
-    def form_valid(self, form):
-        form.instance.token_pair = Token.objects.get(symbol="USDT")
-        return super().form_valid(form)
-
 
 class AccountListView(ObjectListView):
     model = Account
@@ -51,9 +47,14 @@ class AccountUpdateView(ObjectUpdateView):
     model = Account
     fields = ("name", "exchange", "api_key", "secret", "default", "token_pair")
 
-    # Filter token_pair to only allow certain standard values and avoid
-    # user selecting random tokens
     def get_form(self, *args, **kwargs):
+        """
+        Filter token_pair to only allow certain standard values and avoid
+        user selecting random tokens
+        :param args:
+        :param kwargs:
+        :return: form with new field queryset
+        """
         form = super().get_form(*args, **kwargs)
         if isinstance(self.object.exchange_obj, CoinGeckoVanir):
             form.fields["token_pair"].queryset = Token.objects.filter(
@@ -75,6 +76,11 @@ class AccountDetailView(DetailView):
     template_name = "account/account_detail.html"
 
     def get_context_data(self, **kwargs):
+        """
+        Add accounttokens table into context so it can
+        be displayed
+        :return: context
+        """
         table = self.table_class(self.model.objects.filter(pk=self.kwargs["pk"]))
         table_accounttokens = TokenTableValue(
             Token.objects.filter(accounttokens__account__pk=self.kwargs["pk"]),
