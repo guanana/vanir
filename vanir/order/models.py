@@ -15,9 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class BaseOrder(BaseObject):
-    """
-    Orders
-    """
+    """Orders abstract base model"""
 
     ORDER_TYPE = None
     order_id = models.CharField(max_length=150, editable=False)
@@ -62,6 +60,8 @@ class BaseOrder(BaseObject):
     def symbol(self):
         """
         Construct symbol to send to exchange
+        :return: Symbol
+        :rtype: str
         """
         return f"{self.token_from.symbol}{self.token_to.symbol}"
 
@@ -69,12 +69,17 @@ class BaseOrder(BaseObject):
     def new_client_order_id(self):
         """
         Construct order id to send to the exchange
+        :return: datetime with symbol as identifier
+        :rtype: str
         """
         return f"{datetime.datetime.today().strftime('%Y%m%d%H%M%S')}{self.symbol}"
 
     def save(self, *args, **kwargs):
         """
         Construct name and order id then send the order with the proper parameters
+        :param args:
+        :param kwargs:
+        :return: save
         """
         self.name = f"{datetime.datetime.today().strftime('%X %x')}:{self.token_from.symbol}/{self.token_to.symbol}"
         self.order_id = self.new_client_order_id
@@ -91,6 +96,11 @@ class BaseOrder(BaseObject):
         return super(BaseOrder, self).save(*args, **kwargs)
 
     def execute_order(self, **kwargs):
+        """
+        Execute order on exchange
+        :param kwargs:
+        :return: response from exchange object
+        """
         return self.account.exchange_obj.create_order(**self.order_args, **kwargs)
 
     @property
@@ -108,6 +118,7 @@ class BaseOrder(BaseObject):
 
 
 class BasePriceOrder(BaseOrder):
+    """Order with price abstract base model"""
     price = models.FloatField(help_text=constants.PRICE, default=0)
 
     @property
@@ -122,6 +133,7 @@ class BasePriceOrder(BaseOrder):
 
 
 class BasePriceLimitOrder(BasePriceOrder):
+    """Base limit order abstract base model"""
     timeInForce = models.CharField(
         max_length=4,
         choices=TimeInForce.choices,
@@ -134,6 +146,7 @@ class BasePriceLimitOrder(BasePriceOrder):
 
 
 class LimitOrder(BasePriceLimitOrder):
+    """Limit order model"""
     ORDER_TYPE = "LIMIT"
     token_from = models.ForeignKey(
         Token, related_name="token_from_limit", on_delete=models.CASCADE, null=False
@@ -158,9 +171,7 @@ class LimitOrder(BasePriceLimitOrder):
 
 
 class MarketOrder(BaseOrder):
-    """
-    Trade instantly at the current market price
-    """
+    """Trade instantly at the current market price"""
 
     ORDER_TYPE = "MARKET"
     token_from = models.ForeignKey(
@@ -183,6 +194,7 @@ class MarketOrder(BaseOrder):
 
 
 class StopPriceOrder(BaseOrder):
+    """Stop Price Order model"""
     stopprice = models.FloatField(help_text=constants.PRICE, default=0)
     token_from = models.ForeignKey(
         Token,
@@ -213,6 +225,7 @@ class StopPriceOrder(BaseOrder):
 
 
 class StopLossOrTakeProfitLimitOrder(BasePriceLimitOrder):
+    """Stop Loos or Take Profit Order model"""
     token_from = models.ForeignKey(
         Token,
         related_name="token_from_loss_or_take",

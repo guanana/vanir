@@ -6,6 +6,11 @@ from vanir.utils.exceptions import ExchangeExtendedFunctionalityError
 
 
 def fetch_default_account():
+    """
+    Fetch default account from all the accounts
+    :return: default account
+    :rtype: Account
+    """
     from vanir.core.account.models import Account
 
     if Account.objects.count() == 0:
@@ -26,6 +31,12 @@ def fetch_default_account():
 
 
 def fetch_exchange_obj(exchange_name: str):
+    """
+    Check for registry in Extended exchange and returns
+    the exchange class
+    :return: Exchange object
+    :rtype: BasicExchange
+    """
     try:
         class_obj = ExtendedExchangeRegistry.get_class_by_name(
             exchange_name.split(" ")[0]

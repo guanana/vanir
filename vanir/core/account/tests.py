@@ -115,13 +115,17 @@ class TestAccountUrls(TestCase):
         path = self.url_test("edit", {"pk": 1})
         assert resolve(path).view_name == "account:account_edit"
 
+    def test_delete_account_url(self):
+        path = self.url_test("delete", {"pk": 1})
+        assert resolve(path).view_name == "account:account_delete"
+
     def test_tokens_add_account_url(self):
         path = self.url_test("tokens_add", {"pk": 1})
         assert resolve(path).view_name == "account:account_tokens_add"
 
-    def test_delete_account_url(self):
-        path = self.url_test("delete", {"pk": 1})
-        assert resolve(path).view_name == "account:account_delete"
+    def test_tokens_edit_account_url(self):
+        path = self.url_test("tokens_edit", {"pk": 1})
+        assert resolve(path).view_name == "account:account_tokens_edit"
 
     def test_refresh_account_url(self):
         path = self.url_test("refresh", {"pk": 1})

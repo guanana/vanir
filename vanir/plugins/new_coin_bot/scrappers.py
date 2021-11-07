@@ -14,11 +14,17 @@ requests_session = requests.Session()
 
 
 class BaseScrap:
+    """Base scrap class"""
     def __init__(self):
         self.url = ""
         self.match_lines = dict()
 
     def _raw_content(self):
+        """
+        Get web raw content
+        :return: soup object with the web data
+        :rtype: BeautifulSoup
+        """
         page = requests_session.get(self.url, headers={"User-Agent": ""})
         if not page:
             raise ValueError(f"There was a problem with the connection to {self.url}")
@@ -27,6 +33,7 @@ class BaseScrap:
 
 
 class AnnouncementScrap(BaseScrap):
+    """Binance Announcement Scrap Base class"""
     def __init__(self, scrap_option: str):
         super().__init__()
         self.scrap_option = scrap_option
@@ -46,7 +53,8 @@ class AnnouncementScrap(BaseScrap):
         """
         Aggregation method that will join all list of tokens and return just
         a unique list of tokens to import
-        @returns: list(symbols: str)
+        :return: list(symbols: str)
+        :rtype: list
         """
         raise NotImplementedError
 
@@ -67,6 +75,7 @@ class AnnouncementScrapModel(BaseScrap):
 
 
 class ScrapBinance(AnnouncementScrap):
+    """Scrap Binance implementation"""
     URL_HREF_PATTERN = re.compile("href=(?P<url>)")  # noqa W605
     CLEAN_WORDS = ["Margin", "Isolated", "Futures"]
 
@@ -84,11 +93,21 @@ class ScrapBinance(AnnouncementScrap):
 
     @property
     def text_content(self):
+        """
+        Find all links
+        :return: List of links
+        :rtype: list
+        """
         content = self._raw_content().findAll("a", id=self.url_pattern)
         return [item.text for item in content]
 
     @property
     def url_lines(self):
+        """
+        Index in a dictionary the urls
+        :return: dictionary indexed
+        :rtype: dict
+        """
         content = self._raw_content().find_all("a", id=self.url_pattern)
         dict_urls = {
             idx: f"{self.base_url}{item['href']}" for idx, item in enumerate(content)
@@ -96,6 +115,12 @@ class ScrapBinance(AnnouncementScrap):
         return dict_urls
 
     def discard_match(self, line):
+        """
+        Discard unwanted lines
+        :param line: line to check
+        :return: If discard True, else False
+        :rtype: bool
+        """
         match = [
             True for discard_word in self.CLEAN_WORDS if discard_word in line.split()
         ]
@@ -107,6 +132,8 @@ class ScrapBinance(AnnouncementScrap):
     def direct_list_tokens(self):
         """
         Scrapes new listings page for and returns new Symbol when appropriate
+        :return: Token in the announcement
+        :rtype: list
         """
         direct_list_tokens = []
         for idx, line in enumerate(self.text_content):
@@ -125,6 +152,8 @@ class ScrapBinance(AnnouncementScrap):
     def new_pair_tokens(self):
         """
         Scrapes new pairs and returns new pairs when appropriate
+        :return: Pairs in the announcement
+        :rtype: list
         """
         new_pair_tokens = []
         for idx, line in enumerate(self.text_content):
@@ -142,12 +171,23 @@ class ScrapBinance(AnnouncementScrap):
 
     @cached_property
     def _last_token_announcements(self):
+        """
+        Wrapup function to check the tokens and pairs
+        :return: list of matching lines
+        :rtype: list
+        """
         self.direct_list_tokens()
         self.new_pair_tokens()
         return list(self.match_lines.keys())
 
     @cache
     def release_date(self, line):
+        """
+        Check for release date from the announcement
+        :param line: Line to check
+        :return: date of the announcement
+        :rtype datetime
+        """
         scrap_timestamp_obj = ScrapTimestamp()
         if len(self._last_token_announcements) > 0:
             try:
@@ -184,6 +224,12 @@ class ScrapTimestamp(BaseScrap):
     )  # noqa W605
 
     def get_date(self, line):
+        """
+        Get date of the announcement with regexp
+        :param line: Line to check
+        :return: date or none
+        :rtype: datetime or None
+        """
         try:
             return self.match_lines[line]
         except KeyError:
@@ -227,6 +273,11 @@ class ScrapTimestamp(BaseScrap):
         return date
 
     def get_news_publish_date(self):
+        """
+        Get the date of the announcement (not the date of listing)
+        :return: date of announcement
+        :rtype: datetime or None
+        """
         news_publish = self._raw_content().find("div", {"class": "css-17s7mnd"})
         try:
             date = datetime.strptime(news_publish.text, "%Y-%m-%d %H:%M")
