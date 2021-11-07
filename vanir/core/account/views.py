@@ -1,4 +1,6 @@
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
@@ -66,7 +68,7 @@ class AccountUpdateView(ObjectUpdateView):
         return form
 
 
-class AccountDetailView(DetailView):
+class AccountDetailView(LoginRequiredMixin, DetailView):
     model = Account
     table_class = AccountTable
     template_name = "account/account_detail.html"
@@ -88,7 +90,7 @@ class AccountDetailView(DetailView):
         return super().get_context_data(**context)
 
 
-class AccountTokenBulkUpdateValueView(DetailView):
+class AccountTokenBulkUpdateValueView(LoginRequiredMixin, DetailView):
     model = Account
 
     def get(self, request, *args, **kwargs):
@@ -112,6 +114,7 @@ class AccountDeleteView(ObjectDeleteView):
     success_url = reverse_lazy("account:account_list")
 
 
+@login_required
 def exchange_testview(request, pk):
     if Account.objects.get(pk=pk).extended_exchange:
         response = Account.objects.get(pk=pk).exchange_obj.test()
@@ -123,12 +126,14 @@ def exchange_testview(request, pk):
         return redirect(reverse("account:account_more", kwargs={"pk": pk}))
 
 
+@login_required
 def delete_tokens_account(request, pk):
     Account.objects.get(pk=pk).clear_tokens()
     response = True
     return exchange_view_render("account/account_delete_tokens.html", response, request)
 
 
+@login_required
 def exchange_balanceview(request, pk):
     if Account.objects.get(pk=pk).extended_exchange:
         response = Account.objects.get(pk=pk).exchange_obj.get_balance_html()
@@ -145,6 +150,7 @@ def exchange_balanceview(request, pk):
         return redirect(reverse("account:account_more", kwargs={"pk": pk}))
 
 
+@login_required
 def exchange_importtokens(request, pk):
     account = Account.objects.get(pk=pk)
     if account.extended_exchange:
