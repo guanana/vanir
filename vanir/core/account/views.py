@@ -10,14 +10,9 @@ from vanir.core.account.tables import AccountTable
 from vanir.core.account.utils import exchange_view_render
 from vanir.core.exchange.libs.exchanges import ExtendedExchange
 from vanir.core.token.models import Token
-from vanir.core.token.tables import TokenTableValue
+from vanir.core.token.tables import AccountTokenTableValue
 from vanir.utils.datasource.coingecko import CoinGeckoVanir
-from vanir.utils.views import (
-    ObjectCreateView,
-    ObjectDeleteView,
-    ObjectListView,
-    ObjectUpdateView,
-)
+from vanir.utils.views import ObjectCreateView, ObjectDeleteView, ObjectListView, ObjectUpdateView
 
 
 class AccountCreateView(ObjectCreateView):
@@ -28,6 +23,7 @@ class AccountCreateView(ObjectCreateView):
         "api_key",
         "secret",
         "default_fee_rate",
+        "token_pair",
         "default",
         "testnet",
     )
@@ -36,10 +32,6 @@ class AccountCreateView(ObjectCreateView):
         context = super().get_context_data(**kwargs)
         context["SUPPORTED_EXCHANGES"] = ExtendedExchange.all_supported()
         return context
-
-    def form_valid(self, form):
-        form.instance.token_pair = Token.objects.get(symbol="USDT")
-        return super().form_valid(form)
 
 
 class AccountListView(ObjectListView):
@@ -51,9 +43,14 @@ class AccountUpdateView(ObjectUpdateView):
     model = Account
     fields = ("name", "exchange", "api_key", "secret", "default", "token_pair")
 
-    # Filter token_pair to only allow certain standard values and avoid
-    # user selecting random tokens
     def get_form(self, *args, **kwargs):
+        """
+        Filter token_pair to only allow certain standard values and avoid
+        user selecting random tokens
+        :param args:
+        :param kwargs:
+        :return: form with new field queryset
+        """
         form = super().get_form(*args, **kwargs)
         if isinstance(self.object.exchange_obj, CoinGeckoVanir):
             form.fields["token_pair"].queryset = Token.objects.filter(
@@ -75,8 +72,13 @@ class AccountDetailView(DetailView):
     template_name = "account/account_detail.html"
 
     def get_context_data(self, **kwargs):
+        """
+        Add accounttokens table into context so it can
+        be displayed
+        :return: context
+        """
         table = self.table_class(self.model.objects.filter(pk=self.kwargs["pk"]))
-        table_accounttokens = TokenTableValue(
+        table_accounttokens = AccountTokenTableValue(
             Token.objects.filter(accounttokens__account__pk=self.kwargs["pk"]),
             account_pk=self.kwargs["pk"],
         )
@@ -158,3 +160,13 @@ class AccountTokensCreateView(ObjectCreateView):
     def form_valid(self, form):
         form.instance.account = Account.objects.get(pk=self.kwargs["pk"])
         return super().form_valid(form)
+
+
+class AccountTokensUpdateView(ObjectUpdateView):
+    model = AccountTokens
+    fields = ("token", "quantity")
+
+
+class AccountTokensDeleteView(ObjectDeleteView):
+    model = AccountTokens
+    success_url = reverse_lazy("account:account_list")

@@ -12,9 +12,7 @@ from vanir.utils.models import BaseObject, TimeStampedMixin
 
 
 class Account(BaseObject):
-    """
-    Exchange Account
-    """
+    """Exchange Account"""
 
     exchange = models.ForeignKey(
         "exchange.Exchange", on_delete=models.CASCADE, null=False
@@ -54,6 +52,7 @@ class Account(BaseObject):
         ordering = ["name"]
 
     def clean(self):
+        """Clean the object before saving"""
         if self.exchange_obj:
             if not self.exchange_obj.test():
                 raise ValidationError(
@@ -61,6 +60,11 @@ class Account(BaseObject):
                 )
 
     def save(self, *args, **kwargs):
+        """
+        Saves account but first checks if it's extended exchange
+        and if there's another account with default=True and corrects
+        problem of 2 accounts being default.
+        """
         from vanir.core.account.helpers.balance import update_balance
 
         if self._state.adding:
@@ -74,9 +78,11 @@ class Account(BaseObject):
         super().save(*args, **kwargs)
 
     def check_default(self):
-        # Check if there are more accounts with default setting
-        # if there is another (can only be one). Remove the default
-        # flag and add it to the new one
+        """
+        Check if there are more accounts with default setting
+        if there is another (can only be one). Remove the default
+        flag and add it to the new one
+        """
         if self.default:
             for account in Account.objects.all():
                 if account.default and account != self:
@@ -87,9 +93,17 @@ class Account(BaseObject):
             self.default = True
 
     def clear_tokens(self):
+        """
+        Remove all the tokens assigned to an account
+        """
         self.accounttokens_set.all().delete()
 
     def is_extended_exchange(self):
+        """
+        Checks if the exchange is "supported" or not
+        :return: If it's or not an extended/supported exchange
+        :rtype: bool
+        """
         if isinstance(self.exchange_obj, CoinGeckoVanir):
             return False
         else:
@@ -97,6 +111,12 @@ class Account(BaseObject):
 
     @cached_property
     def exchange_obj(self):
+        """
+        Checks and returns the appropriate object, for now either
+        VanirBinance or CongeckoVanir
+        :return: Appropriate object base on exchange
+        :rtype: CoinGeckoVanir or VanirBinance
+        """
         try:
             class_obj = fetch_exchange_obj(self.exchange.name)
             self.extended_exchange = True
@@ -107,6 +127,12 @@ class Account(BaseObject):
 
     @property
     def total_value_account(self):
+        """
+        Calculates value of the account base on the tokens
+        attach to it.
+        :return: total value
+        :rtype: float
+        """
         total_value = 0
         for token_account in self.accounttokens_set.all():
             try:
@@ -117,13 +143,17 @@ class Account(BaseObject):
 
     @property
     def total_value_account_table(self):
+        """
+        Property used by the table to display the value
+        with the appropriate token pair
+        :return: Value + Token
+        :rtype: str
+        """
         return f"{self.total_value_account} {self.token_pair}"
 
 
 class AccountTokens(TimeStampedMixin):
-    """
-    Relation between account and tokens
-    """
+    """Relation between account and tokens"""
 
     id = models.BigAutoField(primary_key=True)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
@@ -139,4 +169,8 @@ class AccountTokens(TimeStampedMixin):
 
     @staticmethod
     def get_title():
+        """
+        Use by templates to get title instead of class name
+        :rtype: str
+        """
         return "tokens to the account"
