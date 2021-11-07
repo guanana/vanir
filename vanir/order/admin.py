@@ -1,11 +1,6 @@
 from django.contrib import admin
 
-from .models import (
-    LimitOrder,
-    MarketOrder,
-    StopLossOrTakeProfitLimitOrder,
-    StopPriceOrder,
-)
+from .models import LimitOrder, MarketOrder, StopLossOrTakeProfitLimitOrder, StopPriceOrder
 
 admin.site.register(LimitOrder)
 admin.site.register(MarketOrder)

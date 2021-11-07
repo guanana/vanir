@@ -1,11 +1,6 @@
 from vanir.utils.tables import ObjectTable
 
-from .models import (
-    LimitOrder,
-    MarketOrder,
-    StopLossOrTakeProfitLimitOrder,
-    StopPriceOrder,
-)
+from .models import LimitOrder, MarketOrder, StopLossOrTakeProfitLimitOrder, StopPriceOrder
 
 
 class LimitOrderTable(ObjectTable):

@@ -2,13 +2,7 @@ from django.urls import reverse_lazy
 
 from vanir.core.exchange.models import Exchange
 from vanir.core.exchange.tables import ExchangeTable
-from vanir.utils.views import (
-    ObjectCreateView,
-    ObjectDeleteView,
-    ObjectDetailView,
-    ObjectListView,
-    ObjectUpdateView,
-)
+from vanir.utils.views import ObjectCreateView, ObjectDeleteView, ObjectDetailView, ObjectListView, ObjectUpdateView
 
 
 class ExchangeCreateView(ObjectCreateView):

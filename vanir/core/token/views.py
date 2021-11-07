@@ -6,10 +6,7 @@ from vanir.core.token.filtersets import TokenFilter
 from vanir.core.token.helpers.import_utils import bulk_update
 from vanir.core.token.models import Token
 from vanir.core.token.tables import TokenTable
-from vanir.utils.exceptions import (
-    AccountRequiredError,
-    ExchangeExtendedFunctionalityError,
-)
+from vanir.utils.exceptions import AccountRequiredError, ExchangeExtendedFunctionalityError
 from vanir.utils.views import (
     ObjectCreateView,
     ObjectDeleteView,

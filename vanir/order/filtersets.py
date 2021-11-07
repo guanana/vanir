@@ -1,11 +1,6 @@
 from django_filters import FilterSet
 
-from vanir.order.models import (
-    LimitOrder,
-    MarketOrder,
-    StopLossOrTakeProfitLimitOrder,
-    StopPriceOrder,
-)
+from vanir.order.models import LimitOrder, MarketOrder, StopLossOrTakeProfitLimitOrder, StopPriceOrder
 
 
 class BaseFilter(FilterSet):

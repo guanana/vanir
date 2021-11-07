@@ -1,12 +1,6 @@
 from django.urls import path
 
-from .views import (
-    ExchangeCreateView,
-    ExchangeDeleteView,
-    ExchangeDetailView,
-    ExchangeListView,
-    ExchangeUpdateView,
-)
+from .views import ExchangeCreateView, ExchangeDeleteView, ExchangeDetailView, ExchangeListView, ExchangeUpdateView
 
 app_name = "exchange"
 urlpatterns = [

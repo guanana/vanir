@@ -6,13 +6,7 @@ from django.views.generic import DetailView
 from vanir.plugins.new_coin_bot.helpers import run_scrap
 from vanir.plugins.new_coin_bot.models import BinanceNewToken, NewCoinConfig
 from vanir.plugins.new_coin_bot.tables import BinanceNewTokenTable, NewCoinConfigTable
-from vanir.plugins.views import (
-    PluginCreateView,
-    PluginDeleteView,
-    PluginDetailView,
-    PluginListView,
-    PluginUpdateView,
-)
+from vanir.plugins.views import PluginCreateView, PluginDeleteView, PluginDetailView, PluginListView, PluginUpdateView
 
 
 # New Coin Config

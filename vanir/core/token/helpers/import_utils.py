@@ -4,10 +4,7 @@ from django.db.models import QuerySet
 
 from vanir.core.account.models import Account, AccountTokens
 from vanir.core.token.models import Token
-from vanir.utils.exceptions import (
-    AccountRequiredError,
-    ExchangeExtendedFunctionalityError,
-)
+from vanir.utils.exceptions import AccountRequiredError, ExchangeExtendedFunctionalityError
 from vanir.utils.helpers import fetch_default_account, value_pair
 
 logger = logging.getLogger(__name__)

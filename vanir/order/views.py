@@ -3,34 +3,14 @@ from django.db.models import Q
 from django.http import HttpResponse
 from django.urls import reverse_lazy
 
-from vanir.utils.views import (
-    ObjectCreateView,
-    ObjectDeleteView,
-    ObjectDetailView,
-    ObjectListFilterView,
-)
+from vanir.utils.views import ObjectCreateView, ObjectDeleteView, ObjectDetailView, ObjectListFilterView
 
 from ..core.account.models import Account
 from ..core.token.models import Token
-from .filtersets import (
-    LimitOrderFilter,
-    MarketOrderFilter,
-    StopLossOrTakeProfitLimitOrderFilter,
-    StopPriceOrderFilter,
-)
+from .filtersets import LimitOrderFilter, MarketOrderFilter, StopLossOrTakeProfitLimitOrderFilter, StopPriceOrderFilter
 from .forms import LimitForm, MarketForm, StopLossOrTakeProfitLimitForm, StopPriceForm
-from .models import (
-    LimitOrder,
-    MarketOrder,
-    StopLossOrTakeProfitLimitOrder,
-    StopPriceOrder,
-)
-from .tables import (
-    LimitOrderTable,
-    MarketOrderTable,
-    StopLossOrTakeProfitLimitOrderTable,
-    StopPriceOrderTable,
-)
+from .models import LimitOrder, MarketOrder, StopLossOrTakeProfitLimitOrder, StopPriceOrder
+from .tables import LimitOrderTable, MarketOrderTable, StopLossOrTakeProfitLimitOrderTable, StopPriceOrderTable
 
 
 class BaseOrderCreateView(ObjectCreateView):

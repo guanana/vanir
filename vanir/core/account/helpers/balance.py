@@ -1,8 +1,4 @@
-from vanir.core.token.helpers.import_utils import (
-    bulk_update,
-    import_token_account,
-    token_import,
-)
+from vanir.core.token.helpers.import_utils import bulk_update, import_token_account, token_import
 from vanir.core.token.models import Token
 
 

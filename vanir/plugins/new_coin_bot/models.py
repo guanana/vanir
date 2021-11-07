@@ -6,11 +6,7 @@ from django_celery_beat.models import IntervalSchedule, PeriodicTask
 
 from vanir.core.token.models import Coin, Token
 from vanir.plugins.models import PluginBase
-from vanir.plugins.new_coin_bot.choices import (
-    DiscoverMethod,
-    ScheduleScrap,
-    ScrapperOptions,
-)
+from vanir.plugins.new_coin_bot.choices import DiscoverMethod, ScheduleScrap, ScrapperOptions
 from vanir.plugins.new_coin_bot.helpers import token_already_exists
 from vanir.plugins.new_coin_bot.scrappers import ScrapBinance
 from vanir.utils.models import TimeStampedMixin

@@ -4,12 +4,7 @@ from django.core.exceptions import ValidationError
 
 from vanir.core.token.models import Token
 from vanir.order import constants
-from vanir.order.models import (
-    LimitOrder,
-    MarketOrder,
-    StopLossOrTakeProfitLimitOrder,
-    StopPriceOrder,
-)
+from vanir.order.models import LimitOrder, MarketOrder, StopLossOrTakeProfitLimitOrder, StopPriceOrder
 
 
 class BaseOrderFrom(forms.ModelForm):

@@ -2,13 +2,7 @@ from django.urls import reverse_lazy
 
 from vanir.core.blockchain.models import Blockchain
 from vanir.core.blockchain.tables import BlockchainTable
-from vanir.utils.views import (
-    ObjectCreateView,
-    ObjectDeleteView,
-    ObjectDetailView,
-    ObjectListView,
-    ObjectUpdateView,
-)
+from vanir.utils.views import ObjectCreateView, ObjectDeleteView, ObjectDetailView, ObjectListView, ObjectUpdateView
 
 
 class BlockchainCreateView(ObjectCreateView):
