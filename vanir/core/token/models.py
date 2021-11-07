@@ -6,6 +6,7 @@ from vanir.utils.token_constants import dollar_pairs
 
 
 class Coin(models.Model):
+    """Abstract Coin model"""
     symbol = models.CharField(max_length=10, unique=True)
     last_value = models.FloatField(null=True, verbose_name="Last value")
 
@@ -19,6 +20,12 @@ class Coin(models.Model):
         return (self.symbol,)
 
     def set_value(self, account=None):
+        """
+        Set value on the coin
+        :param account: Account to use to update the value
+        :return: last value or None
+        :rtype: float or None
+        """
         from vanir.utils.helpers import fetch_default_account
 
         if not account:
@@ -36,7 +43,12 @@ class Coin(models.Model):
             return False
 
     def check_exceptions_value(self, account):
-        # Special exception when calling same pair
+        """
+        Special exception when calling same pair as the token
+        :param account: Account to check for the pair
+        :return: 1
+        :rtype: int
+        """
         if self.symbol == account.token_pair.symbol:
             self.last_value = 1
             self.save()
@@ -48,6 +60,7 @@ class Coin(models.Model):
 
 
 class Token(BaseObject, Coin):
+    """Token model"""
     token_type = models.CharField(max_length=9, choices=TokenTypes.choices, null=True)
 
     class Meta:

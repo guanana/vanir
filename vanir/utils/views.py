@@ -62,7 +62,7 @@ class ObjectUpdateView(LoginRequiredMixin, UpdateView):
         return set_context_data(context, self)
 
 
-class ObjectDetailView(DetailView):
+class ObjectDetailView(LoginRequiredMixin, DetailView):
     model = None
     table_class = None
     template_name = "object_detail.html"

@@ -58,6 +58,13 @@ def validated_viewname(model, action):
 
 @register.filter()
 def get_model_image(model_name, image_name: str = ""):
+    """
+    Auxiliary function to get the image of the model
+    :param model_name: model name
+    :param image_name: image name
+    :return: image path
+    :rtype: str
+    """
     path_name = (
         f"images/{model_name}/{model_name}.png"
         if not image_name

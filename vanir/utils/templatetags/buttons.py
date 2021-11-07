@@ -8,6 +8,13 @@ register = template.Library()
 
 
 def _validated_viewname_by_context(context, action):
+    """
+    Internal validation of view base on request context
+    :param context: Request context
+    :param action: action to create the full viewname
+    :return: Viewname or raise error
+    :rtype: str
+    """
     if not context or not action:
         raise ValidationError("Something went wrong with viewname validation")
     viewname = f'{context["app_label"]}:{context["model_name"]}_{action}'
@@ -23,6 +30,11 @@ def _validated_viewname_by_context(context, action):
 
 @register.inclusion_tag("buttons/edit.html")
 def edit_button(instance):
+    """
+    Generic function to add edit button on models
+    :param instance: model
+    :return: button url
+    """
     viewname = validated_viewname(instance, "edit")
     url = reverse(viewname, kwargs={"pk": instance.pk})
 
@@ -33,6 +45,11 @@ def edit_button(instance):
 
 @register.inclusion_tag("buttons/delete.html")
 def delete_button(instance):
+    """
+    Generic function to add delete button on models
+    :param instance: model
+    :return: button url
+    """
     viewname = validated_viewname(instance, "delete")
     url = reverse(viewname, kwargs={"pk": instance.pk})
 
@@ -43,6 +60,11 @@ def delete_button(instance):
 
 @register.inclusion_tag("buttons/cancel_order.html")
 def cancel_order_button(instance):
+    """
+    Generic function to add cancel order button
+    :param instance: model
+    :return: button url
+    """
     viewname = validated_viewname(instance, "delete")
     url = reverse(viewname, kwargs={"pk": instance.pk})
 
@@ -58,6 +80,11 @@ def cancel_order_button(instance):
 
 @register.inclusion_tag("buttons/add.html", takes_context=True)
 def add_button(context):
+    """
+    Generic function to add add button on models
+    :param instance: model
+    :return: button url
+    """
     viewname = _validated_viewname_by_context(context, "add")
     url = reverse(viewname)
 
