@@ -20,6 +20,8 @@ logger = logging.getLogger(__name__)
 
 
 class ExtendedExchangeRegistry(type):
+    """Extended Exchange Registry class creator"""
+
     registered = {}
 
     def __new__(mcs, name, bases, attrs):
@@ -46,6 +48,8 @@ class ExtendedExchangeRegistry(type):
 
 
 class BasicExchange:
+    """Base Basic Exchange class"""
+
     @abstractmethod
     def __init__(self, account):
         self.account = account
@@ -56,29 +60,69 @@ class BasicExchange:
 
     @abstractmethod
     def test(self) -> bool:
+        """
+        Add test method to see if the exchange is properly
+        configured
+        :return: True if all okay, false otherwise
+        :rtype: bool
+        """
         raise NotImplementedError
 
     @abstractmethod
     def get_balance(self) -> pd.DataFrame:
+        """
+        Method to get balance of the account in Panda Data Frame
+        :return: Data Frame with data
+        :rtype: pandas.DataFrame
+        """
         raise NotImplementedError
 
     @abstractmethod
     def all_assets_prices(self) -> dict:
+        """
+        Return price of all assets in the exchange
+        :return: Current price of all assets in the exchange
+        :rtype: dict
+        """
         pass
 
-    def get_token_price(self, token1, token2) -> float:
+    def get_token_price(self, token1: str, token2: str) -> float:
+        """
+        Returns the price for specific ticker (pair)
+        :param token1: Token one
+        :param token2: Token two (pair)
+        :return: Price of the token
+        :rtype: float
+        """
         raise NotImplementedError
 
     @abstractmethod
     def order_process(self, *args, **kwargs):
+        """
+        Process order on the exchange
+        :param args: Order args
+        :param kwargs: Order kwargs
+        """
         raise NotImplementedError
 
     @abstractmethod
     def order_validation(self, *args, **kwargs):
+        """
+        Validates the order before placing it
+        :param args: Order validation args
+        :param kwargs: Order validation kwargs
+        """
         pass
 
     @abstractmethod
     def order_correction(self, *args, **kwargs):
+        """
+        Corrects the order if it contains problems
+        and possible
+        :param args: Order validation args
+        :param kwargs: Order validation kwargs
+        :return: Sanitise order
+        """
         pass
 
 

@@ -10,14 +10,9 @@ from vanir.core.account.tables import AccountTable
 from vanir.core.account.utils import exchange_view_render
 from vanir.core.exchange.libs.exchanges import ExtendedExchange
 from vanir.core.token.models import Token
-from vanir.core.token.tables import TokenTableValue
+from vanir.core.token.tables import AccountTokenTableValue
 from vanir.utils.datasource.coingecko import CoinGeckoVanir
-from vanir.utils.views import (
-    ObjectCreateView,
-    ObjectDeleteView,
-    ObjectListView,
-    ObjectUpdateView,
-)
+from vanir.utils.views import ObjectCreateView, ObjectDeleteView, ObjectListView, ObjectUpdateView
 
 
 class AccountCreateView(ObjectCreateView):
@@ -28,6 +23,7 @@ class AccountCreateView(ObjectCreateView):
         "api_key",
         "secret",
         "default_fee_rate",
+        "token_pair",
         "default",
         "testnet",
     )
@@ -82,7 +78,7 @@ class AccountDetailView(DetailView):
         :return: context
         """
         table = self.table_class(self.model.objects.filter(pk=self.kwargs["pk"]))
-        table_accounttokens = TokenTableValue(
+        table_accounttokens = AccountTokenTableValue(
             Token.objects.filter(accounttokens__account__pk=self.kwargs["pk"]),
             account_pk=self.kwargs["pk"],
         )
@@ -164,3 +160,13 @@ class AccountTokensCreateView(ObjectCreateView):
     def form_valid(self, form):
         form.instance.account = Account.objects.get(pk=self.kwargs["pk"])
         return super().form_valid(form)
+
+
+class AccountTokensUpdateView(ObjectUpdateView):
+    model = AccountTokens
+    fields = ("token", "quantity")
+
+
+class AccountTokensDeleteView(ObjectDeleteView):
+    model = AccountTokens
+    success_url = reverse_lazy("account:account_list")
