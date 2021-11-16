@@ -2,9 +2,9 @@ from django.urls import reverse
 from django.utils.html import format_html
 from django_tables2 import Column
 
+from vanir.core.account.models import Account, AccountTokens
 from vanir.utils.tables import ObjectTable
 
-from ..account.models import AccountTokens
 from .models import Token
 
 
@@ -24,6 +24,7 @@ class TokenTable(ObjectTable):
 class AccountTokenTableValue(TokenTable):
     def __init__(self, data, account_pk):
         self.account_pk = account_pk
+        self.account = Account.objects.get(pk=self.account_pk)
         super().__init__(data)
 
     name = Column(empty_values=())
@@ -47,10 +48,12 @@ class AccountTokenTableValue(TokenTable):
         return round(
             AccountTokens.objects.get(
                 account__pk=self.account_pk, token__pk=record.pk
-            ).quantity
-            * record.last_value,
-            4,
+            ).quantity * record.last_value * self.account.get_value_factor,
+            ndigits=4,
         )
+
+    def before_render(self, request):
+        self.columns.columns["total_value"].name = f"Total value in {self.account.token_pair.name}s"
 
     class Meta:
         sequence = ("name", "symbol", "last_value", "quantity", "total_value")
