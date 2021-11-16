@@ -19,10 +19,10 @@
 - model: token.token
   pk: 3
   fields:
-    name: Dollar
-    symbol: USD
+    name: Bitcoin
+    symbol: BTC
     last_value: 1
-    token_type: FIAT
+    token_type: OTHER
 
 
 - model: token.token
@@ -36,7 +36,23 @@
 - model: token.token
   pk: 5
   fields:
+    name: Dollar
+    symbol: USD
+    last_value: 1
+    token_type: FIAT
+
+- model: token.token
+  pk: 6
+  fields:
     name: Euro
     symbol: EUR
+    last_value: 1
+    token_type: FIAT
+
+- model: token.token
+  pk: 7
+  fields:
+    name: GB Pound
+    symbol: GBP
     last_value: 1
     token_type: FIAT
