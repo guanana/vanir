@@ -6,6 +6,7 @@ from simple_history.models import HistoricalRecords
 
 from vanir.core.token.models import Token
 from vanir.utils.datasource.coingecko import CoinGeckoVanir
+from vanir.utils.datasource.fiat_convertor import FiatConvertorVanir
 from vanir.utils.exceptions import ExchangeExtendedFunctionalityError
 from vanir.utils.helpers import fetch_exchange_obj
 from vanir.utils.models import BaseObject, TimeStampedMixin
@@ -149,7 +150,17 @@ class Account(BaseObject):
         :return: Value + Token
         :rtype: str
         """
-        return f"{self.total_value_account} {self.token_pair}"
+        return f"{round(self.total_value_account * self.get_value_factor, ndigits=2) } {self.token_pair}"
+
+    @cached_property
+    def get_value_factor(self):
+        """
+        Get the factor to multiply by base on the pair token
+        :return: factor
+        :rtype: float
+        """
+        fc = FiatConvertorVanir()
+        return fc.convert_from(self.token_pair.symbol)
 
 
 class AccountTokens(TimeStampedMixin):
