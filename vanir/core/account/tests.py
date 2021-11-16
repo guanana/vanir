@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import PropertyMock, patch
 
 import pytest
 from binance.exceptions import BinanceAPIException
@@ -150,7 +150,9 @@ class TestAccountUrls(TestCase):
 
 
 class AccountViewTestNoAuth(TestCase):
-    def setUp(self):
+    @patch("vanir.utils.datasource.coingecko.CoinGeckoVanir.all_assets_prices", new_callable=PropertyMock)
+    def setUp(self, mock_prices):
+        mock_prices.return_value = {"TSTUSD": 1}
         number_of_accounts = 12
         self.token = Token.objects.create(name="Test", symbol="TST")
         self.exchange = Exchange.objects.create(
@@ -176,7 +178,9 @@ class AccountViewTestNoAuth(TestCase):
 
 
 class AccountViewTestAuth(TestCase):
-    def setUp(self):
+    @patch("vanir.utils.datasource.coingecko.CoinGeckoVanir.all_assets_prices", new_callable=PropertyMock)
+    def setUp(self, mock_prices):
+        mock_prices.return_value = {"TSTUSD": 1}
         number_of_accounts = 12
         self.token = Token.objects.create(name="Test", symbol="TST")
         self.exchange = Exchange.objects.create(

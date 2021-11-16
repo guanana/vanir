@@ -105,7 +105,7 @@ class TestAccountHelpers(TestCase):
 
     @patch("pycoingecko.api.CoinGeckoAPI.get_coins_list", return_value=all_coins_list)
     def test_coingecko_get_name_by_symbol(self, mock_pycoingecko_all_coins_list):
-        bnb_name = self.manual_account.exchange_obj.get_name_by_symbol("BNB")
+        bnb_name = self.manual_account.exchange_obj.get_token_full_name("BNB")
         self.assertEqual(bnb_name, "binance coin")
         self.assertEqual(mock_pycoingecko_all_coins_list.called, True)
 
@@ -113,11 +113,11 @@ class TestAccountHelpers(TestCase):
     def test_coingecko_get_name_by_symbol_not_found(
         self, mock_pycoingecko_all_coins_list
     ):
-        eos_name = self.manual_account.exchange_obj.get_name_by_symbol("EOS")
-        self.assertEqual(eos_name, "Unknown")
+        eos_name = self.manual_account.exchange_obj.get_token_full_name("EOS")
+        self.assertEqual(eos_name, "EOS")
         self.assertEqual(mock_pycoingecko_all_coins_list.called, True)
 
-    @patch("vanir.utils.datasource.coingecko.CoinGeckoVanir.get_coins_markets")
+    @patch("vanir.utils.datasource.coingecko.CoinGeckoVanir.get_coins_list")
     def test_account_get_balance_manual(self, mock_coingecko_price):
         balance = self.manual_account.exchange_obj.get_balance()
         self.assertIsNone(balance)
