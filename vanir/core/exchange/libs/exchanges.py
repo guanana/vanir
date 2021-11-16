@@ -86,7 +86,7 @@ class BasicExchange:
         """
         pass
 
-    def get_token_price(self, token1: str, token2: str) -> float:
+    def get_token_base_price(self, token1: str, token2: str) -> float:
         """
         Returns the price for specific ticker (pair)
         :param token1: Token one
@@ -102,6 +102,16 @@ class BasicExchange:
         Process order on the exchange
         :param args: Order args
         :param kwargs: Order kwargs
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_token_full_name(self, symbol: str) -> str:
+        """
+        Get token symbol and returns the name
+        :param symbol: Symbol to query
+        :return: Token name
+        :rtype: str
         """
         raise NotImplementedError
 
@@ -165,7 +175,7 @@ class VanirBinance(ExtendedExchange, Client, metaclass=ExtendedExchangeRegistry)
         except BinanceAPIException:
             return False
 
-    def get_balance(self):
+    def get_balance_pd(self) -> pd.DataFrame:
         account = self.get_account()
         balance = [
             asset
@@ -182,10 +192,26 @@ class VanirBinance(ExtendedExchange, Client, metaclass=ExtendedExchangeRegistry)
         return df
 
     def get_balance_html(self):
-        df = self.get_balance()
+        df = self.get_balance_pd()
         response = change_table_style(df.to_html(classes="table table-striped"))
         response = change_table_align(response)
         return response
+
+    def get_balance(self) -> dict:
+        df = self.get_balance_pd()
+        balance_dict = {}
+        if df is not None:
+            try:
+                for index, row in df.iterrows():
+                    # Catch APENFT vs NFT problem with Binance
+                    if row["asset"] == "NFT":
+                        symbol = "APENFT"
+                    else:
+                        symbol = row["asset"]
+                    balance_dict[symbol] = float(row["free"]) + float(row["locked"])
+            except AttributeError:
+                pass
+        return balance_dict
 
     @cached_property
     def pairs_info(self):
@@ -213,7 +239,20 @@ class VanirBinance(ExtendedExchange, Client, metaclass=ExtendedExchangeRegistry)
             all_margin_assets.update({asset["assetName"]: asset["assetFullName"]})
         return all_margin_assets
 
-    def get_token_price(self, token1: str, token2: str):
+    def get_token_full_name(self, symbol: str) -> str:
+        """
+        Try to get the name of the symbol by querying coins list
+        :param symbol: Token to check the name
+        :return: Name if found, symbol otherwise
+        :rtype: str
+        """
+        try:
+            name = self.all_margin_assets[symbol]
+        except KeyError:
+            return symbol
+        return name
+
+    def get_token_base_price(self, token1: str, token2: str):
         """
         Get the price of a single token
         :param token1: String symbol first token
@@ -221,6 +260,8 @@ class VanirBinance(ExtendedExchange, Client, metaclass=ExtendedExchangeRegistry)
         :return: None or price
         :rtype: None or float
         """
+        if token2 == "USD":
+            token2 = "USDT"
         try:
             price = self.get_avg_price(symbol=f"{token1}{token2}")["price"]
         except BinanceAPIException as binanceexception:
