@@ -19,7 +19,7 @@ from vanir.utils.views import (
 
 class TokenCreateView(ObjectCreateView):
     model = Token
-    fields = ("name", "symbol", "last_value")
+    fields = ("name", "symbol", "last_value", "token_type")
 
 
 class TokenListView(ObjectListFilterView):
@@ -67,16 +67,15 @@ class TokenBulkUpdateValueView(ObjectListView):
         try:
             bulk_update()
         except AccountRequiredError:
-            # TODO: Add coingecko https://pypi.org/project/pycoingecko/
             messages.error(
                 request,
                 "You need to have a supported exchange account configured as default",
             )
-            return super(TokenBulkUpdateValueView, self).get(request, *args, **kwargs)
+            return redirect(reverse("token:token_list"))
         except ExchangeExtendedFunctionalityError:
             messages.warning(
                 request, "You need to configure a supported exchange for this operation"
             )
-            return super(TokenBulkUpdateValueView, self).get(request, *args, **kwargs)
+            return redirect(reverse("token:token_list"))
         messages.info(request, "Bulk update completed")
-        return super(TokenBulkUpdateValueView, self).get(request, *args, **kwargs)
+        return redirect(reverse("token:token_list"))

@@ -50,4 +50,6 @@ def fetch_exchange_obj(exchange_name: str):
 
 
 def value_pair(tkn: Coin, tkn2: str = "USDT"):
+    if tkn.symbol == tkn2:
+        return "SAME_TOKEN"
     return f"{tkn.symbol}{tkn2}"

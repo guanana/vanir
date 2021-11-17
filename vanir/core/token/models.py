@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 from vanir.core.token.choices import TokenTypes
@@ -8,7 +9,7 @@ from vanir.utils.token_constants import dollar_pairs
 class Coin(models.Model):
     """Abstract Coin model"""
     symbol = models.CharField(max_length=10, unique=True)
-    last_value = models.FloatField(null=True, verbose_name="Last value")
+    last_value = models.FloatField(null=True, verbose_name=f"Last value ({settings.VANIR_BASE_SYSTEM_PAIR})")
 
     class Meta:
         abstract = True
@@ -17,7 +18,7 @@ class Coin(models.Model):
         return self.symbol
 
     def natural_key(self):
-        return (self.symbol,)
+        return self.symbol
 
     def set_value(self, account=None):
         """
@@ -33,8 +34,7 @@ class Coin(models.Model):
         exceptions_value = self.check_exceptions_value(account)
         if exceptions_value:
             return exceptions_value
-        pair = account.token_pair
-        self.last_value = account.exchange_obj.get_token_price(self.symbol, pair.symbol)
+        self.last_value = account.exchange_obj.get_token_base_price(self.symbol, settings.VANIR_BASE_SYSTEM_PAIR)
         if self.last_value:
             self.last_value = round(self.last_value, 4)
             self.save()
